@@ -17,7 +17,8 @@ import Data.Data (Data)
 
 import Botland.Types
 
-import qualified Data.Aeson.Generic as A
+import qualified Data.Aeson.Generic as AG
+import qualified Data.Aeson as A
 import Data.Aeson (encode)
 import qualified Data.ByteString.Lazy.Char8 as L
 
@@ -34,12 +35,15 @@ createUnit r = do
     -- easy parsing! Wahoo!
     -- let message = fromJust $ A.decode (body r) :: Message Unit
         -- unit = obj message
-    let unit = fromJust $ A.decode (body r) :: Unit
+    let unit = fromJust $ AG.decode (body r) :: Unit
+        -- unit = obj msg 
     ok $ toResponse $ encode (Message unit)
+    ok $ toResponse $ encode (Error "This is an error")
+    ok $ toResponse $ encode (Token unit "a00s90sdksdisd0sd0sd90sd09")
     -- send unit
 
-send :: (Data a) => a -> ServerPart Response
-send = ok . toResponse . A.encode . Message
+-- send :: (Data a) => a -> ServerPart Response
+-- send = ok . toResponse . A.encode . Message
 
 -- {error: "error message"}
 -- {}
