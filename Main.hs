@@ -24,7 +24,7 @@ main = serve Nothing app
 app :: ServerPart Response
 app = route $ do
     get "/unit/:unitId" unitDetails
-    post "/unit/create" createUnit
+    post "/creature/create" createCreature
     mount $ serveDirectory DisableBrowsing ["index.html"] "./public" 
 
 
@@ -37,15 +37,21 @@ unitDetails r = do
 -- screw it, just use headers for the token
 -- I need to generate a unique id for the unit
 -- now set a header
-createUnit :: Req -> ServerPart Response
-createUnit r = do
-    let unit = case decode (body r) of
-                    Just unit -> unit :: Unit
-                    Nothing -> Unit (Just "") "Woot" 
-    let unitId = Just "1" -- pretend our system generated this
-        unitToken = "abcdefg"
-    setHeaderM "X-Unit-Token" unitToken
-    ok $ toResponse $ encode $ Location 10 10 (unit { unitId = unitId })
+createCreature :: Req -> ServerPart Response
+createCreature r = do
+    let creature :: Maybe Creature = decode (body r)
+    liftIO $ print creature
+    
+    case creature of 
+        Nothing -> internalServerError $ toResponse $ encode $ Error "Could not parse your creature"
+        Just c -> do
+            let unitId = "id"
+                unitToken = "abcdefg"
+            setHeaderM "X-Unit-Token" unitToken
+            ok $ toResponse $ encode $ CreatureUnit unitId c
+    
+
+    -- pretend I generate these
 
 {-
 
