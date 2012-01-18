@@ -5,19 +5,17 @@ module Main where
 import Control.Applicative ((<$>))
 import Control.Monad.IO.Class (liftIO)
 
-import Happstack.Ella as E 
+import Happstack.Ella (Req, body, cap, route, get, post, mount)
 import Happstack.Lite
 
 import Happstack.Server (takeRequestBody, askRq)
 import Happstack.Server.Types (RqBody(..))
 
-import Data.Maybe (fromJust)
-
 import Data.Data (Data)
 
 import Botland.Types
 
-import Data.Aeson.Generic (encode, decode)
+import Data.Aeson (encode, decode)
 import qualified Data.ByteString.Lazy.Char8 as L
 
 main :: IO ()
@@ -25,15 +23,29 @@ main = serve Nothing app
 
 app :: ServerPart Response
 app = route $ do
+    get "/unit/:unitId" unitDetails
     post "/unit/create" createUnit
     mount $ serveDirectory DisableBrowsing ["index.html"] "./public" 
 
--- screw it, just use headers for the token
-createUnit :: E.Req -> ServerPart Response
-createUnit r = do
-    let unit = fromJust $ decode (body r) :: Unit
-    ok $ toResponse $ encode (Error "This is an error")
 
+unitDetails :: Req -> ServerPart Response
+unitDetails r = do
+    let unitId = cap r
+    ok $ toResponse $ encode (Error ("not implemented, but you gave us the id: " ++ unitId))
+    
+
+-- screw it, just use headers for the token
+-- I need to generate a unique id for the unit
+-- now set a header
+createUnit :: Req -> ServerPart Response
+createUnit r = do
+    let unit = case decode (body r) of
+                    Just unit -> unit :: Unit
+                    Nothing -> Unit (Just "") "Woot" 
+    let unitId = Just "1" -- pretend our system generated this
+        unitToken = "abcdefg"
+    setHeaderM "X-Unit-Token" unitToken
+    ok $ toResponse $ encode $ Location 10 10 (unit { unitId = unitId })
 
 {-
 
