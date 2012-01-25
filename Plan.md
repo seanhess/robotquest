@@ -76,12 +76,14 @@ Can I write my javascript in haskell? Probably not, but that would be awesome. E
 
 ### Milestones
 
+Milestone one
 1. API — create a unit. 
+    [ ] Serialize (try fromJSON CreatureType)
+    [ ] Create in redis (any way you want for now!)
 2. API — move a unit
 3. API — get world state
-4. Web Client — Show entire world state, and refresh constantly 
-5. Simple bot that moves around randomly. Can spawn multiple instances of them.
-
+4. Web Client — Show entire world state, and refresh regularly via ajax/json.
+5. Simple bot that moves around randomly. Can spawn multiple instances of them. Maybe I have a control panel for it?
 
 
 

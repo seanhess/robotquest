@@ -4,19 +4,21 @@ module Botland.Types where
 
 import GHC.Generics
 import Control.Applicative ((<$>), (<*>))
-import Control.Monad (mzero)
+import Control.Monad (mzero, guard)
 
 import Data.Data (Data, Typeable, typeOf)
 import Data.Aeson (ToJSON, (.=), object, (.:), FromJSON, Object(..), Value, parseJSON, toJSON)
 import qualified Data.Aeson as A
 import Data.Aeson.Types (Parser)
 
-import Data.Text (Text, pack)
+import Data.Text (Text, pack, unpack)
 import Data.Char (toLower, toUpper) 
 
 import Data.Map (Map)
+import Data.Maybe (isJust, fromJust)
 
 import Safe (readMay, readDef)
+
 
 
 type Id = String
@@ -36,10 +38,11 @@ newtype Field = Field (Map Point Unit) deriving (Generic)
 data Creature = Creature CreatureType deriving (Typeable, Show)
 data Block = Block BlockType deriving (Generic, Typeable)
 
-
 instance FromJSON Creature where
-    -- todo: switch this to readMay, and return mzero on failure
-    parseJSON (A.Object v) = Creature <$> (read <$> (v .: "type"))
+    parseJSON (A.Object v) = do
+        mt <- readMay <$> (v .: "type") 
+        guard (isJust mt)
+        return $ Creature $ fromJust mt
     parseJSON _          = mzero
 
 instance ToJSON Creature where
@@ -86,6 +89,7 @@ typePropertyName = pack . map toLower . show . typeOf
 -- don't lowercase these guys
 typeJSON :: (Show a) => a -> Value
 typeJSON = A.String . pack . show
+
 
 
 

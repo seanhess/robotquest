@@ -34,14 +34,9 @@ unitDetails r = do
     ok $ toResponse $ encode (Error ("not implemented, but you gave us the id: " ++ unitId))
     
 
--- screw it, just use headers for the token
--- I need to generate a unique id for the unit
--- now set a header
 createCreature :: Req -> ServerPart Response
 createCreature r = do
-    let creature :: Maybe Creature = decode (body r)
-    liftIO $ print creature
-    
+    let creature = decode (body r) :: Maybe Creature
     case creature of 
         Nothing -> internalServerError $ toResponse $ encode $ Error "Could not parse your creature"
         Just c -> do
@@ -49,9 +44,6 @@ createCreature r = do
                 unitToken = "abcdefg"
             setHeaderM "X-Unit-Token" unitToken
             ok $ toResponse $ encode $ CreatureUnit unitId c
-    
-
-    -- pretend I generate these
 
 {-
 
