@@ -16,6 +16,7 @@ import Data.Char (toLower, toUpper)
 
 import Data.Map (Map)
 import Data.Maybe (isJust, fromJust)
+import Data.List.Split (splitOn)
 
 import Safe (readMay, readDef)
 
@@ -25,8 +26,17 @@ type Id = String
 type UnitToken = String
 
 data Point = Point { x :: Int, y :: Int } deriving (Generic)
-instance Show Point where
-    show p = (show (x p)) ++ "." ++ (show (y p))
+
+-- wasn't worth implementing read
+showPoint :: Point -> String
+showPoint p = (show (x p)) ++ "." ++ (show (y p))
+
+readPoint :: String -> Point
+readPoint cs = Point (read x) (read y)  --- can't do it this way! Might have multiple digits!
+    where xy = splitOn "." cs 
+          x = xy !! 0
+          y = xy !! 1 
+
 instance ToJSON Point
 instance FromJSON Point
 
@@ -44,6 +54,9 @@ data ActorType = Bot | Player deriving (Generic, Typeable, Show, Read)
 
 -- ! can't access unless Point is Ord
 data Field = Field [(Point, Id)] deriving (Generic)
+instance ToJSON Field where
+    toJSON (Field fs) = object $ map jsonHashPoint fs
+        where jsonHashPoint (p, i) = (pack $ showPoint p) .= toJSON i
 
 data Actor = Actor ActorType deriving (Typeable, Show)
 
