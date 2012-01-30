@@ -9,7 +9,7 @@ import Control.Monad (mzero, guard)
 import Data.Data (Data, Typeable, typeOf)
 import Data.Aeson (ToJSON, (.=), object, (.:), FromJSON, Object(..), Value, parseJSON, toJSON)
 import qualified Data.Aeson as A
-import Data.Aeson.Types (Parser)
+import Data.Aeson.Types (Parser, Pair)
 
 import Data.Text (Text, pack, unpack)
 import Data.Char (toLower, toUpper) 
@@ -22,47 +22,55 @@ import Safe (readMay, readDef)
 
 
 type Id = String
-data Point = Point { x :: Int, y :: Int } deriving (Show, Generic)
+type UnitToken = String
+
+data Point = Point { x :: Int, y :: Int } deriving (Generic)
+instance Show Point where
+    show p = (show (x p)) ++ "." ++ (show (y p))
 instance ToJSON Point
 instance FromJSON Point
 
-data Unit = CreatureUnit Id Creature
-          | BlockUnit Id Object
-          deriving (Generic)
+-- what about when I want to represent it with the token
+-- it's more an association of an actor with an id
+
+-- unit means anything with an id, or an id and token
+data Unit a = Unit { iden :: String, obj :: a }
+            | Token { iden :: String, token :: String, obj :: a }
+            deriving (Generic)
+-- can't decide if it should be all the same thing or not
 
 data BlockType = Wood | Stone deriving (Generic, Typeable, Show)
-data CreatureType = Bot | Player deriving (Generic, Typeable, Show, Read)
+data ActorType = Bot | Player deriving (Generic, Typeable, Show, Read)
 
-newtype Field = Field (Map Point Unit) deriving (Generic)
+-- ! can't access unless Point is Ord
+data Field = Field [(Point, Id)] deriving (Generic)
 
-data Creature = Creature CreatureType deriving (Typeable, Show)
-data Block = Block BlockType deriving (Generic, Typeable)
+data Actor = Actor ActorType deriving (Typeable, Show)
 
-instance FromJSON Creature where
+instance FromJSON Actor where
     parseJSON (A.Object v) = do
         mt <- readMay <$> (v .: "type") 
         guard (isJust mt)
-        return $ Creature $ fromJust mt
+        return $ Actor $ fromJust mt
     parseJSON _          = mzero
 
-instance ToJSON Creature where
+instance ToJSON Actor where
     -- really, what I probably want is a function that can include the "type" part and concat my list with another
-    toJSON (Creature t) = object ["type" .= t]
+    toJSON (Actor t) = object ["type" .= t]
 
-instance FromJSON CreatureType
-instance ToJSON CreatureType 
-    where toJSON = typeJSON
+instance FromJSON ActorType
+instance ToJSON ActorType where toJSON = typeJSON
 
 instance FromJSON BlockType
 instance ToJSON BlockType where toJSON = typeJSON
 
-instance FromJSON Unit
-instance ToJSON Unit where
-    toJSON (CreatureUnit i c) = idObjectToJSON i c
-    toJSON (BlockUnit i o) = idObjectToJSON i o -- just use a standard function for now
+instance (FromJSON a) => FromJSON (Unit a)
+instance (ToJSON a, Typeable a) => ToJSON (Unit a) where
+    toJSON (Unit i o) = object $ idObjectToJSON i o
+    toJSON (Token i t o) = object $ ["token" .= t] ++ idObjectToJSON i o
 
-idObjectToJSON :: (ToJSON a, Typeable a) => Id -> a -> Value
-idObjectToJSON i o = object ["id" .= i, typePropertyName o .= toJSON o]
+idObjectToJSON :: (ToJSON a, Typeable a) => Id -> a -> [Pair]
+idObjectToJSON i o = ["id" .= i, typePropertyName o .= toJSON o]
     
 
 -- message you might want to return. I used data because it's easier to serialize / parse

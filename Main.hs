@@ -2,117 +2,99 @@
 
 module Main where
 
-import Control.Applicative ((<$>))
-import Control.Monad.IO.Class (liftIO)
+import Botland.Types (Unit(..), Actor(..), Point(..))
+import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, Fault(..), send)
+import Web.Scotty (get, post, json, param, header, scotty)
 
-import Happstack.Ella (Req, body, cap, route, get, post, mount)
-import Happstack.Server (ok, toResponse, ServerPart, Response, serveDirectory, Browsing(..), internalServerError, setHeaderM)
-import Happstack.Server.Monads (ServerPartT)
 
-import Happstack.Lite (serve)
 
-import Happstack.Server (takeRequestBody, askRq)
-import Happstack.Server.Types (RqBody(..))
+import Database.Redis (runRedis, connect, defaultConnectInfo, ping, set, keys, Redis, Connection, incr, hset, Reply(..))
 
-import Data.Data (Data)
-
-import Botland.Types
-
-import Data.Aeson (encode, decode)
+import qualified Database.Redis as R 
+import Data.Text.Lazy (Text)
+import qualified Data.Text.Lazy as T
+import Data.ByteString.Char8 (pack, append, concat)
+import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as L
 
-import Database.Redis (runRedis, connect, defaultConnectInfo, ping, set, keys, Redis, Connection)
-import qualified Database.Redis as R 
 
-import Control.Monad.Reader (ReaderT, ask, runReaderT)
-import Control.Monad.Trans.Class (lift)
-
--- This is the right format. No a included, because it gets man later
-type MyMonad = ReaderT L.ByteString (ServerPartT IO) 
-
--- file: ch18/UglyStack.hs
-runMyMonad :: MyMonad a -> L.ByteString -> ServerPart a
-runMyMonad k s = runReaderT k s
-
--- Ok, there is no RedisT, but there is a ServerPartT
--- ServerPartT ReaderT MyConfig (Redis IO)
+-- delete me
+import Data.Aeson (decode, encode)
+import Control.Monad (when, guard)
+import Network.HTTP.Types (statusBadRequest)
 
 main :: IO ()
 main = do
     db <- connect defaultConnectInfo
-    runRedis db doSomeStuff  -- i can do stuff, but I want an AWESOME monad ...
-    -- let wt = "woot" :: L.ByteString
-    -- let router = simple :: ServerPart Response
-    -- serve Nothing simple
-    -- serve Nothing $ runReaderT simple wt
-    serve Nothing $ runMyMonad simple "WHATUP!"
+    let redis = queryRedis db
+
+    scotty 3000 $ do
+
+        -- returns the world location map
+        -- get "/world" $ do
+        --     w <- world
+        --     json w
+
+        get "/actor/:unitId" $ do
+            uid <- param "unitId"  
+            a <- redis $ actorFetch uid
+            send a
+
+        post "/actor/new" $ decodeBody $ \a -> do
+            au <- redis $ actorCreate a
+            header "X-Unit-Token" $ T.pack (token au)
+            json au
+
+        -- mount $ serveDirectory DisableBrowsing ["index.html"] "./public" 
 
 
-doSomeStuff :: Redis ()
-doSomeStuff = do
-    result <- ping
-    set "mykey" "myvalue"
-    value <- R.get "mykey"
-    k <- keys "*"
-    liftIO $ print k
-    -- case result of 
-    --     Left reply -> liftIO $ print reply
-    --     Right status -> liftIO $ print status 
-    return ()
 
-simple :: MyMonad Response
-simple = do
-    foo <- ask
-    ok $ toResponse foo
-    -- let hi = "HELLO" :: L.ByteString
-    -- ok $ toResponse "HELLO"
-    -- value <- ask -- gets the value out, no?  -- not an instance of MonadReader
-    -- return $ ok $ toResponse ask
-    -- ok $ toResponse "HELLO"
-    -- return toResponse "HELLO"
+-- changeme: instead I should return error messages on a server error
+actorFetch :: B.ByteString -> Redis (Either Fault Actor)
+actorFetch uid = do
+    reply <- R.get ("units:" `append` uid) 
+    case reply of
+        Right (Just bs) -> do
+            let ma = decode $ b2l bs :: Maybe Actor
+            case ma of
+                Just a -> return $ Right a
+                _ -> return $ Left $ ServerError "Could not parse stored actor"
+        _ -> return $ Left NotFound
 
-app :: ServerPart Response
-app = route $ do
-    get "/unit/:unitId" unitDetails
-    post "/creature/create" createCreature
-    mount $ serveDirectory DisableBrowsing ["index.html"] "./public" 
+actorCreate :: Actor -> Redis (Unit Actor) 
+actorCreate a = do
+    id <- uuid
+    token <- uuid
 
-unitDetails :: Req -> ServerPart Response
-unitDetails r = do
-    let unitId = cap r
-    ok $ toResponse $ encode (Error ("not implemented, but you gave us the id: " ++ unitId))
+    let p = Point 0 0 -- CHANGEME
+    
+    -- save the actor information, its token, and its position
+    let key = ("units:" `append` (pack id))
+    set key (l2b $ encode a)
+    set (key `append` ":token") (pack token)
+    hset "world" (pack $ show p) (pack id)
 
-createCreature :: Req -> ServerPart Response
-createCreature r = do
-    let creature = decode (body r) :: Maybe Creature
-    case creature of 
-        Nothing -> internalServerError $ toResponse $ encode $ Error "Could not parse your creature"
-        Just c -> do
-            -- put him in the data store
-            let unitId = "id"
-                unitToken = "abcdefg"
-            setHeaderM "X-Unit-Token" unitToken
-            ok $ toResponse $ encode $ CreatureUnit unitId c
+    -- so many characters are LAME, pack, show, encode, l2b, append
+    -- so, i could pick an internal string representation that matched ONE of them. 
+    -- Text, ByteString, or L.ByteString
+
+    -- return all the information
+    return $ Token id token a
 
 {-
 
-CREATE A UNIT
-[√] POST /unit/create
-[ ] Creates it in the data store
-[ ] Figure out data storage (redis, mongo?)
-[ ] Create a unit id
-[ ] Create a unit control token
-[√] Send down the unit (body)
-[ ] Send down control token (header? extra body field?)
+BOT FIELDS
+[ ] home page / repository
+[ ] appearance? name? type? (yes, they need a unique typename)
 
-[ ] Protocol: {unitToken: "", unit: {}}, rather than headers, because headers are hard for javascript. 
-[ ] {error: "", unit{}}, etc, rather than simply body messages. It's just easier to deal with.
+NEXT STEPS
+[ ] GET unit information
+[ ] GET world with locations
+[ ] move unit
 
-[ ] Bots can have a home page or source link
 
-THINGS TO EXPERIMENT WITH
-[ ] Figure out redis
-[ ] Proper way to send down that token along with the message
+REMEMBER
+[ ] Unit cleanup (no heartbeat?, etc?)
 
 -}
 

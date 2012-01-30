@@ -87,3 +87,40 @@ Milestone one
 
 
 
+
+
+
+NEXT STEPS
+[ ] save a creature into redis any way you want
+[ ] give the creature a unique id and token and send it back
+[ ] give it a location
+[ ] make a client to show the location
+
+
+
+
+
+        -- 1 -- Hash: x.y -> unitId 
+        -- 2 -- roomX -> unitId -- not very useful. would have to have all the position information too
+            -- yeah, just do the hash
+
+        -- I could have a set of available locations, and a set of used locations
+        -- interesting. o 
+            -- it would make it easy to give them a location :)
+            -- doesn't 
+            -- per-room. Doesn't tell you WHO is where?
+        -- set of available locations
+        -- set of unavailable locations? no, a set of people's locations
+        -- single set of everything
+            -- Sets = 1. check set of available locations, 2. claim new location. 3. remove old location 
+            -- Hashes = 1. check is available. 2. set new location. 3. remove old location. 
+            -- it's the same!
+
+            -- you can still get everything. ok. start with sets. 
+            -- this means I'd have to start by filling it up, which is LAME
+                -- but I could just fetch it, if it doesn't exist, fill it? 
+                -- nawww... it's a little weird
+            -- always start them on 0 and don't check for now. 
+
+            -- Hashets
+
