@@ -87,9 +87,11 @@ idObjectToJSON i o = ["id" .= i, typePropertyName o .= toJSON o]
     
 
 -- message you might want to return. I used data because it's easier to serialize / parse
-data Error = Error { error :: String } deriving (Generic)
-instance FromJSON Error
-instance ToJSON Error
+data Fault = Fault { message :: String } 
+           | NotFound
+           deriving (Generic)
+instance FromJSON Fault
+instance ToJSON Fault
 
 
 

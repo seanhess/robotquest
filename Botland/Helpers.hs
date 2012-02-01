@@ -14,7 +14,7 @@ import qualified Data.ByteString as B
 import Data.Conduit.Lazy (lazyConsume)
 import qualified Data.Text.Lazy as T
 
-import Network.HTTP.Types (statusBadRequest, status404, status500)
+import Network.HTTP.Types (statusBadRequest, status404, status500, status400)
 import Network.Wai (requestBody)
 
 import Web.Scotty (ActionM, request, raise, status, json, text, redirect, rescue)
@@ -61,17 +61,14 @@ l2b = B.concat . L.toChunks
 b2l :: B.ByteString -> L.ByteString
 b2l l = L.fromChunks [l]
 
-
-data Fault = NotFound
-           | ServerError T.Text
-
+-- handles the fault checking, sending proper stuff
 send :: (ToJSON a) => Either Fault a -> ActionM ()
 send ea = do
     case ea of
         Left NotFound -> do
-            status status404 
-            text "Not Found" -- change to JSON?
-        Left (ServerError msg) -> do
-            status status500
-            text msg 
+            status status404
+            json $ Fault "Not Found"
+        Left f -> do
+            status status400 -- always a bad request. Their fault right? :)
+            json f
         Right a -> json a 
