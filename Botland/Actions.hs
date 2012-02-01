@@ -5,7 +5,7 @@ module Botland.Actions where
 import Botland.Types
 import Botland.Helpers (uuid, l2b, b2l)
 
-import Database.Redis (runRedis, connect, defaultConnectInfo, ping, get, set, keys, Redis, Connection, incr, hset, Reply(..), hgetall, hdel)
+import Database.Redis (runRedis, connect, defaultConnectInfo, ping, get, set, keys, Redis, Connection, incr, hset, Reply(..), hgetall, hdel, hsetnx)
 
 import Data.ByteString.Char8 (pack, unpack, append, concat, ByteString(..))
 import qualified Data.ByteString.Char8 as B
@@ -66,20 +66,13 @@ actorMove uid p = do
                 return $ Left $ Fault "Invalid move"
             else do
 
-            hset "world" (pack $ showPoint p) uid
-            set lk (pack $ showPoint p)
-            hdel "world" [(pack $ showPoint po)] 
-            
-            return $ Right "OK"
-
-                -- try to set. 
-            -- unset old location
-
-            -- 2 -- validate new location
-                -- valid move? Anyone there?
-            -- 3 -- set new location
-            -- 4 -- unset old location
-
+            res <- hsetnx "world" (pack $ showPoint p) uid
+            case res of 
+                Right True -> do
+                    set lk (pack $ showPoint p)
+                    hdel "world" [(pack $ showPoint po)] 
+                    return $ Right "OK"
+                _ -> return $ Left $ Fault "Space Occupied"
 
 neighboring :: Point -> Point -> Bool
 neighboring p1 p2 = withinOne (x p1) (x p2) && withinOne (y p1) (y p2)
