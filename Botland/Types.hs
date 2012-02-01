@@ -11,7 +11,9 @@ import Data.Aeson (ToJSON, (.=), object, (.:), FromJSON, Object(..), Value, pars
 import qualified Data.Aeson as A
 import Data.Aeson.Types (Parser, Pair)
 
+import qualified Data.ByteString.Char8 as B
 import Data.Text (Text, pack, unpack)
+import Data.Text.Encoding (decodeUtf8)
 import Data.Char (toLower, toUpper) 
 
 import Data.Map (Map)
@@ -27,13 +29,12 @@ type UnitToken = String
 
 data Point = Point { x :: Int, y :: Int } deriving (Generic)
 
--- wasn't worth implementing read
-showPoint :: Point -> String
-showPoint p = (show (x p)) ++ "." ++ (show (y p))
+showPoint :: Point -> B.ByteString
+showPoint p = B.pack $ (show (x p)) ++ "." ++ (show (y p))
 
-readPoint :: String -> Point
-readPoint cs = Point (read x) (read y)  --- can't do it this way! Might have multiple digits!
-    where xy = splitOn "." cs 
+readPoint :: B.ByteString -> Point
+readPoint cs = Point (read x) (read y)
+    where xy = splitOn "." (B.unpack cs)
           x = xy !! 0
           y = xy !! 1 
 
@@ -56,7 +57,7 @@ data ActorType = Bot | Player deriving (Generic, Typeable, Show, Read)
 data Field = Field [(Point, Id)] deriving (Generic)
 instance ToJSON Field where
     toJSON (Field fs) = object $ map jsonHashPoint fs
-        where jsonHashPoint (p, i) = (pack $ showPoint p) .= toJSON i
+        where jsonHashPoint (p, i) = (decodeUtf8 $ showPoint p) .= toJSON i
 
 data Actor = Actor ActorType deriving (Typeable, Show)
 
@@ -89,6 +90,7 @@ idObjectToJSON i o = ["id" .= i, typePropertyName o .= toJSON o]
 -- message you might want to return. I used data because it's easier to serialize / parse
 data Fault = Fault { message :: String } 
            | NotFound
+           | NotAuthorized
            deriving (Generic)
 instance FromJSON Fault
 instance ToJSON Fault

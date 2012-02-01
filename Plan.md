@@ -94,9 +94,9 @@ NEXT STEPS
 [√] save a creature into redis any way you want
 [√] give the creature a unique id and token and send it back
 [√] give it a location
-[ ] Allow movement
+[√] Allow movement
+[√] Unique location
 [ ] make a client to show the location
-[ ] Unique location
 
 
 

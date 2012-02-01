@@ -14,7 +14,7 @@ import qualified Data.ByteString as B
 import Data.Conduit.Lazy (lazyConsume)
 import qualified Data.Text.Lazy as T
 
-import Network.HTTP.Types (statusBadRequest, status404, status500, status400)
+import Network.HTTP.Types (statusBadRequest, status404, status500, status400, status401)
 import Network.Wai (requestBody)
 
 import Web.Scotty (ActionM, request, raise, status, json, text, redirect, rescue)
@@ -68,6 +68,9 @@ send ea = do
         Left NotFound -> do
             status status404
             json $ Fault "Not Found"
+        Left NotAuthorized -> do
+            status status401
+            json $ Fault "Not Authorized"
         Left f -> do
             status status400 -- always a bad request. Their fault right? :)
             json f

@@ -2,10 +2,11 @@
 
 module Main where
 
-import Botland.Actions (world, actorFetch, actorCreate, actorMove)
-import Botland.Types (Unit(..), Actor(..), Point(..), readPoint)
+import Botland.Actions (world, actorFetch, actorCreate, actorMove, authorized)
+import Botland.Types (Unit(..), Actor(..), Point(..), readPoint, Fault(..))
 import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, send)
-import Web.Scotty (get, post, json, param, header, scotty, text)
+import Web.Scotty (get, post, json, param, header, scotty, text, request)
+import Network.Wai (requestHeaders)
 
 import qualified Database.Redis as R 
 import Data.Text.Lazy (Text)
@@ -14,6 +15,9 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.ByteString.Char8 (pack, unpack, append, concat)
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as L
+
+
+import Data.Maybe (fromMaybe)
 
 
 main :: IO ()
@@ -39,20 +43,25 @@ main = do
             json au
 
         post "/actor/:unitId/move/:p" $ do
-            -- TODO: see if they have the right token
-            -- middleware, in other worlds
-            -- returns not authorized
+
             uid <- param "unitId"
             ps <- param "p"
+            r <- request
+            let headers = requestHeaders r
+                token = fromMaybe "" $ lookup "X-Unit-Token" headers
+            
+            isAuth <- redis $ authorized uid token
+            if (not isAuth) then
+                send $ (Left NotAuthorized :: Either Fault String)
+            else do
+            
             let p = readPoint ps
-
+            
             res <- redis $ actorMove uid p
             send res
             
--- what if I had a single error type. I always just returned 200 + an error message, and serialized it. 
--- Fault
-
         -- mount $ serveDirectory DisableBrowsing ["index.html"] "./public" 
+
 
 
 {-
@@ -61,13 +70,12 @@ BOT FIELDS
 [ ] home page / repository
 [ ] appearance? name? type? (yes, they need a unique typename)
 
-NEXT STEPS
-[√] GET unit information
-[√] GET world with locations
-[ ] move unit
-
 REMEMBER
 [ ] Unit cleanup (no heartbeat?, etc?)
+
+[ ] Validate token (middleware?)
+[ ] Edges of world
+[ ] get rid of all strings (use ByteString)
 
 -}
 

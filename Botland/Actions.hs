@@ -2,6 +2,8 @@
 
 module Botland.Actions where
 
+import Prelude hiding ((++))
+
 import Botland.Types
 import Botland.Helpers (uuid, l2b, b2l)
 
@@ -20,12 +22,12 @@ world = do
     case reply of
         Left r -> return $ Left (Fault "Could not get world")
         Right m -> return $ Right $ Field (map toField m)
-    where toField (l, v) = ((readPoint $ unpack l), (unpack v))
+    where toField (l, v) = ((readPoint l), (unpack v))
     
 
 actorFetch :: B.ByteString -> Redis (Either Fault Actor)
 actorFetch uid = do
-    reply <- get ("units:" `append` uid) 
+    reply <- get ("units:" ++ uid) 
     case reply of
         Right (Just bs) -> do
             let ma = decode $ b2l bs :: Maybe Actor
@@ -42,38 +44,52 @@ actorCreate a = do
     let p = Point 0 0 -- CHANGEME
     
     -- save the actor information, its token, and its position
-    let key = ("units:" `append` (pack id))
+    let key = ("units:" ++ (pack id))
     set key (l2b $ encode a)
-    set (key `append` ":token") (pack token)
-    set (key `append` ":location") (pack $ showPoint p)
-    hset "world" (pack $ showPoint p) (pack id)
+    set (key ++ ":token") (pack token)
+    set (key ++ ":location") (showPoint p)
+    hset "world" (showPoint p) (pack id)
 
     return $ Token id token a
 
 
 actorMove :: B.ByteString -> Point -> Redis (Either Fault String)
 actorMove uid p = do
-    let k = ("units:" `append` uid)
-        lk = (k `append` ":location")
+    let k = ("units:" ++ uid)
+        lk = (k ++ ":location")
     ep <- get lk
     case ep of
         Left r -> return $ Left $ Fault (show r)
         Right Nothing -> return $ Left $ Fault "Could not find location"
         Right (Just bs) -> do
-            let po = readPoint $ unpack bs
+            let po = readPoint bs
 
             if (not $ neighboring p po) then 
                 return $ Left $ Fault "Invalid move"
             else do
 
-            res <- hsetnx "world" (pack $ showPoint p) uid
+            res <- hsetnx "world" (showPoint p) uid
             case res of 
                 Right True -> do
-                    set lk (pack $ showPoint p)
-                    hdel "world" [(pack $ showPoint po)] 
+                    set lk (showPoint p)
+                    hdel "world" [(showPoint po)] 
                     return $ Right "OK"
                 _ -> return $ Left $ Fault "Space Occupied"
 
 neighboring :: Point -> Point -> Bool
 neighboring p1 p2 = withinOne (x p1) (x p2) && withinOne (y p1) (y p2)
     where withinOne a b = (a == b || a == (b-1) || a == (b+1))
+
+
+
+authorized :: ByteString -> ByteString -> Redis Bool
+authorized uid token = do
+    r <- get ("units:" ++ uid ++ ":token")
+    case r of
+        Left r -> return False
+        Right (Just bs) -> return (token == bs)
+
+
+(++) :: ByteString -> ByteString -> ByteString
+(++) = append
+
