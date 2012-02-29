@@ -3,7 +3,7 @@
 module Main where
 
 --, actorFetch, actorCreate, actorMove, authorized)
-import Botland.Actions (world, unitCreate) 
+import Botland.Actions (world, unitCreate, unitGetDescription) 
 import Botland.Types.Unit (Unit(..))
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
@@ -45,13 +45,13 @@ main = do
             w <- redis $ world
             send w
 
-        --get "/actor/:unitId" $ do
-        --    uid <- param "unitId"  
-        --    a <- redis $ actorFetch uid
-        --    send a
+        get "/unit/:unitId/description" $ do
+            uid <- param "unitId"  
+            a <- redis $ unitGetDescription uid
+            send a
 
-        post "/unit/new" $ decodeBody $ \a -> do
-            u <- redis $ unitCreate a
+        post "/unit/new" $ decodeBody $ \d -> do
+            u <- redis $ unitCreate d 
             header "X-Auth-Token" $ b2t (unitToken u)
             json u
 

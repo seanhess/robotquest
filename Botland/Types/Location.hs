@@ -16,7 +16,6 @@ data Field = Field { fieldStart :: Point, fieldSize :: Size, locations :: [Locat
 data Location = Location { point :: Point, unitId :: ByteString } deriving (Generic)
 
 
-
 instance ToJSON Point
 instance FromJSON Point
 

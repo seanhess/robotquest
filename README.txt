@@ -4,10 +4,11 @@ Botland
 
 TODO
 
-[ ] Get it compiling
-[ ] test to see if you can use raise/rescue instead of case statements /fault (auto fault with error)
-[ ] tests
-
+[√] Get it compiling
+[x] test to see if you can use raise/rescue instead of case statements /fault (auto fault with error)
+[ ] functional tests
+[ ] safe spawn
+[ ] test movement 
 
 
 

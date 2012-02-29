@@ -6,7 +6,7 @@ import Data.ByteString.Char8 (ByteString)
 import Data.Data (Data, Typeable)
 
 import GHC.Generics (Generic)
-import Data.Aeson (FromJSON, ToJSON)
+import Data.Aeson (FromJSON, ToJSON, object, (.=))
 
 -- message you might want to return.
 data Fault = Fault { message :: ByteString } 

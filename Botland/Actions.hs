@@ -35,16 +35,17 @@ toLocation :: (ByteString, ByteString) -> Location
 toLocation (ps, id) = Location p id
     where p = fromMaybe (Point 0 0) $ decode $ b2l ps
 
---actorFetch :: ByteString -> Redis (Either Fault Actor)
---actorFetch uid = do
---    reply <- get ("units:" ++ uid) 
---    case reply of
---        Left _ -> return $ Left NotFound
---        Right (Just bs) -> do
---            let ma = decode $ b2l bs :: Maybe Actor
---            case ma of
---                Nothing -> return $ Left $ Fault "Could not parse stored actor"
---                Just a -> return $ Right a
+unitGetDescription :: ByteString -> Redis (Either Fault UnitDescription)
+unitGetDescription uid = do
+    reply <- get ("units:" ++ uid ++ ":description")
+    case reply of
+        Left _ -> return $ Left NotFound
+        Right Nothing -> return $ Left NotFound
+        Right (Just bs) -> do
+            let ma = decode $ b2l bs :: Maybe UnitDescription
+            case ma of
+                Nothing -> return $ Left $ Fault "Could not parse description"
+                Just a -> return $ Right a
 
 unitCreate :: UnitDescription -> Redis Unit
 unitCreate d = do
@@ -55,7 +56,7 @@ unitCreate d = do
         u = Unit id token d 
     
     -- save the actor information, its token, and its position
-    set ("units:" ++ id) (l2b $ encode u)
+    set ("units:" ++ id ++ ":description") (l2b $ encode d)
     set ("units:" ++ id ++ ":token") token
     --set (key ++ ":location") (showPoint p)
     hset "world" (l2b $ encode p) id
