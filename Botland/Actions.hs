@@ -16,7 +16,8 @@ import Data.ByteString.Char8 (pack, unpack, append, concat, ByteString(..))
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Data.Text.Lazy as T
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust)
+
 
 worldStart :: Point
 worldStart = Point 0 0
@@ -58,46 +59,48 @@ unitCreate d = do
     -- save the actor information, its token, and its position
     set ("units:" ++ id ++ ":description") (l2b $ encode d)
     set ("units:" ++ id ++ ":token") token
-    --set (key ++ ":location") (showPoint p)
+    set ("units:" ++ id ++ ":location") (l2b $ encode p)
     hset "world" (l2b $ encode p) id
     return u
 
 
---actorMove :: B.ByteString -> Point -> Redis (Either Fault String)
---actorMove uid p = do
---    let k = ("units:" ++ uid)
---        lk = (k ++ ":location")
---    ep <- get lk
---    case ep of
---        Left r -> return $ Left $ Fault (show r)
---        Right Nothing -> return $ Left $ Fault "Could not find location"
---        Right (Just bs) -> do
---            let po = readPoint bs
+unitMove :: ByteString -> Point -> Redis (Either Fault String)
+unitMove uid p = do
+    let lk = ("units:" ++ uid ++ ":location")
+    ep <- get lk
+    case ep of
+        Left r -> return $ Left $ Fault (pack $ show r)
+        Right Nothing -> return $ Left $ Fault "Could not find location"
+        Right (Just bs) -> do
 
---            if (not $ neighboring p po) then 
---                return $ Left $ Fault "Invalid move"
---            else do
+            -- possible error, except we put in ourselves
+            let po = fromJust $ decode $ b2l bs
 
---            res <- hsetnx "world" (showPoint p) uid
---            case res of 
---                Left _ -> return $ Left $ Fault "Space Occupied"
---                Right True -> do
---                    set lk (showPoint p)
---                    hdel "world" [(showPoint po)] 
---                    return $ Right "OK"
+            if (not $ neighboring p po) then 
+                return $ Left $ Fault "Invalid move"
+            else do
 
---neighboring :: Point -> Point -> Bool
---neighboring p1 p2 = withinOne (x p1) (x p2) && withinOne (y p1) (y p2)
---    where withinOne a b = (a == b || a == (b-1) || a == (b+1))
+            res <- hsetnx "world" (l2b $ encode p) uid
+            case res of 
+                Left _ -> return $ Left $ Fault "Space Occupied"
+                Right True -> do
+                    set lk (l2b $ encode p)
+                    hdel "world" [l2b $ encode po]
+                    return $ Right "OK"
+
+neighboring :: Point -> Point -> Bool
+neighboring p1 p2 = withinOne (x p1) (x p2) && withinOne (y p1) (y p2)
+    where withinOne a b = (a == b || a == (b-1) || a == (b+1))
 
 
 
---authorized :: ByteString -> ByteString -> Redis Bool
---authorized uid token = do
---    r <- get ("units:" ++ uid ++ ":token")
---    case r of
---        Left r -> return False
---        Right (Just bs) -> return (token == bs)
+authorized :: ByteString -> ByteString -> Redis Bool
+authorized uid token = do
+    r <- get ("units:" ++ uid ++ ":token")
+    case r of
+        Left r -> return False
+        Right Nothing -> return False
+        Right (Just bs) -> return (token == bs)
 
 
 (++) :: ByteString -> ByteString -> ByteString

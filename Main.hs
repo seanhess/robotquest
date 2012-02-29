@@ -2,8 +2,7 @@
 
 module Main where
 
---, actorFetch, actorCreate, actorMove, authorized)
-import Botland.Actions (world, unitCreate, unitGetDescription) 
+import Botland.Actions (world, unitCreate, unitGetDescription, unitMove, authorized) 
 import Botland.Types.Unit (Unit(..))
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
@@ -55,20 +54,20 @@ main = do
             header "X-Auth-Token" $ b2t (unitToken u)
             json u
 
-        --post "/actor/:unitId/move" $ decodeBody $ \p -> do
-        --    uid <- param "unitId"
-        --    r <- request
+        post "/unit/:unitId/move" $ decodeBody $ \p -> do
+            uid <- param "unitId"
+            r <- request
 
-        --    let headers = requestHeaders r
-        --        token = fromMaybe "" $ lookup "X-Auth-Token" headers
+            let headers = requestHeaders r
+                token = fromMaybe "" $ lookup "X-Auth-Token" headers
             
-        --    isAuth <- redis $ authorized uid token
-        --    if (not isAuth) then
-        --        send $ (Left NotAuthorized :: Either Fault String)
-        --    else do
+            isAuth <- redis $ authorized uid token
+            if (not isAuth) then
+                send $ (Left NotAuthorized :: Either Fault String)
+            else do
             
-        --    res <- redis $ actorMove uid p
-        --    send res
+            res <- redis $ unitMove uid p
+            send res
             
 
 {-
