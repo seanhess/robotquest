@@ -2,6 +2,8 @@
 
 module Botland.Helpers where
 
+import Prelude hiding ((++))
+
 import Control.Monad.Trans.Resource (runResourceT)
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Error (throwError)
@@ -12,7 +14,7 @@ import Botland.Types.Message (Fault(..))
 import Data.Aeson (decode, ToJSON, FromJSON, encode)
 import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Data.ByteString as B
-import Data.ByteString.Char8 (ByteString, pack, unpack)
+import Data.ByteString.Char8 (ByteString, pack, unpack, append)
 import Data.Conduit.Lazy (lazyConsume)
 import qualified Data.Text.Lazy as T
 
@@ -80,3 +82,6 @@ send ea = do
             status status400 -- always a bad request. Their fault right? :)
             json f
         Right a -> json a 
+
+(++) :: ByteString -> ByteString -> ByteString
+(++) = append

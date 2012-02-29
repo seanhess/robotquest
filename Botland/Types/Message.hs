@@ -12,8 +12,15 @@ import Data.Aeson (FromJSON, ToJSON, object, (.=))
 data Fault = Fault { message :: ByteString } 
            | NotFound
            | NotAuthorized
-           deriving (Data, Typeable, Generic)
+           deriving (Generic, Show)
 
 instance FromJSON Fault
 instance ToJSON Fault
+
+
+
+data Empty = Empty deriving (Generic)
+
+instance FromJSON Empty
+instance ToJSON Empty
 

@@ -4,15 +4,15 @@ module Botland.Actions where
 
 import Prelude hiding ((++))
 
-import Botland.Helpers (uuid, l2b, b2l)
+import Botland.Helpers (uuid, l2b, b2l, (++))
 import Botland.Types.Message (Fault(..))
 import Botland.Types.Location (Field(..), Point(..), Size(..), Location(..))
 import Botland.Types.Unit (Unit(..), UnitDescription(..))
 
-import Database.Redis (runRedis, connect, defaultConnectInfo, ping, get, set, keys, Redis, Connection, incr, hset, Reply(..), hgetall, hdel, hsetnx)
+import Database.Redis (runRedis, connect, defaultConnectInfo, ping, get, set, keys, Redis, Connection, incr, hset, Reply(..), hgetall, hdel, hsetnx, flushall)
 
 import Data.Aeson (encode, decode)
-import Data.ByteString.Char8 (pack, unpack, append, concat, ByteString(..))
+import Data.ByteString.Char8 (pack, unpack, concat, ByteString(..))
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Data.Text.Lazy as T
@@ -82,16 +82,21 @@ unitMove uid p = do
 
             res <- hsetnx "world" (l2b $ encode p) uid
             case res of 
-                Left _ -> return $ Left $ Fault "Space Occupied"
                 Right True -> do
                     set lk (l2b $ encode p)
                     hdel "world" [l2b $ encode po]
                     return $ Right "OK"
+                _ -> return $ Left $ Fault "Space Occupied"
 
 neighboring :: Point -> Point -> Bool
 neighboring p1 p2 = withinOne (x p1) (x p2) && withinOne (y p1) (y p2)
     where withinOne a b = (a == b || a == (b-1) || a == (b+1))
 
+
+resetWorld :: Redis ()
+resetWorld = do
+    flushall
+    return ()
 
 
 authorized :: ByteString -> ByteString -> Redis Bool
@@ -102,7 +107,4 @@ authorized uid token = do
         Right Nothing -> return False
         Right (Just bs) -> return (token == bs)
 
-
-(++) :: ByteString -> ByteString -> ByteString
-(++) = append
 

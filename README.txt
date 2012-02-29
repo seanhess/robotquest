@@ -8,8 +8,18 @@ TODO
 [x] test to see if you can use raise/rescue instead of case statements /fault (auto fault with error)
 [ ] functional tests
 [ ] safe spawn
+[ ] send back a starting location
 [ ] test movement 
+[ ] unit cleanup (heartbeat?)
 
+[ ] block edge of the world movement
+
+[ ] description - home page / repository
+[ ] description - robot description fields
+
+
+EXPLORE
+[ ] middleware validate user auth token (or cleaner way to do it)
 
 
 

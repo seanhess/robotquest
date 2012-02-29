@@ -2,7 +2,7 @@
 
 module Main where
 
-import Botland.Actions (world, unitCreate, unitGetDescription, unitMove, authorized) 
+import Botland.Actions (world, unitCreate, unitGetDescription, unitMove, authorized, resetWorld) 
 import Botland.Types.Unit (Unit(..))
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
@@ -29,7 +29,6 @@ main :: IO ()
 main = do
     db <- R.connect R.defaultConnectInfo
     let redis = queryRedis db
-
 
     scotty 3000 $ do
 
@@ -68,22 +67,12 @@ main = do
             
             res <- redis $ unitMove uid p
             send res
-            
 
-{-
+        -- temporary, for admin testing
+        post "/admin/clear" $ do
+            redis $ resetWorld
+            text "OK"
 
-BOT FIELDS
-[ ] home page / repository
-[ ] appearance? name? type? (yes, they need a unique typename)
 
-REMEMBER
-[ ] Unit cleanup (no heartbeat?, etc?)
-
-[ ] Validate token (middleware?)
-[ ] Edges of world
-[ ] get rid of all strings (use ByteString)
-[ ] Need some functional tests
-
--}
 
 

@@ -11,23 +11,21 @@ import Test.QuickCheck.Property (Testable)
 
 import Network.HTTP (simpleHTTP, Request(..), Response)
 import Network.HTTP.Base (mkRequest, RequestMethod(GET, POST, DELETE, PUT), rspBody, rqBody, rqHeaders)
-import Network.HTTP.Headers (insertHeader, mkHeader, HeaderName(..))
+import Network.HTTP.Headers (replaceHeader, mkHeader, HeaderName(..))
 import Network.URI    (parseURI)
 
 import Data.Aeson (FromJSON, encode, decode, ToJSON)
-import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (ByteString, pack, unpack)
 import qualified Data.ByteString.Lazy.Char8 as L
 import Data.Maybe (fromJust)
 
-import Botland.Types 
+import Botland.Types.Unit (Unit(..), UnitDescription(..))
+import Botland.Types.Message (Fault(..), Empty(..))
+import Botland.Types.Location (Point(..))
 
 main = do 
     putStrLn "Running Tests..."
-    --functional testAuthentication
-
-whatever :: IO ()
-whatever = do
-    putStrLn "whatever"
+    functional testAuthentication
 
 -- the only thing I really need to test functionally is that the token/auth stuff works
 -- everything else, just use the redis functions directly? 
@@ -38,31 +36,58 @@ whatever = do
 --    print (rspBody res)
 --    return $ rspBody res
 
---postNewActor :: IO (Unit Actor)
---postNewActor = do
---    let actor = Actor Bot 
---    res <- send (request POST "http://localhost:3000/actor/new" actor)
---    let body = rspBody res
---        mua = decode body :: Unit Actor
---    case decode body of
---        Nothing -> error ("Could not parse " ++ (L.unpack body))
---        Just ua -> return ua
+clear :: IO () 
+clear = do
+    send (request GET "http://localhost:3000/admin/clear")
+    return ()
 
---moveActorWithToken :: IO ()
---moveActorWithToken = undefined
+postNewUnit :: IO (Unit)
+postNewUnit = do
+    let desc = UnitDescription "source" "notes"
+    let req = setBody desc (request POST "http://localhost:3000/unit/new")
+    res <- send req
+    let body = rspBody res
+    case (decode body :: Maybe Unit) of
+        Nothing -> error ("Could not parse " ++ (L.unpack body))
+        Just u -> return u
 
---moveActorWithoutToken :: IO ()
---moveActorWithoutToken = undefined
+moveActorWithoutToken :: ByteString -> IO (Fault)
+moveActorWithoutToken uid = do
+    let p = Point 0 1
+    let req = setBody p (request POST ("http://localhost:3000/unit/" ++ (unpack uid) ++ "/move"))
+    res <- send req
+    let body = rspBody res
+    case (decode body :: Maybe Fault) of
+        Nothing -> error ("Was not a fault: " ++ (L.unpack body))
+        Just f -> return f 
 
---testAuthentication :: Property
---testAuthentication = monadicIO $ do
---    ua <- run $ postNewActor
---    assert $ True
+moveActorWithToken :: ByteString -> ByteString -> IO Bool
+moveActorWithToken uid token = do
+    let p = Point 0 1
+    let req = setHeader "X-Auth-Token" (unpack token) $ setBody p (request POST ("http://localhost:3000/unit/" ++ (unpack uid) ++ "/move")) 
+    res <- send req
+    let body = rspBody res
+    case (decode body :: Maybe Fault) of
+        Just f -> return $ error (show f)
+        Nothing -> return True
+
+testAuthentication :: Property
+testAuthentication = monadicIO $ do
+
+    run $ clear
+
+    u <- run $ postNewUnit
+    let uid = unitId u
+        token = unitToken u
+
+    -- will already fail if it isn't a fault
+    f <- run $ moveActorWithoutToken uid
+    r <- run $ moveActorWithToken uid token
+
+    assert r
 
 
 -- then, test the redis stuff on its own
-
-
 
 
 
@@ -85,20 +110,16 @@ whatever = do
 functional :: (Testable prop) => prop -> IO ()
 functional = quickCheckWith stdArgs { maxSuccess = 5 } 
 
-get :: String -> Request L.ByteString
-get u = request GET u Empty
+--get :: String -> Request L.ByteString
+--get u = request GET u Empty
 
-post :: (ToJSON a) => String -> a -> Request L.ByteString
-post u b = request POST u b 
+--post :: (ToJSON a) => String -> a -> Request L.ByteString
+--post u b = request POST u b 
 
-request :: (ToJSON a) => RequestMethod -> String -> a -> Request L.ByteString
-request rm u b = case parseURI u of
+request :: RequestMethod -> String -> Request L.ByteString
+request rm u = case parseURI u of
     Nothing -> error ("Bad URL" ++ u)
-    Just url -> Request url POST headers body
-        where body = encode b
-              headers = [ mkHeader HdrContentType "application/json"
-                        , mkHeader HdrContentLength (show (L.length body))
-                        ]
+    Just url -> mkRequest POST url
 
 send :: Request L.ByteString -> IO (Response L.ByteString)
 send req = do
@@ -107,5 +128,17 @@ send req = do
         Left e -> error $ show e 
         Right r -> r
 
+
+setBody :: (ToJSON a) => a -> Request L.ByteString -> Request L.ByteString
+setBody obj req = req' { rqBody = body }
+  where
+    body = encode obj
+    req' = replaceHeader HdrContentType "application/json" .
+           replaceHeader HdrContentLength (show $ L.length body) $
+           req
+
+
+setHeader :: String -> String -> Request L.ByteString -> Request L.ByteString  
+setHeader name value = replaceHeader (HdrCustom name) value
 
 
