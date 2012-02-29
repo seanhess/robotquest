@@ -4,6 +4,14 @@ Botland
 
 TODO
 
+[ ] Get it compiling
+[ ] test to see if you can use raise/rescue instead of case statements /fault (auto fault with error)
+[ ] tests
+
+
+
+
+
 >>> Do me first <<<
 [ ] Functional Tests
     [ ] They MUST be at the API level. 

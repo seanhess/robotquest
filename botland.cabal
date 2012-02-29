@@ -13,4 +13,4 @@ Cabal-version:       >=1.2
 
 Library
   Exposed-modules:   Botland
-  Build-depends:     base >= 3 && < 5, scotty, hedis, text, wai, wai-extra, mtl, bytestring
+  Build-depends:     base >= 3 && < 5, scotty, hedis, text, wai, wai-extra, mtl, bytestring, MissingH

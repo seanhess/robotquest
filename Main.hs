@@ -2,12 +2,15 @@
 
 module Main where
 
-import Botland.Actions (world, actorFetch, actorCreate, actorMove, authorized)
-import Botland.Types (Unit(..), Actor(..), Point(..), readPoint, Fault(..))
-import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, send)
+--, actorFetch, actorCreate, actorMove, authorized)
+import Botland.Actions (world, unitCreate) 
+import Botland.Types.Unit (Unit(..))
+import Botland.Types.Message (Fault(..))
+--import Botland.Types.Location (Point(..))
+import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send, json)
 import Network.Wai.Middleware.Headers (cors)
 
-import Web.Scotty (get, post, json, param, header, scotty, text, request, middleware, file)
+import Web.Scotty (get, post, param, header, scotty, text, request, middleware, file, json)
 import Network.Wai (requestHeaders)
 
 import qualified Database.Redis as R 
@@ -42,33 +45,30 @@ main = do
             w <- redis $ world
             send w
 
-        get "/actor/:unitId" $ do
-            uid <- param "unitId"  
-            a <- redis $ actorFetch uid
-            send a
+        --get "/actor/:unitId" $ do
+        --    uid <- param "unitId"  
+        --    a <- redis $ actorFetch uid
+        --    send a
 
-        -- TODO: maybe I should just have many of them return whatever, and I can merge the json objects. Then I don't need to have an instance of Unit Actor, or anything
-        post "/actor/new" $ decodeBody $ \a -> do
-            au <- redis $ actorCreate a
-            header "X-Auth-Token" $ T.pack (token au)
-            json au
+        post "/unit/new" $ decodeBody $ \a -> do
+            u <- redis $ unitCreate a
+            header "X-Auth-Token" $ b2t (unitToken u)
+            json u
 
-        post "/actor/:unitId/move/:p" $ do
-            uid <- param "unitId"
-            ps <- param "p"
-            r <- request
+        --post "/actor/:unitId/move" $ decodeBody $ \p -> do
+        --    uid <- param "unitId"
+        --    r <- request
 
-            let headers = requestHeaders r
-                token = fromMaybe "" $ lookup "X-Auth-Token" headers
+        --    let headers = requestHeaders r
+        --        token = fromMaybe "" $ lookup "X-Auth-Token" headers
             
-            isAuth <- redis $ authorized uid token
-            if (not isAuth) then
-                send $ (Left NotAuthorized :: Either Fault String)
-            else do
+        --    isAuth <- redis $ authorized uid token
+        --    if (not isAuth) then
+        --        send $ (Left NotAuthorized :: Either Fault String)
+        --    else do
             
-            let p = readPoint ps
-            res <- redis $ actorMove uid p
-            send res
+        --    res <- redis $ actorMove uid p
+        --    send res
             
 
 {-
