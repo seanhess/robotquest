@@ -12,6 +12,7 @@ import qualified Data.Aeson as A
 import Data.Aeson.Types (Parser, Pair)
 
 import qualified Data.ByteString.Char8 as B
+import Data.ByteString.Char8 (ByteString) 
 import Data.Text (Text, pack, unpack)
 import Data.Text.Encoding (decodeUtf8)
 import Data.Char (toLower, toUpper) 
@@ -19,6 +20,7 @@ import Data.Char (toLower, toUpper)
 import Data.Map (Map)
 import Data.Maybe (isJust, fromJust)
 import Data.List.Split (splitOn)
+import qualified Data.Vector as V (toList)
 
 import Safe (readMay, readDef)
 
@@ -27,12 +29,14 @@ import Safe (readMay, readDef)
 type Id = String
 type UnitToken = String
 
+
+-- Point, just an X, Y
 data Point = Point { x :: Int, y :: Int } deriving (Generic)
 
-showPoint :: Point -> B.ByteString
+showPoint :: Point -> ByteString
 showPoint p = B.pack $ (show (x p)) ++ "." ++ (show (y p))
 
-readPoint :: B.ByteString -> Point
+readPoint :: ByteString -> Point
 readPoint cs = Point (read x) (read y)
     where xy = splitOn "." (B.unpack cs)
           x = xy !! 0
@@ -41,23 +45,35 @@ readPoint cs = Point (read x) (read y)
 instance ToJSON Point
 instance FromJSON Point
 
--- what about when I want to represent it with the token
--- it's more an association of an actor with an id
-
--- unit means anything with an id, or an id and token
-data Unit a = Unit { iden :: String, obj :: a }
-            | Token { iden :: String, token :: String, obj :: a }
+data Unit a = Unit { id :: Id, token :: UnitToken, obj :: a }
             deriving (Generic)
--- can't decide if it should be all the same thing or not
+
+instance FromJSON Unit
+instance ToJSON Unit
+
+type Unit = (Id, UnitToken, Actor)
+
+type Field = Map Point Id  -- yeah how it's stored in the system, sure.
 
 data BlockType = Wood | Stone deriving (Generic, Typeable, Show)
 data ActorType = Bot | Player deriving (Generic, Typeable, Show, Read)
 
+-- a rectangle!
+data Bounds = Bounds 
+
 -- ! can't access unless Point is Ord
-data Field = Field [(Point, Id)] deriving (Generic)
+-- the field could contain blocks too, no? 
+-- either way, it makes sense for it to contain strings... 
+-- but it would be far better if it contained blocks too
+
+type Location = (Point, Id)
+data Field = Field [Location] deriving (Generic)
 instance ToJSON Field where
     toJSON (Field fs) = object $ map jsonHashPoint fs
         where jsonHashPoint (p, i) = (decodeUtf8 $ showPoint p) .= toJSON i
+
+toLocation :: (ByteString, ByteString) -> Location
+toLocation (l, v) = ((readPoint l), (B.unpack v))
 
 data Actor = Actor ActorType deriving (Typeable, Show)
 
@@ -80,8 +96,8 @@ instance ToJSON BlockType where toJSON = typeJSON
 
 instance (FromJSON a) => FromJSON (Unit a)
 instance (ToJSON a, Typeable a) => ToJSON (Unit a) where
-    toJSON (Unit i o) = object $ idObjectToJSON i o
-    toJSON (Token i t o) = object $ ["token" .= t] ++ idObjectToJSON i o
+    --toJSON (Unit i o) = object $ idObjectToJSON i o
+    toJSON (Unit i t o) = object $ ["token" .= t] ++ idObjectToJSON i o
 
 idObjectToJSON :: (ToJSON a, Typeable a) => Id -> a -> [Pair]
 idObjectToJSON i o = ["id" .= i, typePropertyName o .= toJSON o]
@@ -94,6 +110,9 @@ data Fault = Fault { message :: String }
            deriving (Generic)
 instance FromJSON Fault
 instance ToJSON Fault
+
+data Empty = Empty deriving (Generic)
+instance ToJSON Empty
 
 
 

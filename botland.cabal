@@ -1,0 +1,16 @@
+Name:                botland
+Version:             0.1
+Synopsis:            REST-based MMO AI Programming Game
+Description:         REST-based MMO AI Programming Game
+Homepage:            http://seanhess.github.com
+Author:              Sean Hess
+Maintainer:          seanhess@gmail.com
+
+Category:            Application
+Build-type:          Simple
+
+Cabal-version:       >=1.2
+
+Library
+  Exposed-modules:   Botland
+  Build-depends:     base >= 3 && < 5, scotty, hedis, text, wai, wai-extra, mtl, bytestring

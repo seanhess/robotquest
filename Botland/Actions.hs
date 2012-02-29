@@ -21,20 +21,18 @@ world = do
     reply <- hgetall "world"  
     case reply of
         Left r -> return $ Left (Fault "Could not get world")
-        Right m -> return $ Right $ Field (map toField m)
-    where toField (l, v) = ((readPoint l), (unpack v))
-    
+        Right m -> return $ Right $ Field (map toLocation m)
 
 actorFetch :: B.ByteString -> Redis (Either Fault Actor)
 actorFetch uid = do
     reply <- get ("units:" ++ uid) 
     case reply of
+        Left _ -> return $ Left NotFound
         Right (Just bs) -> do
             let ma = decode $ b2l bs :: Maybe Actor
             case ma of
+                Nothing -> return $ Left $ Fault "Could not parse stored actor"
                 Just a -> return $ Right a
-                _ -> return $ Left $ Fault "Could not parse stored actor"
-        _ -> return $ Left NotFound
 
 actorCreate :: Actor -> Redis (Unit Actor) 
 actorCreate a = do
@@ -70,11 +68,11 @@ actorMove uid p = do
 
             res <- hsetnx "world" (showPoint p) uid
             case res of 
+                Left _ -> return $ Left $ Fault "Space Occupied"
                 Right True -> do
                     set lk (showPoint p)
                     hdel "world" [(showPoint po)] 
                     return $ Right "OK"
-                _ -> return $ Left $ Fault "Space Occupied"
 
 neighboring :: Point -> Point -> Bool
 neighboring p1 p2 = withinOne (x p1) (x p2) && withinOne (y p1) (y p2)

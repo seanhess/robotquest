@@ -22,7 +22,6 @@ import Web.Scotty (ActionM, request, raise, status, json, text, redirect, rescue
 import Database.Redis (runRedis, connect, defaultConnectInfo, ping, set, keys, Redis, Connection, incr)
 
 import qualified System.UUID.V4 as U
-import qualified Data.UUID
 
 -- i need to turn this into something json compatible
 body :: ActionM (L.ByteString)
@@ -54,7 +53,7 @@ uuid = do
     return $ show u
 
 
--- converts an object to redis bytestring
+-- converts a lazy bytestring to redis bytestring
 l2b :: L.ByteString -> B.ByteString
 l2b = B.concat . L.toChunks
 
