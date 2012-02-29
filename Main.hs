@@ -7,7 +7,7 @@ import Botland.Actions (world, unitCreate)
 import Botland.Types.Unit (Unit(..))
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
-import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send, json)
+import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
 import Network.Wai.Middleware.Headers (cors)
 
 import Web.Scotty (get, post, param, header, scotty, text, request, middleware, file, json)

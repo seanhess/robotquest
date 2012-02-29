@@ -11,7 +11,7 @@ import Botland.Types.Unit (Unit(..), UnitDescription(..))
 
 import Database.Redis (runRedis, connect, defaultConnectInfo, ping, get, set, keys, Redis, Connection, incr, hset, Reply(..), hgetall, hdel, hsetnx)
 
-import Data.Aeson.Generic (encode, decode)
+import Data.Aeson (encode, decode)
 import Data.ByteString.Char8 (pack, unpack, append, concat, ByteString(..))
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as L

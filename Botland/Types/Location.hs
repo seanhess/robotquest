@@ -1,15 +1,37 @@
-{-# LANGUAGE OverloadedStrings, DeriveDataTypeable #-}
+{-# LANGUAGE OverloadedStrings, DeriveDataTypeable, DeriveGeneric #-}
 
 module Botland.Types.Location where
 
 import Data.ByteString.Char8 (ByteString)
 import Data.Data (Data, Typeable, typeOf)
 
-data Point = Point { x :: Int, y :: Int } deriving (Data, Typeable, Show)
-data Size = Size { width :: Int, height :: Int } deriving (Data, Typeable, Show)
-data Field = Field { fieldStart :: Point, fieldSize :: Size, locations :: [Location] } deriving (Data, Typeable, Show) 
+import GHC.Generics (Generic)
+import Data.Aeson (FromJSON, ToJSON)
+
+data Point = Point { x :: Int, y :: Int } deriving (Generic)
+data Size = Size { width :: Int, height :: Int } deriving (Generic)
+data Field = Field { fieldStart :: Point, fieldSize :: Size, locations :: [Location] } deriving (Generic)
 
 -- change locations to be a simple array of location objects
-data Location = Location { point :: Point, unitId :: ByteString } deriving (Data, Typeable, Show)
+data Location = Location { point :: Point, unitId :: ByteString } deriving (Generic)
+
+
+
+instance ToJSON Point
+instance FromJSON Point
+
+instance ToJSON Size
+instance FromJSON Size
+
+instance ToJSON Field
+instance FromJSON Field
+
+instance ToJSON Location
+instance FromJSON Location
+
+
+
+
+
 
 
