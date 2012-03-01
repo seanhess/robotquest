@@ -7,7 +7,7 @@ import Prelude hiding ((++))
 import Botland.Helpers (uuid, l2b, b2l, (++))
 import Botland.Types.Message (Fault(..))
 import Botland.Types.Location (Field(..), Point(..), Size(..), Location(..))
-import Botland.Types.Unit (Unit(..), UnitDescription(..))
+import Botland.Types.Unit (Spawn(..), UnitDescription(..))
 
 import Database.Redis (runRedis, connect, defaultConnectInfo, ping, get, set, keys, Redis, Connection, incr, hset, Reply(..), hgetall, hdel, hsetnx, flushall)
 
@@ -48,21 +48,21 @@ unitGetDescription uid = do
                 Nothing -> return $ Left $ Fault "Could not parse description"
                 Just a -> return $ Right a
 
-unitCreate :: UnitDescription -> Redis Unit
+unitCreate :: UnitDescription -> Redis Spawn
 unitCreate d = do
     id <- uuid
     token <- uuid
 
     let p = Point 0 0 -- CHANGEME
-        u = Unit id token d 
     
     -- save the actor information, its token, and its position
     set ("units:" ++ id ++ ":description") (l2b $ encode d)
     set ("units:" ++ id ++ ":token") token
     set ("units:" ++ id ++ ":location") (l2b $ encode p)
     hset "world" (l2b $ encode p) id
-    return u
 
+    -- they need to know the info, the token, and the starting location, etc
+    return $ Spawn id token p
 
 unitMove :: ByteString -> Point -> Redis (Either Fault String)
 unitMove uid p = do

@@ -19,7 +19,7 @@ import Data.ByteString.Char8 (ByteString, pack, unpack)
 import qualified Data.ByteString.Lazy.Char8 as L
 import Data.Maybe (fromJust)
 
-import Botland.Types.Unit (Unit(..), UnitDescription(..))
+import Botland.Types.Unit (Spawn(..), UnitDescription(..))
 import Botland.Types.Message (Fault(..), Empty(..))
 import Botland.Types.Location (Point(..))
 
@@ -41,15 +41,17 @@ clear = do
     send (request GET "http://localhost:3000/admin/clear")
     return ()
 
-postNewUnit :: IO (Unit)
+postNewUnit :: IO (Spawn)
 postNewUnit = do
     let desc = UnitDescription "source" "notes"
     let req = setBody desc (request POST "http://localhost:3000/unit/new")
     res <- send req
     let body = rspBody res
-    case (decode body :: Maybe Unit) of
+    case (decode body :: Maybe Spawn) of
         Nothing -> error ("Could not parse " ++ (L.unpack body))
-        Just u -> return u
+        Just u -> do
+            print u
+            return u
 
 moveActorWithoutToken :: ByteString -> IO (Fault)
 moveActorWithoutToken uid = do

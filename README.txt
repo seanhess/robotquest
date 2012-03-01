@@ -6,9 +6,9 @@ TODO
 
 [√] Get it compiling
 [x] test to see if you can use raise/rescue instead of case statements /fault (auto fault with error)
-[ ] functional tests
+[√] functional tests
+[√] send back a starting location
 [ ] safe spawn
-[ ] send back a starting location
 [ ] test movement 
 [ ] unit cleanup (heartbeat?)
 
@@ -17,11 +17,8 @@ TODO
 [ ] description - home page / repository
 [ ] description - robot description fields
 
-
 EXPLORE
 [ ] middleware validate user auth token (or cleaner way to do it)
-
-
 
 >>> Do me first <<<
 [ ] Functional Tests

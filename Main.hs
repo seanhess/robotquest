@@ -3,7 +3,7 @@
 module Main where
 
 import Botland.Actions (world, unitCreate, unitGetDescription, unitMove, authorized, resetWorld) 
-import Botland.Types.Unit (Unit(..))
+import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
 import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
@@ -49,9 +49,9 @@ main = do
             send a
 
         post "/unit/new" $ decodeBody $ \d -> do
-            u <- redis $ unitCreate d 
-            header "X-Auth-Token" $ b2t (unitToken u)
-            json u
+            s <- redis $ unitCreate d 
+            header "X-Auth-Token" $ b2t (unitToken s)
+            json s
 
         post "/unit/:unitId/move" $ decodeBody $ \p -> do
             uid <- param "unitId"

@@ -2,6 +2,8 @@
 
 module Botland.Types.Unit where
 
+import Botland.Types.Location (Point(..))
+
 import Data.ByteString.Char8 (ByteString)
 import Data.Data (Data, Typeable, typeOf)
 import Data.Aeson (ToJSON, FromJSON)
@@ -19,15 +21,11 @@ import GHC.Generics (Generic)
 
 type UnitId = ByteString
 type UnitToken = ByteString
-data Unit = Unit { unitId :: UnitId 
-                  , unitToken :: UnitToken 
-                  , unitDescription :: UnitDescription
-                  } deriving (Generic, Typeable, Show)
 
-instance FromJSON Unit
-instance ToJSON Unit
-
-
+-- they already know their description
+data Spawn = Spawn { unitId :: UnitId, unitToken :: UnitToken, spawnPoint :: Point } deriving (Generic, Show)
+instance ToJSON Spawn
+instance FromJSON Spawn
 
 data Block = Block { blockType :: BlockType } deriving (Data, Typeable, Show, Generic)
 data BlockType = Wood | Stone deriving (Data, Typeable, Show, Read, Generic)
