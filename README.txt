@@ -17,10 +17,7 @@ TODO
 [ ] description - robot description fields
 
 [ ] build a world viewer!
-    [ ] cors support?
-
 [ ] build a bot!
-    [ ] cors?
 
 SAFE SPAWN
     [ ] or support multiple things being in a location.. ... hmm... 

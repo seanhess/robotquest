@@ -2,7 +2,7 @@
 
 module Main where
 
-import Botland.Actions (world, unitSpawn, unitGetDescription, unitMove, authorized, resetWorld) 
+import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, worldInfo) 
 import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
@@ -53,8 +53,11 @@ main = do
             file "public/index.html"
 
         get "/world" $ do
-            w <- redis $ world
-            send w
+            send $ Right worldInfo
+
+        get "/world/locations" $ do
+            ls <- redis $ worldLocations
+            send ls
 
         get "/unit/:unitId/description" $ do
             uid <- param "unitId"  

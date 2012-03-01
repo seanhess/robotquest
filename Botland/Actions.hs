@@ -18,20 +18,20 @@ import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Data.Text.Lazy as T
 import Data.Maybe (fromMaybe, fromJust)
 
-
-
 worldInfo :: FieldInfo
 worldInfo = FieldInfo (Point 0 0) (Size 100 100)
 
 sharedSpawn :: Point
 sharedSpawn = Point 50 50
 
-world :: Redis (Either Fault Field)
-world = do
+
+-- the field for the whole world. Remove this eventually in favor of smaller fields
+worldLocations :: Redis (Either Fault [Location])
+worldLocations = do
     reply <- hgetall "world"  
     case reply of
         Left r -> return $ Left (Fault "Could not get world")
-        Right m -> return $ Right $ Field worldInfo (map toLocation m)
+        Right m -> return $ Right (map toLocation m)
 
 toLocation :: (ByteString, ByteString) -> Location
 toLocation (ps, id) = Location p id

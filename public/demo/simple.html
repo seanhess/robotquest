@@ -3,23 +3,76 @@
 <head>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<style>
+
+    #viewer {
+        border: solid 1px black;
+    }
+
+</style>
 <script>
     console.log("HI")
     $(function() {
-        console.log("LOADED")
+
+        var $canvas = $("#viewer")
+        var canvas = $canvas.get(0)
+        var ctx = canvas.getContext("2d")
+        var cw = 500;
+        var ch = 500;
+        var PollInterval = 1000 
+
+        function getWorldInfo(cb) {
+            $.get("/world", function(info) {
+                cb(info.fieldStart, info.fieldSize)
+            })
+        }
+
+        function getWorld(cb) {
+            $.get("/world/locations", cb)
+        }
+
+        function drawWorld(locations) {
+
+        }
+
+        function start() {
+            getWorldInfo(function(start, size) {
+                var blockWidth = cw / size.width
+                var blockHeight = ch / size.height
+                var interval = setInterval(function() {
+                    getWorld(function(locations) {
+                        // console.log("GOT LOCATIONS", locations)
+                        ctx.clearRect(0, 0, cw, ch)
+                        for (var i = 0; i < locations.length; i++) {
+                            var loc = locations[i]
+                            var x = loc.point.x * blockWidth
+                            var y = loc.point.y * blockHeight 
+                            ctx.fillStyle = "#000"
+                            ctx.fillRect(x, y, blockWidth, blockHeight)
+                            // ctx.fillRect(1, 1, 100, 100)
+                        }
+                    })
+                }, PollInterval)
+            })
+        }
+
+        start()
+
+        // ctx.fillStyle = "rgb(200,0,0)"
+        // ctx.fillRect(0, 0, 100, 100)
 
         // {"type":"Bot"}
-        $.ajax( { type: 'POST'
-                , url: '/actor/new'
-                , data: {type: "Bot"} 
-                , dataType: "json"
-                , success: function() {
+        // $.ajax( { type: 'POST'
+        //         , url: '/actor/new'
+        //         , data: {type: "Bot"} 
+        //         , dataType: "json"
+        //         , success: function() {
 
-                })
+        //         })
 
-        }"/actor/new", '{"type": "Bot"}', function(data) {
-            console.log("BOT!", data)
-        }, "json")
+        // }"/actor/new", '{"type": "Bot"}', function(data) {
+        //     console.log("BOT!", data)
+        // }, "json")
 
         // hmm, it doesn't really send a json body, does it
     })
@@ -27,12 +80,6 @@
 
 </head>
 <body>
-    <h1>Botland</h1>
-    <p>v1.0</p>
-    <!-- I should have a reusable view thing? -->
-    <!-- or just say "connected" etc -->
-
-
-
+    <canvas id="viewer" width="500" height="500"></canvas>
 
 </body>
