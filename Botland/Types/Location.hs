@@ -8,9 +8,11 @@ import Data.Data (Data, Typeable, typeOf)
 import GHC.Generics (Generic)
 import Data.Aeson (FromJSON, ToJSON)
 
-data Point = Point { x :: Int, y :: Int } deriving (Generic, Show)
+data Point = Point { x :: Int, y :: Int } deriving (Generic, Show, Eq)
 data Size = Size { width :: Int, height :: Int } deriving (Generic, Show)
-data Field = Field { fieldStart :: Point, fieldSize :: Size, locations :: [Location] } deriving (Generic, Show)
+data Field = Field { fieldInfo :: FieldInfo, locations :: [Location] } deriving (Generic, Show)
+
+data FieldInfo = FieldInfo { fieldStart :: Point, fieldSize :: Size } deriving (Generic, Show)
 
 -- change locations to be a simple array of location objects
 data Location = Location { point :: Point, unitId :: ByteString } deriving (Generic, Show)
@@ -28,9 +30,5 @@ instance FromJSON Field
 instance ToJSON Location
 instance FromJSON Location
 
-
-
-
-
-
-
+instance ToJSON FieldInfo
+instance FromJSON FieldInfo

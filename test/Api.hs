@@ -44,7 +44,7 @@ clear = do
 postNewUnit :: IO (Spawn)
 postNewUnit = do
     let desc = UnitDescription "source" "notes"
-    let req = setBody desc (request POST "http://localhost:3000/unit/new")
+    let req = setBody desc (request POST "http://localhost:3000/unit/spawn")
     res <- send req
     let body = rspBody res
     case (decode body :: Maybe Spawn) of
@@ -53,9 +53,8 @@ postNewUnit = do
             print u
             return u
 
-moveActorWithoutToken :: ByteString -> IO (Fault)
-moveActorWithoutToken uid = do
-    let p = Point 0 1
+moveActorWithoutToken :: ByteString -> Point -> IO (Fault)
+moveActorWithoutToken uid p = do
     let req = setBody p (request POST ("http://localhost:3000/unit/" ++ (unpack uid) ++ "/move"))
     res <- send req
     let body = rspBody res
@@ -63,9 +62,8 @@ moveActorWithoutToken uid = do
         Nothing -> error ("Was not a fault: " ++ (L.unpack body))
         Just f -> return f 
 
-moveActorWithToken :: ByteString -> ByteString -> IO Bool
-moveActorWithToken uid token = do
-    let p = Point 0 1
+moveActorWithToken :: ByteString -> ByteString -> Point -> IO Bool
+moveActorWithToken uid token p = do
     let req = setHeader "X-Auth-Token" (unpack token) $ setBody p (request POST ("http://localhost:3000/unit/" ++ (unpack uid) ++ "/move")) 
     res <- send req
     let body = rspBody res
@@ -81,10 +79,11 @@ testAuthentication = monadicIO $ do
     u <- run $ postNewUnit
     let uid = unitId u
         token = unitToken u
+        p = (spawnPoint u) { x = 51 }
 
     -- will already fail if it isn't a fault
-    f <- run $ moveActorWithoutToken uid
-    r <- run $ moveActorWithToken uid token
+    f <- run $ moveActorWithoutToken uid p
+    r <- run $ moveActorWithToken uid token p
 
     assert r
 
