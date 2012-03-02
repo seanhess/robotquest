@@ -21,7 +21,7 @@ import qualified Data.Text.Lazy as T
 import Network.HTTP.Types (statusBadRequest, status404, status500, status400, status401)
 import Network.Wai (requestBody)
 
-import Web.Scotty (ActionM, request, raise, status, text, redirect, rescue, header, json)
+import Web.Scotty (ActionM, request, raise, status, text, redirect, rescue, header, json, param)
 import qualified Web.Scotty
 
 import Database.Redis (runRedis, connect, defaultConnectInfo, ping, set, keys, Redis, Connection, incr)
@@ -58,6 +58,9 @@ uuid = do
     return $ pack $ show u
 
 
+-- AUTHENTICATION
+
+
 -- converts a lazy bytestring to redis bytestring
 l2b :: L.ByteString -> B.ByteString
 l2b = B.concat . L.toChunks
@@ -85,3 +88,5 @@ send ea = do
 
 (++) :: ByteString -> ByteString -> ByteString
 (++) = append
+
+

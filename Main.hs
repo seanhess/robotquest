@@ -7,10 +7,12 @@ import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
 import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
+import Botland.Middleware (ownsUnit)
+
 import Network.Wai.Middleware.Headers (cors)
 
 import Web.Scotty (get, post, param, header, scotty, text, request, middleware, file, json, ActionM(..))
-import Network.Wai (requestHeaders)
+
 
 import qualified Database.Redis as R 
 import Data.Text.Lazy (Text)
@@ -29,24 +31,12 @@ main :: IO ()
 main = do
     db <- R.connect R.defaultConnectInfo
     let redis = queryRedis db
+    let unitAuth = ownsUnit db
 
     scotty 3000 $ do
 
         middleware $ staticRoot "public"
         middleware cors
-
-        let unitAuth :: ActionM () -> ActionM ()
-            unitAuth k = do
-                uid <- param "unitId"
-                r <- request
-
-                let headers = requestHeaders r
-                    token = fromMaybe "" $ lookup "X-Auth-Token" headers
-                
-                isAuth <- redis $ authorized uid token
-                if (not isAuth) then
-                    send $ (Left NotAuthorized :: Either Fault String)
-                else k 
 
         get "/" $ do
             header "Content-Type" "text/html"
