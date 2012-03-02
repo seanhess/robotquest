@@ -1,5 +1,10 @@
 
-# install epel
-rpm -Uvh http://dl.fedoraproject.org/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm
+# Tested on Ubuntu Server 11.10 
 
-yum -y install ghc
+# developmentNTqx5Vr75
+
+apt-get -y install git
+apt-get install -yf ghc
+apt-get install -yf cabal-install
+
+git clone 
