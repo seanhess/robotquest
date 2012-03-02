@@ -1,6 +1,7 @@
 Botland
 =============================
 
+developmentNTqx5Vr75
 
 TODO
 
@@ -10,6 +11,8 @@ TODO
 [x] send back a starting location
 [x] safe spawn
 [x] block edge of the world movement 
+[x] middleware validate user auth token (or cleaner way to do it)
+[ ] deploy
 [ ] test movement (move, spawn loc, edge)
 [ ] unit cleanup (heartbeat?)
 
@@ -19,48 +22,48 @@ TODO
 [ ] build a world viewer!
 [ ] build a bot!
 
-SAFE SPAWN
-    [ ] or support multiple things being in a location.. ... hmm... 
+SUPPORT
+[ ] website
+[ ] documentation
 
-OTHER WAYS TO REPRESENT:
-    a room is a set of users. they can leave a room, etc
+BIG CHANGE
+[ ] Game timer. You can only say "left", or "select" and it happens on the next tick if you haven't changed it. 
 
-    locations: id + location
-    set: {id location}
+UNIT CLEANUP
+1. could just leave them there util someone kills them (bad, have to add kill)
+2. could do something fancy with expiring keys. heartbeat? 
+3. every time you move, you update your date. Have a process that goes through and removes old dates every minute (separate from the other stuff). That way it's only on movement. That's pretty easy. I wonder if I can expire the thing too ???
+4. Change locations to be something other than hashes ???
+    I don't want to mgetall 
+    could rooms be sets?
 
-    room:{x:5,y:10} = unitId -- no hash. For checking locality: what's there?
-    room = {location} -- these are used locations. You can see WHO is where by checking room:point
+    double lookup to get a room. This call will happen a lot!
+    room { userId }
+    userId:location
 
-    but then you can't get the contents of the room
+    room { location }
+    room:POINT = userId
 
-    -- so it would be a little annoying to get the contents of the room:
-    1. get locations
-    2. mget keys - gives you the unit ids
-    3. map them together?
+    room { location, userId }, but that doesn't solve the problem. 
 
-    -- what's the best way to track movement?
-    -- in theory, you could enter a square with something on it, no? (NOT NECESSARILY) 
-    -- I can decide. depends on which is easier
+    -- this is what it is
+    user:location = point
+    room { userId }
 
-    -- 1 -- feed the room with available locations and pop them off (have to feed it)
-    -- 2 -- random (hate it, because you have to keep trying. Indeterminate)
-    -- 3 -- 0, 0 is a special square. You don't exist till you move off it (easy!) -- only the last person to move there can. ok. so leave it like it is. You don't exist unless the system says you do.
-        -- prevent ANYONE from existing until they step off the start square 0, 0
+    -- then you know everyone to query for. 
+    -- you have the same problem, you can't expire the set membership
 
-EXPLORE
-[ ] middleware validate user auth token (or cleaner way to do it)
+    it certainly make it easy to expire them. I doubt I can expire set values though!
 
->>> Do me first <<<
-[ ] Functional Tests
-    [ ] They MUST be at the API level. 
-    [ ] Use the production system, just assume you don't run them in production.
+    -- interesting, I have to maintain all indexes myself :) 
 
-[ ] Pick a string representation
-	[ ] choose either Text or ByteString and stick with it. 
-	[ ] some of these libraries can vary. like scotty can pull anything out of a param
+5. Expire the user itself. 
 
-[ ] Get actorMove cleaner
+6. Expire something, then get a pubsub from it, and delete. 
 
-CLEANUP
+7. Require a leave command? 
 
-[ ] 
+8. Time on user, scan through and check all old ones?
+    - but there's no way to query like that. 
+
+

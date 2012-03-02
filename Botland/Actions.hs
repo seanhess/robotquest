@@ -123,9 +123,8 @@ authorized :: ByteString -> ByteString -> Redis Bool
 authorized uid token = do
     r <- get ("units:" ++ uid ++ ":token")
     case r of
-        Left r -> return False
-        Right Nothing -> return False
         Right (Just bs) -> return (token == bs)
+        _ -> return False
 
 
 
