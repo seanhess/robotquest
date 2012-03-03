@@ -15,7 +15,7 @@ git reset --hard $branch
 service redis-server start
 
 # install deps
-aptitude -y install alex libghc-zlib-dev libghc-zlib-bindings-dev
+apt-get -y install alex libghc-zlib-dev libghc-zlib-bindings-dev uuid uuid-dev
 cabal install --only-dependencies
 
 # compile
