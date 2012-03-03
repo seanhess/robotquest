@@ -19,8 +19,12 @@ apt-get -y install alex libghc-zlib-dev libghc-zlib-bindings-dev uuid uuid-dev
 cabal install --only-dependencies
 
 # compile
-echo 'COMPLING!'
+ghc --make Main
 
+# run
+cp -f server/botland.conf /etc/init/botland.conf
+start botland
+restart botland
 
 REMOTE
 
