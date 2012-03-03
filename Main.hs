@@ -42,9 +42,11 @@ main = do
         middleware cors
 
         get "/" $ do
-            liftIO $ putStrLn "Root"
             header "Content-Type" "text/html"
             file "public/index.html"
+
+        get "/test" $ do
+            text "test"
 
         get "/world" $ do
             send $ Right worldInfo
