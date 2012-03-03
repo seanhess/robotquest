@@ -1,4 +1,4 @@
 #!/bin/bash
 
 ssh root@dev.i.tv "cd /root/botland && git fetch && git reset --hard origin/master"
-ssh root@dev.i.tv "cabal install"
+ssh root@dev.i.tv "cd /root/botland cabal install"
