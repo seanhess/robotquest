@@ -27,6 +27,9 @@ import Network.Wai.Middleware.Static (staticRoot)
 import Data.Maybe (fromMaybe)
 
 
+import Control.Monad.IO.Class (liftIO)
+
+
 main :: IO ()
 main = do
     db <- R.connect R.defaultConnectInfo
@@ -39,6 +42,7 @@ main = do
         middleware cors
 
         get "/" $ do
+            liftIO $ putStrLn "Root"
             header "Content-Type" "text/html"
             file "public/index.html"
 
