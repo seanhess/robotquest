@@ -1,4 +1,27 @@
-#!/bin/bash
+#!/bin/bash 
 
-ssh root@dev.i.tv "cd /root/botland && git fetch && git reset --hard origin/master"
-ssh root@dev.i.tv "cd /root/botland cabal install"
+server=$1
+branch=$2
+
+echo "DEPLOY"
+ssh $server <<REMOTE
+cd /root/botland
+
+# checkout
+git fetch
+git reset --hard $branch
+
+# make sure redis is on
+service redis-server start
+
+# install deps
+aptitude -y install alex libghc-zlib-dev libghc-zlib-bindings-dev
+cabal install --only-dependencies
+
+# compile
+echo 'COMPLING!'
+
+
+REMOTE
+
+
