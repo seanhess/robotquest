@@ -9,14 +9,20 @@ import Botland.Types.Message (Fault(..))
 import Botland.Types.Location (Field(..), Point(..), Size(..), Location(..), FieldInfo(..))
 import Botland.Types.Unit (Spawn(..), UnitDescription(..))
 
-import Database.Redis (runRedis, connect, defaultConnectInfo, ping, get, set, keys, Redis, Connection, incr, hset, Reply(..), hgetall, hdel, hsetnx, flushall)
+import Control.Monad.IO.Class (liftIO)
+
+import Database.Redis
 
 import Data.Aeson (encode, decode)
 import Data.ByteString.Char8 (pack, unpack, concat, ByteString(..))
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as L
+import Data.DateTime (getCurrentTime, formatDateTime, DateTime)
 import qualified Data.Text.Lazy as T
 import Data.Maybe (fromMaybe, fromJust)
+
+import Debug.Trace (trace)
+
 
 worldInfo :: FieldInfo
 worldInfo = FieldInfo (Point 0 0) (Size 100 100)
@@ -73,11 +79,19 @@ unitSpawn d = do
     -- you don't exist until you step off the golden square
     --hset "world" (l2b $ encode p) id
 
+    -- hearbeat
+    heartbeat id
+    sadd "units" [id]
+
     -- they need to know the info, the token, and the starting location, etc
     return $ Spawn id token p
 
 unitMove :: ByteString -> Point -> Redis (Either Fault String)
 unitMove uid p = do
+
+    -- record heartbeat
+    heartbeat uid
+
     let lk = ("units:" ++ uid ++ ":location")
     ep <- get lk
     case ep of
@@ -118,13 +132,69 @@ resetWorld = do
     flushall
     return ()
 
-
 authorized :: ByteString -> ByteString -> Redis Bool
 authorized uid token = do
     r <- get ("units:" ++ uid ++ ":token")
     case r of
         Right (Just bs) -> return (token == bs)
         _ -> return False
+
+
+
+
+
+-- inactive units
+-- I like the other guy's solution. diff all the users against the active users
+-- active users = union of all recent-enough heartbeat sets
+-- and I can automatically clean up the old heartbeats
+heartbeat :: ByteString -> Redis ()
+heartbeat id = do
+    dt <- liftIO $ getCurrentTime
+    let ds = dateString dt
+    set (unitHeartbeatKey id) ds
+    return ()
+
+removeInactiveUnits :: DateTime -> Redis ()
+removeInactiveUnits dt = do 
+    let ds = dateString dt
+    res <- smembers "units"
+    case res of 
+        Left _ -> return ()
+        Right ids -> do
+            res <- mget (map unitHeartbeatKey ids)
+            case res of
+                Left _ -> return ()
+                Right mbeats -> do
+                    let oldIds = map fst $ filter (oldHeartBeat ds) $ zip ids mbeats
+                    mapM_ removeUnit oldIds
+                    return ()
+
+dateString :: DateTime -> ByteString
+dateString = pack . (formatDateTime "%Y-%m-%d %H:%M")
+
+removeUnit :: ByteString -> Redis ()
+removeUnit id = do 
+    res <- get (unitLocationKey id)
+    case res of 
+        Left _ -> return ()
+        Right Nothing -> return ()
+        Right (Just loc) -> do
+            hdel "world" [loc]
+            del (unitKeys id)
+            srem "units" [id]
+            return ()
+
+unitHeartbeatKey id = "units:" ++ id ++ ":heartbeat"
+unitLocationKey id = "units:" ++ id ++ ":location"
+unitDescriptionKey id = "units:" ++ id ++ ":description"
+unitTokenKey id = "units:" ++ id ++ ":token"
+unitKeys id = [unitHeartbeatKey id, unitLocationKey id, unitDescriptionKey id, unitTokenKey id]
+
+-- these are ALWAYS in order, I guess.
+oldHeartBeat :: ByteString -> (ByteString, Maybe ByteString) -> Bool
+oldHeartBeat date (id, mhb) = case mhb of
+        Nothing -> False
+        Just hb -> (hb < date)
 
 
 

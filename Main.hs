@@ -2,7 +2,7 @@
 
 module Main where
 
-import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, worldInfo) 
+import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, worldInfo, heartbeat)
 import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
@@ -64,6 +64,11 @@ main = do
             s <- redis $ unitSpawn d 
             header "X-Auth-Token" $ b2t (unitToken s)
             json s
+
+        post "/unit/:unitId/heartbeat" $ unitAuth $ do
+            uid <- param "unitId"
+            redis $ heartbeat uid
+            text "OK"
 
         post "/unit/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
             uid <- param "unitId"
