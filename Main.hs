@@ -11,7 +11,7 @@ import Botland.Middleware (ownsUnit)
 
 import Network.Wai.Middleware.Headers (cors)
 
-import Web.Scotty (get, post, param, header, scotty, text, request, middleware, file, json, ActionM(..))
+import Web.Scotty (get, post, param, header, scotty, text, request, middleware, file, json, ActionM(..), status)
 
 
 import qualified Database.Redis as R 
@@ -23,6 +23,7 @@ import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as L
 
 import Network.Wai.Middleware.Static (staticRoot)
+import Network.HTTP.Types (status200)
 
 import Data.Maybe (fromMaybe)
 
@@ -48,37 +49,46 @@ main = do
         get "/test" $ do
             text "test"
 
+        -- returns FieldInfo 
         get "/world" $ do
             send $ Right worldInfo
 
+        -- returns [Location]
         get "/world/locations" $ do
             ls <- redis $ worldLocations
             send ls
 
+        -- returns UnitDescription
         get "/unit/:unitId/description" $ do
             uid <- param "unitId"  
             a <- redis $ unitGetDescription uid
             send a
 
+        -- body UnitDescription
+        -- returns Spawn
         post "/unit/spawn" $ decodeBody $ \d -> do
             s <- redis $ unitSpawn d 
             header "X-Auth-Token" $ b2t (unitToken s)
             json s
 
+        -- body empty
+        -- returns OK
         post "/unit/:unitId/heartbeat" $ unitAuth $ do
             uid <- param "unitId"
             redis $ heartbeat uid
-            text "OK"
-
+            status status200
+            
+        -- body Point
+        -- returns OK
         post "/unit/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
             uid <- param "unitId"
             res <- redis $ unitMove uid p
             send res
 
-        -- temporary, for admin testing
+        -- temporary, for admin testing. 
         post "/admin/clear" $ do
             redis $ resetWorld
-            text "OK"
+            status status200
 
 
 

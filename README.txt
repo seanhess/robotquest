@@ -7,6 +7,10 @@ Installing Botland
 
 To run on a local development server, install GHC 7.2 or later. See server/setup for instructions on Ubuntu 11.10. `runghc Main` will start the server. 
 
+To install on windows: google "download ghc"
+
+To work on client: just hit the live api: http://dev.i.tv:3000/
+
 TODO
 
 [x] Get it compiling
