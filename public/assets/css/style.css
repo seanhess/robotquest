@@ -6,8 +6,10 @@
 body {}
 
 #logo {
-    margin: 10px;
     height: 250px;
+    margin-bottom: 30px;
+    display: block;
+    color: #000;
 }
 
 #logo img {
@@ -19,7 +21,7 @@ body {}
     font-size: 80px;
     margin: 10px;
     position: relative;
-    top: 80px;
+    top: 70px;
 }
 
 #logo .main.name div {
@@ -33,3 +35,21 @@ body {}
 
 
 
+
+.documentation h2 {
+}
+
+.documentation .methods {
+    margin-bottom: 20px;
+}
+
+.documentation .methods th {
+    text-align: left;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.documentation table td {
+    padding: 8px;
+    border: solid 1px #DDD;
+}

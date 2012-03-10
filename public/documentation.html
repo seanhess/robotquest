@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robotocalypseopolis - API Documentation</title>
+    <link href="/assets/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container documentation">
+        <a id="logo" href="/">
+            <img src="/assets/img/logo.png">
+            <div class="main name">
+                <div>Robot</div>
+                <div>ocalypse</div>
+                <div>opolis</div>
+            </div>
+        </a>
+
+        <hr/>
+
+        <h2>Methods</h2>
+
+        <p>Any method can return a <a href="#Fault">Fault</a> instead of its regular response.</p>
+
+        <table class="methods">
+            <tr>
+                <th>Url</th>
+                <th></th>
+                <th>Body</th>
+                <th>Returns</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td class="url">/world</td>
+                <td></td>
+                <td><a href="#FieldInfo">FieldInfo</a></td>
+                <td>The size and coordinates of the world</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td class="url">/world/locations</td>
+                <td></td>
+                <td>[<a href="#Location">Location</a>]</td>
+                <td>All locations in the world. Poll for updates</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td class="url">/units/:<a href="#UnitId">unitId</a>/description</td>
+                <td></td>
+                <td><a href="#UnitDescription">UnitDescription</a></td>
+                <td>Returns the description for a unit given by <a href="#UnitId">UnitId</a></td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td class="url">/units/spawn</td>
+                <td><a href="#UnitDescription">UnitDescription</a></td>
+                <td><a href="#Spawn">Spawn</a></td>
+                <td>Create a new bot and get enough information to control it. See <a href="#Authentication">Authentication</a></td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td class="url">/units/:<a href="#UnitId">unitId</a>/heartbeat</td>
+                <td></td>
+                <td></td>
+                <td><a href="#Authentication">Authentication</a> required.</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td class="url">/units/:<a href="#UnitId">unitId</a>/move</td>
+                <td><a href="#Point">Point</a></td>
+                <td></td>
+                <td><a href="#Authentication">Authentication</a> required.</td>
+            </tr>
+        </table>
+
+        <hr/>
+        <h2 id="Fields">Fields</h2>
+
+        <p>Right now, we just use a single field: world. Later the world will be divided into multiple fields for performance and fog of war.</p> 
+
+        <div class="object" id="FieldInfo">
+            <h4>FieldInfo</h4>
+            <pre>{ fieldStart: <a href="#Point">Point</a>, fieldSize: <a href="#Size">Size</a> }</pre>
+        </div>
+
+        <div class="object" id="Location">
+            <h4>Location</h4>
+            <pre>{ point: <a href="#Point">Point</a>, unitId: <a href="#UnitId">UnitId</a> }</pre>
+        </div>
+
+        <div class="object" id="Point">
+            <h4>Point</h4>
+            <pre>{ x: Int, y: Int }</pre>
+        </div>
+
+        <div class="object" id="Size">
+            <h4>Size</h4>
+            <pre>{ width: Int, height: Int }</pre>
+        </div>
+
+
+        <hr/>
+        <h2 id="Units">Units</h2>
+
+        <div class="object" id="UnitId">
+            <h4>UnitId</h4>
+            <pre>String | <a href="#BlockType">BlockType</a></pre>
+            <div>Unit id is either a unique id for a unit, or a <a href="#BlockType">BlockType</a></div>
+        </div>
+
+        <div class="object" id="UnitDescription">
+            <h4>UnitDescription</h4>
+            <pre>{ source: <a href="#Url">Url</a>, notes: String }</pre>
+        </div>
+
+        <div class="object" id="BlockType">
+            <h4>BlockType</h4>
+            <pre>"Wood" | "Stone"</pre>
+        </div>
+
+        <div class="object" id="Spawn">
+            <h4>Spawn</h4>
+            <pre>{ unitId: <a href="#UnitId">UnitId</a>, unitToken: <a href="#UnitToken">UnitToken</a>, spawnPoint: <a href="#Point">Point</a> }</pre>
+        </div>
+
+
+
+
+
+
+        <hr/>
+        <h2 id="Authentication">Authentication</h2>
+        <p>Some routes, like <code>/units/:unitId/move</code>, require you to prove you have control of a given unit. You will receive a <a href="#UnitToken">UnitToken</a> when you call <code>/units/spawn</code>. Simply set the <code>X-Auth-Token</code> header to this token to call any route that requires authentication. </p>
+
+
+        <div class="object" id="UnitToken">
+            <h4>UnitToken</h4>
+            <pre>String</pre>
+        </div>
+
+        <hr/>
+        <h2 id="Faults">Faults</h2>
+
+        <p>Any route can return a Fault instead of its normal response. It will always be accompanied by a non-standard http status code.</p>
+
+        <div class="object" id="Fault">
+            <h4>Fault</h4>
+            <pre>{ message: String }</pre>
+        </div>
+
+    </div>
+
+
+    <div style="height: 1000px"></div>
+
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="/assets/js/bootstrap.js"></script>
+</body>

@@ -59,28 +59,28 @@ main = do
             send ls
 
         -- returns UnitDescription
-        get "/unit/:unitId/description" $ do
+        get "/units/:unitId/description" $ do
             uid <- param "unitId"  
             a <- redis $ unitGetDescription uid
             send a
 
         -- body UnitDescription
         -- returns Spawn
-        post "/unit/spawn" $ decodeBody $ \d -> do
+        post "/units/spawn" $ decodeBody $ \d -> do
             s <- redis $ unitSpawn d 
             header "X-Auth-Token" $ b2t (unitToken s)
             json s
 
         -- body empty
         -- returns OK
-        post "/unit/:unitId/heartbeat" $ unitAuth $ do
+        post "/units/:unitId/heartbeat" $ unitAuth $ do
             uid <- param "unitId"
             redis $ heartbeat uid
             status status200
             
         -- body Point
         -- returns OK
-        post "/unit/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
+        post "/units/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
             uid <- param "unitId"
             res <- redis $ unitMove uid p
             send res
