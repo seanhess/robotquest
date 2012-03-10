@@ -1,0 +1,35 @@
+@font-face {
+    font-family: robot;
+    src: url('/assets/robot.ttf')  format('truetype');
+}
+
+body {}
+
+#logo {
+    margin: 10px;
+    height: 250px;
+}
+
+#logo img {
+    float: left;
+}
+
+#logo .main.name {
+    font-family: robot;
+    font-size: 80px;
+    margin: 10px;
+    position: relative;
+    top: 80px;
+}
+
+#logo .main.name div {
+    height: 60px; 
+}
+
+#nav {
+    margin: 30px; 
+}
+
+
+
+

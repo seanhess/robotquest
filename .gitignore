@@ -4,3 +4,4 @@ sandbox
 *.hi
 *.o
 dist/*
+*.sublime*
