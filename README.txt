@@ -1,8 +1,12 @@
-Botland
+Robotocalypseopolis
 =============================
 
+Visit http://dev.i.tv:3000/
 
-Installing Botland
+
+
+
+Installing robolis
 ------------------
 
 To run on a local development server, install GHC 7.2 or later. See server/setup for instructions on Ubuntu 11.10. `runghc Main` will start the server. 
@@ -45,6 +49,20 @@ UNIT CLEANUP
 [x] units:id:heartbeat, scan every single member of units, check if heartbeat is too old
 [ ] units:heartbeats:DATE - add them as a member to the right one. Expire these sets. SDIFF them against units
 
+GAME OF LIFE
+[ ] create a unit at a point -- should there be rules about this? What if you ALWAYS had to specify a point to create your unit, and it wouldn't work if someone was standing there? That's easier than what I'm doing now, and less weird. Do it!
+[ ] destroy own unit
+[ ] update color / description 
+
+?????
+[ ] return more information / updates with the world call?
+[ ] make our world hash more flexible. it can return a Unit, a BlockType, or whatever. 
+[ ] have them specify the control password for a given unit
+
+FAQ
+
+Q. Why not use sockets?
+A. Sockets would make updates, and automatic cleanup easier (built in heartbeat), but they would make scaling harder later. HTTP is inherently easy to scale/cache etc. 
 
 
 

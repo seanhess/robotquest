@@ -47,7 +47,7 @@ decodeBody k = do
         Just o -> k o  
         Nothing -> do
             status statusBadRequest
-            text "Could not parse body"
+            json $ Fault "Could not parse body"
 
 queryRedis :: Connection -> Redis a -> ActionM a
 queryRedis db r = liftIO $ runRedis db r
@@ -84,7 +84,8 @@ send ea = do
         Left f -> do
             status status400 -- always a bad request. Their fault right? :)
             json f
-        Right a -> json a 
+        Right a -> do
+            json a 
 
 (++) :: ByteString -> ByteString -> ByteString
 (++) = append

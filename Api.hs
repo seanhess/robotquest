@@ -46,44 +46,43 @@ main = do
             header "Content-Type" "text/html"
             file "public/index.html"
 
-        get "/test" $ do
-            text "test"
-
-        -- returns FieldInfo 
         get "/world" $ do
             send $ Right worldInfo
 
-        -- returns [Location]
         get "/world/locations" $ do
             ls <- redis $ worldLocations
             send ls
 
-        -- returns UnitDescription
         get "/units/:unitId/description" $ do
             uid <- param "unitId"  
             a <- redis $ unitGetDescription uid
             send a
 
-        -- body UnitDescription
-        -- returns Spawn
-        post "/units/spawn" $ decodeBody $ \d -> do
-            s <- redis $ unitSpawn d 
-            header "X-Auth-Token" $ b2t (unitToken s)
-            json s
+        -- put "/units/:unitId/description"
+        -- delete "/units/:unitId"
 
-        -- body empty
-        -- returns OK
+        post "/units" $ decodeBody $ \sr -> do
+            res <- redis $ unitSpawn sr 
+            case res of
+                Right s -> do
+                    header "X-Auth-Token" $ b2t (unitToken s)
+                    send res
+                _ -> send res
+
         post "/units/:unitId/heartbeat" $ unitAuth $ do
             uid <- param "unitId"
             redis $ heartbeat uid
             status status200
             
-        -- body Point
-        -- returns OK
         post "/units/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
             uid <- param "unitId"
             res <- redis $ unitMove uid p
             send res
+
+
+
+
+
 
         -- temporary, for admin testing. 
         post "/admin/clear" $ do

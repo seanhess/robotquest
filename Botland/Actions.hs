@@ -7,11 +7,11 @@ import Prelude hiding ((++))
 import Botland.Helpers (uuid, l2b, b2l, (++))
 import Botland.Types.Message (Fault(..))
 import Botland.Types.Location (Field(..), Point(..), Size(..), Location(..), FieldInfo(..))
-import Botland.Types.Unit (Spawn(..), UnitDescription(..))
+import Botland.Types.Unit (Spawn(..), UnitDescription(..), SpawnRequest(..))
 
 import Control.Monad.IO.Class (liftIO)
 
-import Database.Redis hiding (decode)
+import Database.Redis
 
 import Data.Aeson (encode, decode)
 import Data.ByteString.Char8 (pack, unpack, concat, ByteString(..))
@@ -26,9 +26,6 @@ import Debug.Trace (trace)
 
 worldInfo :: FieldInfo
 worldInfo = FieldInfo (Point 0 0) (Size 100 100)
-
-sharedSpawn :: Point
-sharedSpawn = Point 50 50
 
 
 -- the field for the whole world. Remove this eventually in favor of smaller fields
@@ -62,29 +59,44 @@ unitGetDescription uid = do
 -- when it starts: create the room?
 -- set per room, the values are the locations?
 
-unitSpawn :: UnitDescription -> Redis Spawn
-unitSpawn d = do
+unitSpawn :: SpawnRequest -> Redis (Either Fault Spawn)
+unitSpawn sr = do
     id <- uuid
     token <- uuid
 
     -- everyone starts at the same place. You don't exist until you move off of it.
     -- create a spawnAt 
-    let p = sharedSpawn
-    
-    -- save the actor information, its token, and its position
-    set ("units:" ++ id ++ ":description") (l2b $ encode d)
-    set ("units:" ++ id ++ ":token") token
-    set ("units:" ++ id ++ ":location") (l2b $ encode p)
+    let d = unitDescription sr 
+    let p = requestedPoint sr
 
-    -- you don't exist until you step off the golden square
-    --hset "world" (l2b $ encode p) id
+    liftIO $ print p
+    liftIO $ print worldInfo
 
-    -- hearbeat
-    heartbeat id
-    sadd "units" [id]
 
-    -- they need to know the info, the token, and the starting location, etc
-    return $ Spawn id token p
+    -- LOCATION
+    if (not $ validPoint worldInfo p) then 
+        return $ Left $ Fault "Invalid spawn point"
+    else do
+
+    res <- claimLocation id p
+    case res of 
+        Left f -> return $ Left f
+        Right False -> return $ Left $ Fault "could not claim space"
+        Right True -> do
+            -- save the actor information, its token, and its position
+            set ("units:" ++ id ++ ":description") (l2b $ encode d)
+            set ("units:" ++ id ++ ":token") token
+            set ("units:" ++ id ++ ":location") (l2b $ encode p)
+
+            -- you don't exist until you step off the golden square
+            --hset "world" (l2b $ encode p) id
+
+            -- hearbeat
+            heartbeat id
+            sadd "units" [id]
+
+            -- they need to know the info, the token, and the starting location, etc
+            return $ Right $ Spawn id token p
 
 unitMove :: ByteString -> Point -> Redis (Either Fault String)
 unitMove uid p = do
@@ -106,20 +118,28 @@ unitMove uid p = do
                 return $ Left $ Fault "Invalid move"
             else do
 
-            res <- hsetnx "world" (l2b $ encode p) uid
+            res <- claimLocation uid p
             case res of 
                 Right True -> do
                     set lk (l2b $ encode p)
                     hdel "world" [l2b $ encode po]
                     return $ Right "OK"
-                _ -> return $ Left $ Fault "Space Occupied"
+                Left f -> return $ Left f
+
+
+claimLocation :: ByteString -> Point -> Redis (Either Fault Bool)
+claimLocation uid p = do
+    res <- hsetnx "world" (l2b $ encode p) uid
+    case res of 
+        Right True -> return $ Right True
+        _ -> return $ Left $ Fault "Space Occupied"
 
 neighboring :: Point -> Point -> Bool
 neighboring p1 p2 = withinOne (x p1) (x p2) && withinOne (y p1) (y p2)
     where withinOne a b = (a == b || a == (b-1) || a == (b+1))
 
 validPoint :: FieldInfo -> Point -> Bool
-validPoint f p = xmin < px && px < xmax && ymin < py && py < ymax && p /= sharedSpawn
+validPoint f p = xmin <= px && px <= xmax && ymin <= py && py <= ymax
     where px = x p
           py = y p
           xmin = x $ fieldStart f

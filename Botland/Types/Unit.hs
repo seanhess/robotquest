@@ -23,6 +23,10 @@ type UnitId = ByteString
 type UnitToken = ByteString
 
 -- they already know their description
+data SpawnRequest = SpawnRequest { requestedPoint :: Point, unitDescription :: UnitDescription } deriving (Generic, Show)
+instance FromJSON SpawnRequest
+instance ToJSON SpawnRequest
+
 data Spawn = Spawn { unitId :: UnitId, unitToken :: UnitToken, spawnPoint :: Point } deriving (Generic, Show)
 instance ToJSON Spawn
 instance FromJSON Spawn
