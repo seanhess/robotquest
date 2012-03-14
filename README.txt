@@ -50,9 +50,10 @@ UNIT CLEANUP
 [ ] units:heartbeats:DATE - add them as a member to the right one. Expire these sets. SDIFF them against units
 
 GAME OF LIFE
-[ ] create a unit at a point -- should there be rules about this? What if you ALWAYS had to specify a point to create your unit, and it wouldn't work if someone was standing there? That's easier than what I'm doing now, and less weird. Do it!
+[x] create a unit at a point
+[ ] shared types: all bryce's bots will be the same type and have the same description? No, they could have different colors. Just keep it the same. 
 [ ] destroy own unit
-[ ] update color / description 
+[ ] update color / description !! Needs differential update
 
 ?????
 [ ] return more information / updates with the world call?

@@ -38,7 +38,7 @@ main = do
 
 clear :: IO () 
 clear = do
-    send (request GET "http://localhost:3000/admin/clear")
+    send (request POST "http://localhost:3000/admin/clear")
     return ()
 
 postNewUnit :: IO (Spawn)
@@ -72,6 +72,13 @@ moveActorWithToken uid token p = do
         Just f -> return $ error (show f)
         Nothing -> return True
 
+
+removeUnit :: ByteString -> IO ()
+removeUnit uid = do
+    let req = request DELETE ("http://localhost:3000/units/" ++ (unpack uid))
+    res <- send req
+    return ()
+
 testAuthentication :: Property
 testAuthentication = monadicIO $ do
 
@@ -88,6 +95,8 @@ testAuthentication = monadicIO $ do
     -- will already fail if it isn't a fault
     f <- run $ moveActorWithoutToken uid p
     r <- run $ moveActorWithToken uid token p
+
+    res <- run $ removeUnit uid
 
     --assert r
     return ()
@@ -114,7 +123,7 @@ testAuthentication = monadicIO $ do
 
 
 functional :: (Testable prop) => prop -> IO ()
-functional = quickCheckWith stdArgs { maxSuccess = 5 } 
+functional = quickCheckWith stdArgs { maxSuccess = 1 } 
 
 --get :: String -> Request L.ByteString
 --get u = request GET u Empty
@@ -125,7 +134,7 @@ functional = quickCheckWith stdArgs { maxSuccess = 5 }
 request :: RequestMethod -> String -> Request L.ByteString
 request rm u = case parseURI u of
     Nothing -> error ("Bad URL" ++ u)
-    Just url -> mkRequest POST url
+    Just url -> mkRequest rm url
 
 send :: Request L.ByteString -> IO (Response L.ByteString)
 send req = do

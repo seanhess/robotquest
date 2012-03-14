@@ -2,7 +2,7 @@
 
 module Main where
 
-import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, worldInfo, heartbeat)
+import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, worldInfo, heartbeat, removeUnit)
 import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..))
 --import Botland.Types.Location (Point(..))
@@ -11,7 +11,7 @@ import Botland.Middleware (ownsUnit)
 
 import Network.Wai.Middleware.Headers (cors)
 
-import Web.Scotty (get, post, param, header, scotty, text, request, middleware, file, json, ActionM(..), status)
+import Web.Scotty (get, post, delete, param, header, scotty, text, request, middleware, file, json, ActionM(..), status)
 
 
 import qualified Database.Redis as R 
@@ -68,6 +68,11 @@ main = do
                     header "X-Auth-Token" $ b2t (unitToken s)
                     send res
                 _ -> send res
+
+        delete "/units/:unitId" $ do
+            uid <- param "unitId"
+            redis $ removeUnit uid
+            status status200
 
         post "/units/:unitId/heartbeat" $ unitAuth $ do
             uid <- param "unitId"
