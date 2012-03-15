@@ -2,18 +2,21 @@
 <html>
 <head>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/demo/viewer.js"></script>
+<style>
+    #viewer {
+        border: solid 1px black;
+        margin: 0px auto;
+    }
+</style>
 <script>
+    $(function() {
+        viewer("#viewer").start()
+    })
 </script>
 
 </head>
 <body>
-    <h1>Botland</h1>
-    <p>v1.0</p>
-    <!-- I should have a reusable view thing? -->
-    <!-- or just say "connected" etc -->
-
-
-
-
+    <canvas id="viewer" width="100" height="100"></canvas>
 </body>

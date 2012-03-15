@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
 
 module Main where
 
@@ -29,6 +29,8 @@ import Data.Maybe (fromMaybe)
 
 
 import Control.Monad.IO.Class (liftIO)
+
+import Botland.Types.Unit (SpawnRequest)
 
 
 main :: IO ()
@@ -61,7 +63,7 @@ main = do
         -- put "/units/:unitId/description"
         -- delete "/units/:unitId"
 
-        post "/units" $ decodeBody $ \sr -> do
+        post "/units" $ decodeBody $ \(sr :: SpawnRequest) -> do
             res <- redis $ unitSpawn sr 
             case res of
                 Right s -> do

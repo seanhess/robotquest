@@ -52,8 +52,11 @@ UNIT CLEANUP
 GAME OF LIFE
 [x] create a unit at a point
 [ ] shared types: all bryce's bots will be the same type and have the same description? No, they could have different colors. Just keep it the same. 
-[ ] destroy own unit
+[x] destroy own unit
 [ ] update color / description !! Needs differential update
+
+[ ] make the canvas viewer better
+[ ] make a bot that moves around
 
 ?????
 [ ] return more information / updates with the world call?
