@@ -6,7 +6,7 @@ function request(method, url, body, authToken, cb) {
             , contentType: 'application/json'
             , data: b
             , dataType: "json"
-            , headers: {"X-Auth-Token":authToken, "Content-Length":b.length}
+            , headers: {"X-Auth-Token":authToken}
             , error: function(xhr) {
                 cb(new Error(xhr.responseText))
             }

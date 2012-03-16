@@ -15,6 +15,14 @@ To install on windows: google "download ghc"
 
 To work on client: just hit the live api: http://dev.i.tv:3000/
 
+NEXT STEPS
+[ ] MCP Layer
+
+
+PERFORMANCE
+[ ] GZip
+[ ] Bulk Commands? (easier if we switch to /units/:unitId/act) with an action command, except each one needs a different body :(
+
 TODO
 
 [x] deploy doesn't use same version of redis ()
