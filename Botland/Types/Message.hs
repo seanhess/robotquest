@@ -32,3 +32,6 @@ data Empty = Empty deriving (Generic)
 instance FromJSON Empty
 instance ToJSON Empty
 
+data Test = Test { test :: ByteString } deriving (Generic, Data, Typeable, Show)
+instance ToJSON Test
+instance FromJSON Test

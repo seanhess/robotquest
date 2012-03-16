@@ -4,7 +4,7 @@ module Main where
 
 import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, heartbeat, removeUnit)
 import Botland.Types.Unit (unitToken)
-import Botland.Types.Message (Fault(..))
+import Botland.Types.Message (Fault(..), Test(..))
 import Botland.Types.Location (Point(..), Size(..), FieldInfo(..), GameInfo(..))
 import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
 import Botland.Middleware (ownsUnit)
@@ -57,6 +57,10 @@ main = do
             liftIO $ putStrLn "0.1.2"
             text "0.1.2"
 
+        post "/test" $ decodeBody $ \(test :: Test) -> do 
+            liftIO $ print test
+            text "OK"
+
         get "/game" $ do
             send $ Right gameInfo
 
@@ -107,7 +111,6 @@ main = do
         post "/admin/clear" $ do
             redis $ resetWorld
             status status200
-
 
 
 
