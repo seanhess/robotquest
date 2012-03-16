@@ -54,8 +54,8 @@
             </tr>
             <tr>
                 <td>POST</td>
-                <td class="url">/units/spawn</td>
-                <td><a href="#UnitDescription">UnitDescription</a></td>
+                <td class="url">/units</td>
+                <td><a href="#SpawnRequest">SpawnRequest</a></td>
                 <td><a href="#Spawn">Spawn</a></td>
                 <td>Create a new bot and get enough information to control it. See <a href="#Authentication">Authentication</a></td>
             </tr>
@@ -129,6 +129,12 @@
         <div class="object" id="BlockType">
             <h4>BlockType</h4>
             <pre>"Wood" | "Stone"</pre>
+        </div>
+
+
+        <div class="object" id="SpawnRequest">
+            <h4>SpawnRequest</h4>
+            <pre>{ requestedPoint: <a href="#Point">Point</a>, unitDescription: <a href="#UnitDescription">UnitDescription</a> }</pre>
         </div>
 
         <div class="object" id="Spawn">
