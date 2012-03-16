@@ -21,8 +21,8 @@ apt-get -y install alex libghc-zlib-dev libghc-zlib-bindings-dev uuid uuid-dev
 cabal update 
 cabal install --only-dependencies
 
-# compile
-ghc --make Api
+# compile (use runghc. I couldn't get it to compile before)
+# ghc --make Api
 
 # run
 cp -f server/botland.conf /etc/init/botland.conf
