@@ -11,7 +11,7 @@ import Botland.Types.Unit (Spawn(..), UnitDescription(..), SpawnRequest(..))
 
 import Control.Monad.IO.Class (liftIO)
 
-import Database.Redis
+import Database.Redis hiding (decode)
 
 import Data.Aeson (encode, decode)
 import Data.ByteString.Char8 (pack, unpack, concat, ByteString(..))
