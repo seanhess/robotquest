@@ -17,6 +17,10 @@ To work on client: just hit the live api: http://dev.i.tv:3000/
 
 TODO
 
+[ ] deploy doesn't use same version of redis ()
+
+
+
 [x] Chaos Bot - Movement 
 [x] Able to launch multiple bots from the viewer
 [ ] Auto cleanup (on deploy, figure out easier way to start stuff)

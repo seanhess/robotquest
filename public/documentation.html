@@ -33,10 +33,10 @@
             </tr>
             <tr>
                 <td>GET</td>
-                <td class="url">/world</td>
+                <td class="url">/game</td>
                 <td></td>
-                <td><a href="#FieldInfo">FieldInfo</a></td>
-                <td>The size and coordinates of the world</td>
+                <td><a href="#GameInfo">GameInfo</a></td>
+                <td>The tick interval, size and coordinates of the world</td>
             </tr>
             <tr>
                 <td>GET</td>
@@ -76,6 +76,13 @@
         </table>
 
         <hr/>
+        <h2 id="Game">Game</h2>
+        <div class="object" id="GameInfo">
+            <h4>GameInfo</h4>
+            <pre>{ worldFieldInfo: <a href="#FieldInfo">FieldInfo</a>, msTickInterval: Int }</pre>
+        </div>
+
+        <hr/>
         <h2 id="Fields">Fields</h2>
 
         <p>Right now, we just use a single field: world. Later the world will be divided into multiple fields for performance and fog of war.</p> 
@@ -112,7 +119,11 @@
 
         <div class="object" id="UnitDescription">
             <h4>UnitDescription</h4>
-            <pre>{ source: <a href="#Url">Url</a>, notes: String }</pre>
+            <pre>{ source: <a href="#Url">Url</a>, notes: String, name: String, kind: String, color: String }</pre>
+            <p>Name: for use within your bot. Can be anything</p> 
+            <p>Kind: unique type name for that kind of bot</p>
+            <p>Source: URL to the source for your bot</p>
+            <p>Color: Web-safe color, like "#FFF"</p>
         </div>
 
         <div class="object" id="BlockType">
