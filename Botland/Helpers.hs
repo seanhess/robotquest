@@ -46,6 +46,7 @@ decodeBody k = do
     case mo of
         Just o -> k o  
         Nothing -> do
+            liftIO $ print b
             status statusBadRequest
             json $ Fault "Could not parse body"
 
