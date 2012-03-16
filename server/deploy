@@ -15,19 +15,19 @@ git reset --hard $branch
 service redis-server start
 
 # install deps
-apt-get -y install alex libghc-zlib-dev libghc-zlib-bindings-dev uuid uuid-dev
+# apt-get -y install alex libghc-zlib-dev libghc-zlib-bindings-dev uuid uuid-dev
 
 # slow, but accurate
-cabal update 
-cabal install --only-dependencies
+# cabal update 
+# cabal install --only-dependencies
 
 # compile (use runghc. I couldn't get it to compile before)
-# ghc --make Api
+ghc --make Api.hs
 
 # run
 cp -f server/botland.conf /etc/init/botland.conf
+stop botland
 start botland
-restart botland
 
 REMOTE
 

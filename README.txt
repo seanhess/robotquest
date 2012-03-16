@@ -18,6 +18,8 @@ To work on client: just hit the live api: http://dev.i.tv:3000/
 TODO
 
 [ ] deploy doesn't use same version of redis ()
+[ ] unitauth delete user
+[ ] document delete user
 
 
 
