@@ -33,7 +33,7 @@ import Control.Monad.IO.Class (liftIO)
 import Botland.Types.Unit (SpawnRequest)
 
 worldInfo :: FieldInfo
-worldInfo = FieldInfo (Point 0 0) (Size 20 20)
+worldInfo = FieldInfo (Point 0 0) (Size 10 10)
 
 gameInfo :: GameInfo
 gameInfo = GameInfo worldInfo 500 
