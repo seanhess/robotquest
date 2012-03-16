@@ -15,6 +15,7 @@ function Viewer($parent, size) {
     var factor = 1
 
     var locations
+    var units
 
     // resize
     function resize() {
@@ -33,16 +34,21 @@ function Viewer($parent, size) {
         blockWidth = factor
         blockHeight = factor
 
-        if (locations) 
-            draw(locations)
+        if (locations && units) 
+            draw(locations, units)
     }
 
 
-    function drawLocation(loc, color,  blockWidth, blockHeight) {
-        var x = loc.point.x * blockWidth
-        var y = loc.point.y * blockHeight 
+    function drawLocation(point, description, blockWidth, blockHeight) {
 
-        ctx.fillStyle = color;
+        // wait until it's fully available to draw it
+        if (!description.color) return
+
+        var x = point.x * blockWidth
+        var y = point.y * blockHeight 
+
+
+        ctx.fillStyle = description.color;
         ctx.strokeStyle = "#000"
 
         // ctx.fillRect(x, y, blockWidth, blockHeight)
@@ -56,8 +62,9 @@ function Viewer($parent, size) {
         ctx.fill()
     }
 
-    function draw(newLocations) {
+    function draw(newLocations, newUnits) {
         locations = newLocations
+        units = newUnits
 
         // clear the whole board
         ctx.fillStyle = "#FFF"
@@ -66,7 +73,11 @@ function Viewer($parent, size) {
 
         // draw all locations
         for (var i = 0; i < locations.length; i++) {
-            drawLocation(locations[i], '#FFF', blockWidth, blockHeight)
+            var location = locations[i]
+            var point = location.point
+            var unitId = location.unitId
+            var description = units[unitId]
+            drawLocation(point, description, blockWidth, blockHeight)
         }
     }
 

@@ -3,8 +3,9 @@
 <head>
 
 <script src="/assets/js/jquery.min.js"></script>
-<script src="/demo/viewer.js"></script>
+<script src="/assets/js/async.min.js"></script>
 <script src="/demo/api.js"></script>
+<script src="/demo/viewer.js"></script>
 <script src="/demo/chaosbot.js"></script>
 <style>
 
@@ -44,11 +45,30 @@
             var worldInfo = gameInfo.worldFieldInfo
             var viewer = new Viewer($("#viewer"), worldInfo.fieldSize)
 
+            var units = {}
+
             function tick() {
                 $.get("/world/locations", function(locations) {
-                    viewer.draw(locations)
+
+                    var unknownUnits = locations.filter(function(l) {
+                        return !units[l.unitId]
+                    }).map(function(l) {
+                        return l.unitId
+                    })
+
+                    async.forEach(unknownUnits, function(unitId, done) {
+                        units[unitId] = {} // so we don't fetch them twice
+                        getUnitDescription(unitId, function(d) {
+                            units[unitId] = d
+                            done()
+                        })
+                    }, function() {
+
+                    })
+
+                    viewer.draw(locations, units)
                     for (var i = 0; i < bots.length; i++) {
-                        bots[i].tick(locations)
+                        bots[i].tick(locations, units)
                     }
                 })
             }
@@ -66,6 +86,11 @@
                 bots.push(bot)
             }
 
+            function getUnitDescription(unitId, cb) {
+                $.get("/units/" + unitId + "/description", function(description) {
+                    cb(description)
+                })
+            }
         })
 
 

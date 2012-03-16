@@ -15,7 +15,7 @@ function ChaosBot(worldInfo, color) {
     var description = {source: "http://github.com/seanhess/botland", notes:"chaos bot moves in a direction until hitting something, then changes directions", color: color } 
 
     // we ignore the world. Easier to rely on failures
-    function tick(world) {
+    function tick(world, units) {
         var newPoint = currentAction(point)
         request("POST", "/units/" + unitId + "/move", newPoint, unitToken, function(err) {
 
