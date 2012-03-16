@@ -54,6 +54,7 @@ main = do
             file "public/index.html"
 
         get "/version" $ do
+            liftIO $ putStrLn "0.1.1"
             text "0.1.1"
 
         get "/game" $ do
