@@ -17,6 +17,16 @@ To work on client: just hit the live api: http://dev.i.tv:3000/
 
 TODO
 
+[ ] Chaos Bot - Movement 
+[ ] Able to launch multiple bots from the viewer
+[ ] Auto cleanup (on deploy, figure out easier way to start stuff)
+[ ] Bot type, but name
+[ ] Bot color
+[ ] Special indicator around YOUR bot (a border)
+
+
+
+
 [x] Get it compiling
 [-] test to see if you can use raise/rescue instead of case statements /fault (auto fault with error)
 [x] functional tests
@@ -53,7 +63,7 @@ GAME OF LIFE
 [x] create a unit at a point
 [ ] shared types: all bryce's bots will be the same type and have the same description? No, they could have different colors. Just keep it the same. 
 [x] destroy own unit
-[ ] update color / description !! Needs differential update
+[x] add color to description
 
 [ ] make the canvas viewer better
 [ ] make a bot that moves around

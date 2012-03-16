@@ -2,10 +2,10 @@
 
 module Main where
 
-import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, worldInfo, heartbeat, removeUnit)
+import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, heartbeat, removeUnit)
 import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..))
---import Botland.Types.Location (Point(..))
+import Botland.Types.Location (Point(..), Size(..), FieldInfo(..))
 import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
 import Botland.Middleware (ownsUnit)
 
@@ -32,6 +32,8 @@ import Control.Monad.IO.Class (liftIO)
 
 import Botland.Types.Unit (SpawnRequest)
 
+worldInfo :: FieldInfo
+worldInfo = FieldInfo (Point 0 0) (Size 10 10)
 
 main :: IO ()
 main = do
@@ -64,7 +66,7 @@ main = do
         -- delete "/units/:unitId"
 
         post "/units" $ decodeBody $ \(sr :: SpawnRequest) -> do
-            res <- redis $ unitSpawn sr 
+            res <- redis $ unitSpawn worldInfo sr 
             case res of
                 Right s -> do
                     header "X-Auth-Token" $ b2t (unitToken s)
@@ -83,7 +85,7 @@ main = do
             
         post "/units/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
             uid <- param "unitId"
-            res <- redis $ unitMove uid p
+            res <- redis $ unitMove worldInfo uid p
             send res
 
 

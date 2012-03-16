@@ -24,9 +24,6 @@ import Data.Maybe (fromMaybe, fromJust)
 import Debug.Trace (trace)
 
 
-worldInfo :: FieldInfo
-worldInfo = FieldInfo (Point 0 0) (Size 100 100)
-
 
 -- the field for the whole world. Remove this eventually in favor of smaller fields
 worldLocations :: Redis (Either Fault [Location])
@@ -59,8 +56,8 @@ unitGetDescription uid = do
 -- when it starts: create the room?
 -- set per room, the values are the locations?
 
-unitSpawn :: SpawnRequest -> Redis (Either Fault Spawn)
-unitSpawn sr = do
+unitSpawn :: FieldInfo -> SpawnRequest -> Redis (Either Fault Spawn)
+unitSpawn worldInfo sr = do
     id <- uuid
     token <- uuid
 
@@ -68,10 +65,6 @@ unitSpawn sr = do
     -- create a spawnAt 
     let d = unitDescription sr 
     let p = requestedPoint sr
-
-    liftIO $ print p
-    liftIO $ print worldInfo
-
 
     -- LOCATION
     if (not $ validPoint worldInfo p) then 
@@ -98,8 +91,8 @@ unitSpawn sr = do
             -- they need to know the info, the token, and the starting location, etc
             return $ Right $ Spawn id token p
 
-unitMove :: ByteString -> Point -> Redis (Either Fault String)
-unitMove uid p = do
+unitMove :: FieldInfo -> ByteString -> Point -> Redis (Either Fault String)
+unitMove worldInfo uid p = do
 
     -- record heartbeat
     heartbeat uid
@@ -139,7 +132,7 @@ neighboring p1 p2 = withinOne (x p1) (x p2) && withinOne (y p1) (y p2)
     where withinOne a b = (a == b || a == (b-1) || a == (b+1))
 
 validPoint :: FieldInfo -> Point -> Bool
-validPoint f p = xmin <= px && px <= xmax && ymin <= py && py <= ymax
+validPoint f p = xmin <= px && px < xmax && ymin <= py && py < ymax
     where px = x p
           py = y p
           xmin = x $ fieldStart f

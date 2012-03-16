@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/demo/viewer.js"></script>
+<script src="/demo/api.js"></script>
+<script src="/demo/chaosbot.js"></script>
+<style>
+
+    body {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    #controls {
+        position: absolute;
+        padding: 5px;
+    }
+
+    #viewer {
+        height: 100%;
+        width: 100%;
+        display: block;
+        position: absolute;
+    }
+
+    canvas.viewer {
+        border: solid 1px black;
+        position: absolute;
+        top: 5px;
+        left: 150px;
+    }
+
+</style>
+<script>
+    $(function() {
+
+        var bots = []
+
+        // first, get the world
+        $.get("/world", function(info) {
+            var viewer = new Viewer($("#viewer"), info.fieldSize)
+
+            function tick() {
+                $.get("/world/locations", function(locations) {
+                    viewer.draw(locations)
+                    for (var i = 0; i < bots.length; i++) {
+                        bots[i].tick(locations)
+                    }
+                })
+            }
+
+            tick()
+            var interval = setInterval(tick, 1000)
+
+            $("#ChaosBot").click(function() {
+                spawn(ChaosBot)
+            })
+
+            function spawn(Class) {
+                var bot = new Class(info, $("#color").val())
+                bot.start()
+                bots.push(bot)
+            }
+
+        })
+
+
+    })
+</script>
+
+</head>
+<body>
+    <div id="viewer">
+    </div>
+    <div id="controls">
+        <div>Color</div>
+        <div><input name="color" id="color" value="#000"></input></div>
+        <div><input type="button" value="Chaosbot" id="ChaosBot"></div>
+    </div>
+</body>

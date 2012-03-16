@@ -1,10 +1,12 @@
 
-function viewer(id) {
+function Viewer($parent, size) {
+    this.$parent = $parent
     var $window = $(window) 
-    var $canvas = $(id)
+    var $canvas = $('<canvas class="viewer" width="100" height="100"></canvas>')
+    $parent.append($canvas)
+
     var canvas = $canvas.get(0)
     var ctx = canvas.getContext("2d")
-    var PollInterval = 1000 
 
     var blockWidth 
     var blockHeight
@@ -12,65 +14,50 @@ function viewer(id) {
     var offset = $canvas.position().left
     var factor = 1
 
+    var locations
+
     // resize
-    function resize(size) {
+    function resize() {
         // console.log("SIZE", $window.height(), $window.width())
         // use aspect-ratio sizing. Size to height, which will always be limiting factor
         // canvas.width = $window.width()
 
-        var totalWidth = $window.width()
-        var totalHeight = $window.height()
+        var totalWidth = $parent.width()
+        var totalHeight = $parent.height()
 
         factor = Math.floor(totalHeight / size.height)
-        console.log("NEW FACTOR " + factor)
 
         canvas.width = size.width * factor
         canvas.height = size.height * factor
 
         blockWidth = factor
         blockHeight = factor
+
+        if (locations) 
+            draw(locations)
     }
 
-    function getWorldInfo(cb) {
-        $.get("/world", function(info) {
-            cb(info.fieldStart, info.fieldSize)
-        })
-    }
 
-    function getWorld(cb) {
-        $.get("/world/locations", cb)
-    }
-
-    function drawLocation(loc, blockWidth, blockHeight) {
+    function drawLocation(loc, color,  blockWidth, blockHeight) {
         var x = loc.point.x * blockWidth
         var y = loc.point.y * blockHeight 
-        ctx.fillStyle = "#000"
+        ctx.fillStyle = color;
         ctx.fillRect(x, y, blockWidth, blockHeight)
     }
 
-    function start() {
+    function draw(newLocations) {
+        locations = newLocations
 
-        // drawLocation({point: {x: 0, y: 0}}, 10, 10)
-
-        getWorldInfo(function(start, size) {
-            var interval = setInterval(function() {
-                getWorld(function(locations) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height)
-                    for (var i = 0; i < locations.length; i++) {
-                        drawLocation(locations[i], blockWidth, blockHeight)
-                    }
-                })
-            }, PollInterval)
-
-            $window.bind('resize', function() {
-                resize(size)
-            })
-
-            resize(size)
-        })
+        ctx.fillStyle = "#FFF"
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        // ctx.clearRect(0, 0, canvas.width, canvas.height)
+        for (var i = 0; i < locations.length; i++) {
+            drawLocation(locations[i], '#000', blockWidth, blockHeight)
+        }
     }
 
-    return {
-        start: start
-    }
+    $window.bind('resize', resize)
+    resize()
+
+    this.draw = draw
 }
