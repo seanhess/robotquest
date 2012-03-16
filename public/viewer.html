@@ -39,8 +39,10 @@
         var bots = []
 
         // first, get the world
-        $.get("/world", function(info) {
-            var viewer = new Viewer($("#viewer"), info.fieldSize)
+        $.get("/game", function(gameInfo) {
+            var tickInterval = gameInfo.msTickInterval
+            var worldInfo = gameInfo.worldFieldInfo
+            var viewer = new Viewer($("#viewer"), worldInfo.fieldSize)
 
             function tick() {
                 $.get("/world/locations", function(locations) {
@@ -52,14 +54,14 @@
             }
 
             tick()
-            var interval = setInterval(tick, 1000)
+            var interval = setInterval(tick, tickInterval)
 
             $("#ChaosBot").click(function() {
                 spawn(ChaosBot)
             })
 
             function spawn(Class) {
-                var bot = new Class(info, $("#color").val())
+                var bot = new Class(worldInfo, $("#color").val())
                 bot.start()
                 bots.push(bot)
             }

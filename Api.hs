@@ -5,7 +5,7 @@ module Main where
 import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, heartbeat, removeUnit)
 import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..))
-import Botland.Types.Location (Point(..), Size(..), FieldInfo(..))
+import Botland.Types.Location (Point(..), Size(..), FieldInfo(..), GameInfo(..))
 import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
 import Botland.Middleware (ownsUnit)
 
@@ -35,6 +35,9 @@ import Botland.Types.Unit (SpawnRequest)
 worldInfo :: FieldInfo
 worldInfo = FieldInfo (Point 0 0) (Size 10 10)
 
+gameInfo :: GameInfo
+gameInfo = GameInfo worldInfo 500 
+
 main :: IO ()
 main = do
     db <- R.connect R.defaultConnectInfo
@@ -49,6 +52,9 @@ main = do
         get "/" $ do
             header "Content-Type" "text/html"
             file "public/index.html"
+
+        get "/game" $ do
+            send $ Right gameInfo
 
         get "/world" $ do
             send $ Right worldInfo

@@ -41,18 +41,32 @@ function Viewer($parent, size) {
     function drawLocation(loc, color,  blockWidth, blockHeight) {
         var x = loc.point.x * blockWidth
         var y = loc.point.y * blockHeight 
+
         ctx.fillStyle = color;
-        ctx.fillRect(x, y, blockWidth, blockHeight)
+        ctx.strokeStyle = "#000"
+
+        // ctx.fillRect(x, y, blockWidth, blockHeight)
+        // ctx.strokeRect(x, y, blockWidth, blockHeight)
+        var padding = 1
+        var r = blockWidth / 2 - 2 * padding
+        ctx.beginPath() 
+        ctx.arc(x + r + padding, y + r + padding, r, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.stroke()
+        ctx.fill()
     }
 
     function draw(newLocations) {
         locations = newLocations
 
+        // clear the whole board
         ctx.fillStyle = "#FFF"
         ctx.fillRect(0, 0, canvas.width, canvas.height)
         // ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        // draw all locations
         for (var i = 0; i < locations.length; i++) {
-            drawLocation(locations[i], '#000', blockWidth, blockHeight)
+            drawLocation(locations[i], '#FFF', blockWidth, blockHeight)
         }
     }
 

@@ -17,6 +17,8 @@ data FieldInfo = FieldInfo { fieldStart :: Point, fieldSize :: Size } deriving (
 -- change locations to be a simple array of location objects
 data Location = Location { point :: Point, unitId :: ByteString } deriving (Generic, Show)
 
+data GameInfo = GameInfo { worldFieldInfo :: FieldInfo, msTickInterval :: Int } deriving (Generic, Show)
+
 
 instance ToJSON Point
 instance FromJSON Point
@@ -32,3 +34,6 @@ instance FromJSON Location
 
 instance ToJSON FieldInfo
 instance FromJSON FieldInfo
+
+instance ToJSON GameInfo
+instance FromJSON GameInfo
