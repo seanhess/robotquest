@@ -4,16 +4,18 @@
 apt-get -y install git make wget
 
 # redis
-aptitude -y install redis-server
+apt-get -y install redis-server
 
 # install old versions to get cabal & deps
-aptitude -y install ghc cabal-install
+apt-get -y install ghc cabal-install
 
 # install from source
 # https://gist.github.com/1578981
 # https://bbs.archlinux.org/viewtopic.php?id=94146
 wget http://www.haskell.org/ghc/dist/7.2.2/ghc-7.2.2-x86_64-unknown-linux.tar.bz2
 tar -xjvf ghc-7.2.2-x86_64-unknown-linux.tar.bz2 
+
+cd ghc-7.2.2
 
 # missing library that's actually there
 ln -s /usr/lib/libgmp.so.10.0.1 /usr/lib/libgmp.so.3
