@@ -16,6 +16,9 @@ service redis-server start
 
 # install deps
 apt-get -y install alex libghc-zlib-dev libghc-zlib-bindings-dev uuid uuid-dev
+
+# slow, but accurate
+cabal update 
 cabal install --only-dependencies
 
 # compile

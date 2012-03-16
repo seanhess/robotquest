@@ -53,6 +53,9 @@ main = do
             header "Content-Type" "text/html"
             file "public/index.html"
 
+        get "/version" $ do
+            text "0.1.1"
+
         get "/game" $ do
             send $ Right gameInfo
 
