@@ -20,8 +20,8 @@ TODO
 [ ] deploy doesn't use same version of redis ()
 [ ] unitauth delete user
 [ ] document delete user
-
-
+[ ] docs on github pages (test cross-domain, as well)
+[ ] actual heartbeat / cleanup
 
 [x] Chaos Bot - Movement 
 [x] Able to launch multiple bots from the viewer
