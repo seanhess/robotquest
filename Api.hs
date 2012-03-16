@@ -33,7 +33,7 @@ import Control.Monad.IO.Class (liftIO)
 import Botland.Types.Unit (SpawnRequest)
 
 worldInfo :: FieldInfo
-worldInfo = FieldInfo (Point 0 0) (Size 10 10)
+worldInfo = FieldInfo (Point 0 0) (Size 50 50)
 
 gameInfo :: GameInfo
 gameInfo = GameInfo worldInfo 500 
@@ -54,8 +54,8 @@ main = do
             file "public/index.html"
 
         get "/version" $ do
-            liftIO $ putStrLn "0.1.2"
-            text "0.1.2"
+            liftIO $ putStrLn "0.1.3"
+            text "0.1.3"
 
         post "/test" $ decodeBody $ \(test :: Test) -> do 
             liftIO $ print test
