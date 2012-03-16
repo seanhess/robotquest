@@ -12,7 +12,7 @@ function ChaosBot(worldInfo, color) {
     this.tick = tick
     this.start = start
 
-    var description = {source: "http://github.com/seanhess/botland", notes:"chaos bot moves in a direction until hitting something, then changes directions", color: color } 
+    var description = {kind: "ChaosBot", name: "ChaosBotN", source: "http://github.com/seanhess/botland", notes:"chaos bot moves in a direction until hitting something, then changes directions", color: color } 
 
     // we ignore the world. Easier to rely on failures
     function tick(world, units) {

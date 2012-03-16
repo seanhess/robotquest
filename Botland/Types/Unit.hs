@@ -40,7 +40,7 @@ instance ToJSON Block
 instance ToJSON BlockType where toJSON = typeToJSON
 instance FromJSON BlockType where parseJSON = typeParseJSON
 
-data UnitDescription = UnitDescription { source :: ByteString, notes :: ByteString, color :: ByteString } deriving (Data, Typeable, Show, Generic)
+data UnitDescription = UnitDescription { source :: ByteString, name :: ByteString, kind :: ByteString, notes :: ByteString, color :: ByteString } deriving (Data, Typeable, Show, Generic)
 
 instance FromJSON UnitDescription
 instance ToJSON UnitDescription
