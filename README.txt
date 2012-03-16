@@ -17,8 +17,8 @@ To work on client: just hit the live api: http://dev.i.tv:3000/
 
 TODO
 
-[ ] deploy doesn't use same version of redis ()
-[ ] unitauth delete user
+[x] deploy doesn't use same version of redis ()
+[x] unitauth delete user
 [ ] document delete user
 [ ] docs on github pages (test cross-domain, as well)
 [ ] actual heartbeat / cleanup

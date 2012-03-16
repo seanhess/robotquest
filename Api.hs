@@ -87,7 +87,7 @@ main = do
                     send res
                 _ -> send res
 
-        delete "/units/:unitId" $ do
+        delete "/units/:unitId" $ unitAuth $ do
             uid <- param "unitId"
             redis $ removeUnit uid
             status status200
