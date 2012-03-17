@@ -68,17 +68,17 @@
             </tr>
             <tr>
                 <td>POST</td>
-                <td class="url">/units/:<a href="#UnitId">unitId</a>/heartbeat</td>
-                <td></td>
+                <td class="url">/units/:<a href="#UnitId">unitId</a>/move</td>
+                <td><a href="#Point">Point</a></td>
                 <td></td>
                 <td><a href="#Authentication">Authentication</a> required.</td>
             </tr>
             <tr>
                 <td>POST</td>
-                <td class="url">/units/:<a href="#UnitId">unitId</a>/move</td>
+                <td class="url">/units/:<a href="#UnitId">unitId</a>/attack</td>
                 <td><a href="#Point">Point</a></td>
                 <td></td>
-                <td><a href="#Authentication">Authentication</a> required.</td>
+                <td>Attack a point near you. Must be a position next to a unit you control. If a unit is in that spot, it will be eliminated. <a href="#Authentication">Authentication</a> required.</td>
             </tr>
         </table>
 

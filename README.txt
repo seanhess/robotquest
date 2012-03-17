@@ -16,8 +16,11 @@ To install on windows: google "download ghc"
 To work on client: just hit the live api: http://dev.i.tv:3000/
 
 NEXT STEPS
+[ ] Cleanup bot (remove heartbeat)
 [ ] MCP Layer
-
+[ ] shared descriptions?
+[ ] bulk processing?
+[ ] actions instead of /move
 
 PERFORMANCE
 [ ] GZip

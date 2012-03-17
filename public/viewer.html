@@ -7,6 +7,7 @@
 <script src="/demo/api.js"></script>
 <script src="/demo/viewer.js"></script>
 <script src="/demo/chaosbot.js"></script>
+<script src="/demo/cleanupbot.js"></script>
 <style>
 
     body {
@@ -80,6 +81,10 @@
                 spawn(ChaosBot)
             })
 
+            $("#CleanupBot").click(function() {
+                spawn(CleanupBot)
+            })
+
             function spawn(Class) {
                 var bot = new Class(worldInfo, $("#color").val())
                 bot.start()
@@ -104,6 +109,7 @@
     <div id="controls">
         <div>Color</div>
         <div><input name="color" id="color" value="#000"></input></div>
-        <div><input type="button" value="Chaosbot" id="ChaosBot"></div>
+        <div><button id="ChaosBot">ChaosBot</button></div>
+        <div><button id="CleanupBot">CleanupBot</button></div>
     </div>
 </body>

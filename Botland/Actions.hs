@@ -85,7 +85,6 @@ unitSpawn worldInfo sr = do
             --hset "world" (l2b $ encode p) id
 
             -- hearbeat
-            heartbeat id
             sadd "units" [id]
 
             -- they need to know the info, the token, and the starting location, etc
@@ -93,9 +92,6 @@ unitSpawn worldInfo sr = do
 
 unitMove :: FieldInfo -> ByteString -> Point -> Redis (Either Fault String)
 unitMove worldInfo uid p = do
-
-    -- record heartbeat
-    heartbeat uid
 
     let lk = ("units:" ++ uid ++ ":location")
     ep <- get lk
@@ -118,6 +114,37 @@ unitMove worldInfo uid p = do
                     hdel "world" [l2b $ encode po]
                     return $ Right "OK"
                 Left f -> return $ Left f
+
+
+unitAttack :: FieldInfo -> ByteString -> Point -> Redis (Either Fault Bool)
+unitAttack worldInfo uid p = do
+
+    let lk = ("units:" ++ uid ++ ":location")
+    ep <- get lk
+    case ep of
+        Left r -> return $ Left $ Fault (pack $ show r)
+        Right Nothing -> return $ Left $ Fault "Could not find location"
+        Right (Just bs) -> do
+
+            -- possible error, except we put in ourselves
+            let po = fromJust $ decode $ b2l bs
+
+            if (not $ (neighboring p po && validPoint worldInfo p)) then 
+                return $ Left $ Fault "Invalid attack"
+            else do
+
+            -- conditional unset of the world
+            -- if it succeeds, then clean up the unit
+            -- wait, this kills YOU
+            res <- hget "world" (l2b $ encode p)
+            case res of 
+                Right (Just uid) -> do
+                    res <- removeUnit uid
+                    case res of
+                        Left f -> return $ Left f                    
+                        Right _ -> return $ Right True
+                _ -> return $ Left $ Fault "Invalid attack"
+
 
 
 claimLocation :: ByteString -> Point -> Redis (Either Fault Bool)
@@ -154,60 +181,32 @@ authorized uid token = do
 
 
 
-
-
--- inactive units
--- I like the other guy's solution. diff all the users against the active users
--- active users = union of all recent-enough heartbeat sets
--- and I can automatically clean up the old heartbeats
-heartbeat :: ByteString -> Redis ()
-heartbeat id = do
-    dt <- liftIO $ getCurrentTime
-    let ds = dateString dt
-    set (unitHeartbeatKey id) ds
-    return ()
-
-removeInactiveUnits :: DateTime -> Redis ()
-removeInactiveUnits dt = do 
-    let ds = dateString dt
-    res <- smembers "units"
-    case res of 
-        Left _ -> return ()
-        Right ids -> do
-            res <- mget (map unitHeartbeatKey ids)
-            case res of
-                Left _ -> return ()
-                Right mbeats -> do
-                    let oldIds = map fst $ filter (oldHeartBeat ds) $ zip ids mbeats
-                    mapM_ removeUnit oldIds
-                    return ()
-
 dateString :: DateTime -> ByteString
 dateString = pack . (formatDateTime "%Y-%m-%d %H:%M")
 
-removeUnit :: ByteString -> Redis ()
+removeUnit :: ByteString -> Redis (Either Fault ())
 removeUnit id = do 
+
+    -- if they move after this, I can't remove them!
     res <- get (unitLocationKey id)
     case res of 
-        Left _ -> return ()
-        Right Nothing -> return ()
+        Left _ -> return $ Left $ Fault "Could not remove unit"
+        Right Nothing -> return $ Left $ Fault "Could not find unit location"
         Right (Just loc) -> do
-            hdel "world" [loc]
-            del (unitKeys id)
-            srem "units" [id]
-            return ()
+            res <- hdel "world" [loc]
+            case res of 
+                Right _ -> do 
+                    del (unitKeys id)
+                    srem "units" [id]
+                    return $ Right ()
+                _ -> return $ Left $ Fault "Could not remove from map"
 
-unitHeartbeatKey id = "units:" ++ id ++ ":heartbeat"
+
 unitLocationKey id = "units:" ++ id ++ ":location"
 unitDescriptionKey id = "units:" ++ id ++ ":description"
 unitTokenKey id = "units:" ++ id ++ ":token"
-unitKeys id = [unitHeartbeatKey id, unitLocationKey id, unitDescriptionKey id, unitTokenKey id]
+unitKeys id = [unitLocationKey id, unitDescriptionKey id, unitTokenKey id]
 
--- these are ALWAYS in order, I guess.
-oldHeartBeat :: ByteString -> (ByteString, Maybe ByteString) -> Bool
-oldHeartBeat date (id, mhb) = case mhb of
-        Nothing -> False
-        Just hb -> (hb < date)
 
 
 
