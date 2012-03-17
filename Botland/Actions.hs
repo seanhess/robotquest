@@ -58,8 +58,8 @@ unitGetDescription uid = do
 
 unitSpawn :: FieldInfo -> SpawnRequest -> Redis (Either Fault Spawn)
 unitSpawn worldInfo sr = do
-    id <- uuid
-    token <- uuid
+    id <- uniqueId
+    token <- uniqueId
 
     -- everyone starts at the same place. You don't exist until you move off of it.
     -- create a spawnAt 
@@ -179,6 +179,14 @@ authorized uid token = do
         Right (Just bs) -> return (token == bs)
         _ -> return False
 
+
+-- throw an error on failure. means the db is down anyway
+uniqueId :: Redis ByteString
+uniqueId = do
+    res <- incr "id"
+    case res of 
+        Right i -> return $  pack $ show i 
+        _ -> error "Could not get id"
 
 
 dateString :: DateTime -> ByteString

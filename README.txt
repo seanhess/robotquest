@@ -16,11 +16,12 @@ To install on windows: google "download ghc"
 To work on client: just hit the live api: http://dev.i.tv:3000/
 
 NEXT STEPS
-[ ] Cleanup bot (remove heartbeat)
+[x] Cleanup bot (remove heartbeat)
 [ ] MCP Layer
 [ ] shared descriptions?
 [ ] bulk processing?
 [ ] actions instead of /move
+[ ] Bug: unit can move while it is being destroyed, which makes it stay in the world, but not exist
 
 PERFORMANCE
 [ ] GZip

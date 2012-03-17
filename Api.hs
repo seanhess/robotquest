@@ -71,6 +71,20 @@ main = do
             ls <- redis $ worldLocations
             send ls
 
+        -- register yourself as an MCP
+        -- accepts: mcp stuff
+        -- returns: controlToken
+        -- mcp id? 
+        -- do you pick an MCP id? Sure, it's your own unique name thing
+        post "/mcp" $ text "not implemented"
+
+        -- maybe the MCP picks its own id
+        -- no, it might not pick something unique
+        -- I need a minion id. Can I make smaller ones 
+        -- I could make a smaller id. Just ignore the error
+        -- if it errors throw an error instead.
+        --post "/minion/:minionId" $ decodeBody $
+
         get "/units/:unitId/description" $ do
             uid <- param "unitId"  
             a <- redis $ unitGetDescription uid
