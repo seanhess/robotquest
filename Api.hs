@@ -85,6 +85,8 @@ main = do
         -- if it errors throw an error instead.
         --post "/minion/:minionId" $ decodeBody $
 
+        -- you have to make sure you still exist to do the stuff you do?
+
         get "/units/:unitId/description" $ do
             uid <- param "unitId"  
             a <- redis $ unitGetDescription uid

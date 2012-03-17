@@ -96,10 +96,7 @@ unitMove worldInfo uid p = do
     let lk = ("units:" ++ uid ++ ":location")
     ep <- get lk
     case ep of
-        Left r -> return $ Left $ Fault (pack $ show r)
-        Right Nothing -> return $ Left $ Fault "Could not find location"
         Right (Just bs) -> do
-
             -- possible error, except we put in ourselves
             let po = fromJust $ decode $ b2l bs
 
@@ -114,6 +111,7 @@ unitMove worldInfo uid p = do
                     hdel "world" [l2b $ encode po]
                     return $ Right "OK"
                 Left f -> return $ Left f
+        _ -> return $ Left $ Fault "Could not find location"
 
 
 unitAttack :: FieldInfo -> ByteString -> Point -> Redis (Either Fault Bool)

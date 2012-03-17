@@ -97,4 +97,49 @@ A. Sockets would make updates, and automatic cleanup easier (built in heartbeat)
 
 
 
+SIMPLER IDEAS FOR MOVEMENT
+- send down everything?
+- prepare for differential updates
+
+- minions - contains all minions
+- unit:1:location (stores the location)
+
+1. get the world
+2. make sure a location is available
+3. delete
+4. move
+
+
+CURRENT
+state: hgetall
+open: hsetnx
+delete: remove location, remove unit info (PROBLEM: if moving)
+move: hsetnx, update location
+
+SINGLE INDEX?
+state: units + mget :location
+open: ??? who knows? you need an index of :location
+delete: remove from units
+move: update location
+
+DOUBLE INDEX
+locations:10:3 = unitId -- tells us whether its occupied
+units:5:location
+units - the active units -- make it so if you delete them there is NO WAY they can show up, even if you try to update their location later. 
+
+-- I don't know that it would be any slower. 
+O(2N) vs O(N)
+
+-- getting the world state is one of the most elementary operations. 
+-- I should wait to decide this until I get differential updates in place
+-- because before that it's a waste of time. 
+
+SO, i should just add a check to see if you're still in units before settting the location
+
+-- why keep track of unit location?
+
+THE PROBLEM:
+    is that units can set their location after they have been cleared. 
+
+I should err on the other side, wait until they've "settled"???
 
