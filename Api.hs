@@ -2,7 +2,7 @@
 
 module Main where
 
-import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, removeUnit, unitAttack)
+import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations) -- unitAttack, removeUnit
 import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..), Test(..))
 import Botland.Types.Location (Point(..), Size(..), FieldInfo(..), GameInfo(..))
@@ -36,7 +36,7 @@ worldInfo :: FieldInfo
 worldInfo = FieldInfo (Point 0 0) (Size 10 10)
 
 gameInfo :: GameInfo
-gameInfo = GameInfo worldInfo 500 
+gameInfo = GameInfo worldInfo 1000 
 
 main :: IO ()
 main = do
@@ -69,7 +69,8 @@ main = do
 
         get "/world/locations" $ do
             ls <- redis $ worldLocations
-            send ls
+            json ls
+            --send ls
 
         -- register yourself as an MCP
         -- accepts: mcp stuff
@@ -90,7 +91,7 @@ main = do
         get "/units/:unitId/description" $ do
             uid <- param "unitId"  
             a <- redis $ unitGetDescription uid
-            send a
+            json a
 
         -- put "/units/:unitId/description"
         -- delete "/units/:unitId"
@@ -103,10 +104,10 @@ main = do
                     send res
                 _ -> send res
 
-        delete "/units/:unitId" $ unitAuth $ do
-            uid <- param "unitId"
-            redis $ removeUnit uid
-            status status200
+        --delete "/units/:unitId" $ unitAuth $ do
+        --    uid <- param "unitId"
+        --    redis $ removeUnit uid
+        --    status status200
 
         post "/units/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
             uid <- param "unitId"
@@ -114,10 +115,10 @@ main = do
             send res
 
         -- attack a unit next to you
-        post "/units/:unitId/attack" $ unitAuth $ decodeBody $ \p -> do
-            uid <- param "unitId"
-            res <- redis $ unitAttack worldInfo uid p
-            send res
+        --post "/units/:unitId/attack" $ unitAuth $ decodeBody $ \p -> do
+        --    uid <- param "unitId"
+        --    res <- redis $ unitAttack worldInfo uid p
+        --    send res
 
 
         -- temporary, for admin testing. 

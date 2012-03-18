@@ -12,6 +12,7 @@ import qualified Control.Monad.State as MS
 import Botland.Types.Message (Fault(..))
 
 import Data.Aeson (decode, ToJSON, FromJSON, encode)
+import qualified Data.Aeson as A
 import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Data.ByteString as B
 import Data.ByteString.Char8 (ByteString, pack, unpack, append)
