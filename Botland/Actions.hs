@@ -21,6 +21,7 @@ import qualified Data.ByteString.Lazy.Char8 as L
 import Data.DateTime (getCurrentTime, formatDateTime, DateTime)
 import qualified Data.Text.Lazy as T
 import Data.Maybe (fromMaybe, fromJust, isNothing, isJust)
+import Data.Either.Unwrap (isLeft)
 
 import Debug.Trace (trace)
 
@@ -36,6 +37,7 @@ worldLocations = do
     let kp = zip ids $ result r
     return $ (map toLocation kp)
 
+-- just filter them out, no?
 toLocation :: (ByteString, Maybe ByteString) -> Location
 toLocation (id, Nothing) = error "Could not find point"
 toLocation (id, mps) = Location p id
@@ -105,57 +107,57 @@ claimLocation id p = do
 unitMove :: FieldInfo -> ByteString -> Point -> Redis (Either Fault ())
 unitMove worldInfo id p = do
     r <- get (locationKey id)
+
+    if (isLeft r) then
+        return $ Left $ Fault "Missing location key!"
+    else do
+
     let po = parse $ fromJust $ result r
 
     if (not $ (neighboring p po && validPoint worldInfo p)) then 
         return $ Left $ Fault "Invalid move"
     else do
 
-    open <- claimLocation id p
+    -- try to set the location
+    r <- setnx (worldLocationKey p) id
+    let open = result r
 
     if (not open) then
         return $ Left $ Fault "Space occupied"
     else do
 
-    --liftIO $ putStrLn "MOVING" 
-    --liftIO $ print p
-    --liftIO $ print id
-
+    -- now update the key that says where they are, and be done with it. 
+    watch (minionKeys id)
+    multi
     set (locationKey id) (stringify p)
-    del [(worldLocationKey p)]
+    del [(worldLocationKey po)]
+    r <- exec
+
+    -- ??? check to see if it failed. If so, unset the thing?
+
     return $ Right () 
 
+unitAttack :: FieldInfo -> ByteString -> Point -> Redis (Either Fault ())
+unitAttack worldInfo id p = do
+    r <- get (locationKey id)
 
---unitAttack :: FieldInfo -> ByteString -> Point -> Redis (Either Fault Bool)
---unitAttack worldInfo uid p = do
+    if (isLeft r) then
+        return $ Left $ Fault "Missing location key!"
+    else do
 
---    let lk = ("units:" ++ uid ++ ":location")
---    ep <- get lk
---    case ep of
---        Left r -> return $ Left $ Fault (pack $ show r)
---        Right Nothing -> return $ Left $ Fault "Could not find location"
---        Right (Just bs) -> do
+    let po = parse $ fromJust $ result r
 
---            -- possible error, except we put in ourselves
---            let po = fromJust $ decode $ b2l bs
+    if (not $ (neighboring p po && validPoint worldInfo p)) then 
+        return $ Left $ Fault "Invalid attack"
+    else do
 
---            if (not $ (neighboring p po && validPoint worldInfo p)) then 
---                return $ Left $ Fault "Invalid attack"
---            else do
+    r <- get (worldLocationKey p)
 
---            -- conditional unset of the world
---            -- if it succeeds, then clean up the unit
---            -- wait, this kills YOU
---            res <- hget "world" (l2b $ encode p)
---            case res of 
---                Right (Just uid) -> do
---                    res <- removeUnit uid
---                    case res of
---                        Left f -> return $ Left f                    
---                        Right _ -> return $ Right True
---                _ -> return $ Left $ Fault "Invalid attack"
-
-
+    case r of
+        Right (Just id) -> do
+            removeUnit id
+            return $ Right ()
+        _ -> return $ Left $ Fault "Attack missed"
 
 
 neighboring :: Point -> Point -> Bool
@@ -193,23 +195,15 @@ uniqueId = do
         _ -> error "Could not get id"
 
 
---removeUnit :: ByteString -> Redis (Either Fault ())
---removeUnit id = do 
-
---    -- if they move after this, I can't remove them!
---    res <- get (locationKey id)
---    case res of 
---        Left _ -> return $ Left $ Fault "Could not remove unit"
---        Right Nothing -> return $ Left $ Fault "Could not find unit location"
---        Right (Just loc) -> do
---            res <- hdel "world" [loc]
---            case res of 
---                Right _ -> do 
---                    del (unitKeys id)
---                    srem "units" [id]
---                    return $ Right ()
---                _ -> return $ Left $ Fault "Could not remove from map"
-
+removeUnit :: ByteString -> Redis ()
+removeUnit id = do 
+    -- very first, get them out of the map, so no one acts on them
+    srem "minions" [id]
+    r <- get (locationKey id)
+    let p = parse $ fromJust $ result r  
+    let keys = (worldLocationKey p):(minionKeys id)
+    del keys
+    return ()
 
 locationKey id = "minions:" ++ id ++ ":location"
 descriptionKey id = "minions:" ++ id ++ ":description"

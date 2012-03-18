@@ -2,7 +2,7 @@
 
 module Main where
 
-import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations) -- unitAttack, removeUnit
+import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, unitAttack, removeUnit)
 import Botland.Types.Unit (unitToken)
 import Botland.Types.Message (Fault(..), Test(..))
 import Botland.Types.Location (Point(..), Size(..), FieldInfo(..), GameInfo(..))
@@ -104,10 +104,10 @@ main = do
                     send res
                 _ -> send res
 
-        --delete "/units/:unitId" $ unitAuth $ do
-        --    uid <- param "unitId"
-        --    redis $ removeUnit uid
-        --    status status200
+        delete "/units/:unitId" $ unitAuth $ do
+            uid <- param "unitId"
+            redis $ removeUnit uid
+            status status200
 
         post "/units/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
             uid <- param "unitId"
@@ -115,10 +115,10 @@ main = do
             send res
 
         -- attack a unit next to you
-        --post "/units/:unitId/attack" $ unitAuth $ decodeBody $ \p -> do
-        --    uid <- param "unitId"
-        --    res <- redis $ unitAttack worldInfo uid p
-        --    send res
+        post "/units/:unitId/attack" $ unitAuth $ decodeBody $ \p -> do
+            uid <- param "unitId"
+            res <- redis $ unitAttack worldInfo uid p
+            send res
 
 
         -- temporary, for admin testing. 

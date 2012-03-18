@@ -28,4 +28,5 @@ Library
                     , safe                      >= 0.3.3    && < 0.4
                     , system-uuid               >= 2.1.1    && < 2.2
                     , datetime                  >= 0.2.1    && < 0.3
+                    , either-unwrap             >= 1.1      && < 1.2
 
