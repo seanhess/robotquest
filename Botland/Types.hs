@@ -10,7 +10,7 @@ import GHC.Generics (Generic)
 
 -- this is roughly what it looks like in the database
 --{x, y, _id, color, mcpId, name, source}
-data Bot = Bot { id :: String
+data Bot = Bot { botId :: String
                , x :: Int
                , y :: Int
                , name :: String
@@ -27,6 +27,19 @@ data Game = Game { width :: Int
 
 instance ToJSON Game
 instance FromJSON Game
+
+
+
+-- don't serialize the mcpId, because it is secret
+instance ToJSON Bot where
+    toJSON b = object fs 
+        where fs = [ "id" .= botId b
+                   , "x" .= x b
+                   , "y" .= y b
+                   , "name" .= name b
+                   , "source" .= source b
+                   , "color" .= color b 
+                   ]
 
 
 -- custom serialization baby!!!

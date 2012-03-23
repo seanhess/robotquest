@@ -3,7 +3,8 @@
 module Main where
 
 import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
-import Botland.Types (Bot(..), Game(..))
+import Botland.Types
+import Botland.Control
 
 import Control.Monad.IO.Class (liftIO)
 
@@ -31,13 +32,10 @@ main = do
 
         get "/game" $ json game
 
-        --get "/world" $ do
-        --    send $ Right worldInfo
-
-        --get "/world/locations" $ do
-        --ls <- redis $ worldLocations
-        --json ls
-        --send ls
+        -- returns all the bots, obstacles and whathaveyounots
+        -- everything except MCPId
+        get "/game/positions" $ do
+            json fake 
 
 
 
