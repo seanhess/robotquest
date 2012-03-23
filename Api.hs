@@ -4,7 +4,6 @@ module Main where
 
 import Botland.Helpers
 import Botland.Types
-import Botland.Types.Message
 import Botland.Control
 import Botland.Middleware
 

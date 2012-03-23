@@ -2,16 +2,12 @@
 
 module Botland.Helpers where
 
-import Prelude hiding ((++))
+import Botland.Types
 
 import Control.Monad.Trans.Resource (runResourceT)
 import Control.Monad.IO.Class (liftIO)
-import Control.Monad.Error (throwError)
-import qualified Control.Monad.State as MS 
 
 import Database.MongoDB (Failure(..))
-
-import Botland.Types.Message (Fault(..))
 
 import Data.Aeson (decode, ToJSON, FromJSON, encode)
 import qualified Data.Aeson as A
@@ -27,31 +23,14 @@ import Network.Wai (requestBody)
 import Web.Scotty (ActionM, request, raise, status, text, redirect, rescue, header, json, param)
 import qualified Web.Scotty
 
-import Database.Redis (runRedis, connect, defaultConnectInfo, ping, set, keys, Redis, Connection, incr)
-
-import qualified System.UUID.V4 as U
-
--- i need to turn this into something json compatible
+-- pull out the body as a lazy bytestring (easy for Data.Aeson to consume)
 body :: ActionM (L.ByteString)
 body = do
     r <- request
     bss <- liftIO . runResourceT . lazyConsume . requestBody $ r
     return $ L.fromChunks bss
 
-
-queryRedis :: Connection -> Redis a -> ActionM a
-queryRedis db r = liftIO $ runRedis db r
-
-uuid :: Redis ByteString
-uuid = do
-    u <- liftIO $ U.uuid
-    return $ pack $ show u
-
-
--- AUTHENTICATION
-
-
--- converts a lazy bytestring to redis bytestring
+-- converts a lazy bytestring to strict bytestring
 l2b :: L.ByteString -> B.ByteString
 l2b = B.concat . L.toChunks
 
@@ -79,6 +58,7 @@ send m ea = do
         Right a -> json a 
 
 
+-- send a non-mongo fault
 fault :: Fault -> ActionM ()
 fault f = do
     case f of 
@@ -86,9 +66,6 @@ fault f = do
         NotFound -> status status400
         _ -> status status500
     json f
-
---(++) :: ByteString -> ByteString -> ByteString
---(++) = append
 
 
 

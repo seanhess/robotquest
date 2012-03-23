@@ -2,7 +2,7 @@
 
 module Botland.Middleware where
 
-import Botland.Types.Message
+import Botland.Types
 import Botland.Control
 import Botland.Helpers
 
@@ -17,7 +17,7 @@ import Network.HTTP.Types (status400)
 
 import Web.Scotty
 
-
+-- lets you make sure they have control over a bot before letting them play with it
 runAuth :: Pipe -> Database -> ActionM () -> ActionM ()
 runAuth pipe d k = do
     let mongo action = liftIO $ access pipe master d action 
@@ -30,6 +30,7 @@ runAuth pipe d k = do
         _ -> fault NotAuthorized
 
 
+-- parse the body as something, and call "k" with the result
 decodeBody :: (FromJSON a) => (a -> ActionM ()) -> ActionM ()
 decodeBody k = do
     b <- body

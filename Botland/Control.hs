@@ -17,10 +17,6 @@ import Data.Char (intToDigit)
 
 
 
-fake :: [Bot]
-fake = [fakeBot]
-
-
 ensureIndexes :: Action IO ()
 ensureIndexes = do
     ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)
@@ -72,4 +68,15 @@ randomId = do
 
 intToHex :: Int -> String
 intToHex i = showIntAtBase 16 intToDigit (abs i) "" 
+
+
+
+--validPoint :: FieldInfo -> Point -> Bool
+--validPoint f p = xmin <= px && px < xmax && ymin <= py && py < ymax
+--    where px = x p
+--          py = y p
+--          xmin = x $ fieldStart f
+--          xmax = xmin + (width $ fieldSize f)
+--          ymin = y $ fieldStart f
+--          ymax = ymin + (height $ fieldSize f)
 
