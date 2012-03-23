@@ -2,48 +2,22 @@
 
 module Main where
 
-import Botland.Actions (unitSpawn, unitGetDescription, unitMove, authorized, resetWorld, worldLocations, unitAttack, removeUnit)
-import Botland.Types.Unit (unitToken)
-import Botland.Types.Message (Fault(..), Test(..))
-import Botland.Types.Location (Point(..), Size(..), FieldInfo(..), GameInfo(..))
 import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
-import Botland.Middleware (ownsUnit)
-
-import Network.Wai.Middleware.Headers (cors)
-
-import Web.Scotty (get, post, delete, param, header, scotty, text, request, middleware, file, json, ActionM(..), status)
-
-
-import qualified Database.Redis as R 
-import Data.Text.Lazy (Text)
-import qualified Data.Text.Lazy as T
-import Data.Text.Encoding (encodeUtf8)
-import Data.ByteString.Char8 (pack, unpack, append, concat)
-import qualified Data.ByteString.Char8 as B
-import qualified Data.ByteString.Lazy.Char8 as L
-
-import Network.Wai.Middleware.Static (staticRoot)
-import Network.HTTP.Types (status200)
-
-import Data.Maybe (fromMaybe)
-
+import Botland.Types (Bot(..), Game(..))
 
 import Control.Monad.IO.Class (liftIO)
 
-import Botland.Types.Unit (SpawnRequest)
+import Network.Wai.Middleware.Headers (cors)
+import Network.Wai.Middleware.Static (staticRoot)
+import Network.HTTP.Types (status200)
+import Web.Scotty (get, post, delete, param, header, scotty, text, request, middleware, file, json, ActionM(..), status)
 
-worldInfo :: FieldInfo
-worldInfo = FieldInfo (Point 0 0) (Size 10 10)
 
-gameInfo :: GameInfo
-gameInfo = GameInfo worldInfo 1000 
+game :: Game
+game = Game 10 10 1000 
 
 main :: IO ()
 main = do
-    db <- R.connect R.defaultConnectInfo
-    let redis = queryRedis db
-    let unitAuth = ownsUnit db
-
     scotty 3000 $ do
 
         middleware $ staticRoot "public"
@@ -53,78 +27,18 @@ main = do
             header "Content-Type" "text/html"
             file "public/index.html"
 
-        get "/version" $ do
-            liftIO $ putStrLn "0.1.3"
-            text "0.1.3"
+        get "/version" $ text "Botland 0.2.0"
 
-        post "/test" $ decodeBody $ \(test :: Test) -> do 
-            liftIO $ print test
-            text "OK"
+        get "/game" $ json game
 
-        get "/game" $ do
-            send $ Right gameInfo
+        --get "/world" $ do
+        --    send $ Right worldInfo
 
-        get "/world" $ do
-            send $ Right worldInfo
+        --get "/world/locations" $ do
+        --ls <- redis $ worldLocations
+        --json ls
+        --send ls
 
-        get "/world/locations" $ do
-            ls <- redis $ worldLocations
-            json ls
-            --send ls
-
-        -- register yourself as an MCP
-        -- accepts: mcp stuff
-        -- returns: controlToken
-        -- mcp id? 
-        -- do you pick an MCP id? Sure, it's your own unique name thing
-        post "/mcp" $ text "not implemented"
-
-        -- maybe the MCP picks its own id
-        -- no, it might not pick something unique
-        -- I need a minion id. Can I make smaller ones 
-        -- I could make a smaller id. Just ignore the error
-        -- if it errors throw an error instead.
-        --post "/minion/:minionId" $ decodeBody $
-
-        -- you have to make sure you still exist to do the stuff you do?
-
-        get "/units/:unitId/description" $ do
-            uid <- param "unitId"  
-            a <- redis $ unitGetDescription uid
-            json a
-
-        -- put "/units/:unitId/description"
-        -- delete "/units/:unitId"
-
-        post "/units" $ decodeBody $ \(sr :: SpawnRequest) -> do
-            res <- redis $ unitSpawn worldInfo sr 
-            case res of
-                Right s -> do
-                    header "X-Auth-Token" $ b2t (unitToken s)
-                    send res
-                _ -> send res
-
-        delete "/units/:unitId" $ unitAuth $ do
-            uid <- param "unitId"
-            redis $ removeUnit uid
-            status status200
-
-        post "/units/:unitId/move" $ unitAuth $ decodeBody $ \p -> do
-            uid <- param "unitId"
-            res <- redis $ unitMove worldInfo uid p
-            send res
-
-        -- attack a unit next to you
-        post "/units/:unitId/attack" $ unitAuth $ decodeBody $ \p -> do
-            uid <- param "unitId"
-            res <- redis $ unitAttack worldInfo uid p
-            send res
-
-
-        -- temporary, for admin testing. 
-        post "/admin/clear" $ do
-            redis $ resetWorld
-            status status200
 
 
 
