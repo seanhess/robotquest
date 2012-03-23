@@ -21,7 +21,7 @@ import Data.ByteString.Char8 (ByteString, pack, unpack, append)
 import Data.Conduit.Lazy (lazyConsume)
 import qualified Data.Text.Lazy as T
 
-import Network.HTTP.Types (statusBadRequest, status404, status500, status400, status401)
+import Network.HTTP.Types (status404, status500, status400, status401, status200, status403)
 import Network.Wai (requestBody)
 
 import Web.Scotty (ActionM, request, raise, status, text, redirect, rescue, header, json, param)
@@ -38,18 +38,6 @@ body = do
     bss <- liftIO . runResourceT . lazyConsume . requestBody $ r
     return $ L.fromChunks bss
 
--- this style of function isn't really going to work well. 
--- because I can't leap out and do something fancy (unfortunately)
-decodeBody :: (FromJSON a) => (a -> ActionM ()) -> ActionM ()
-decodeBody k = do
-    b <- body
-    let mo = decode b
-    case mo of
-        Just o -> k o  
-        Nothing -> do
-            --liftIO $ print b
-            status statusBadRequest
-            json $ Fault "Could not parse body"
 
 queryRedis :: Connection -> Redis a -> ActionM a
 queryRedis db r = liftIO $ runRedis db r
@@ -74,7 +62,7 @@ b2t :: B.ByteString -> T.Text
 b2t = T.pack . unpack 
 
 -- handles the fault checking, sending proper stuff
-send :: (ToJSON a) => ByteString -> Either Failure a -> ActionM ()
+send :: (ToJSON a) => String -> Either Failure a -> ActionM ()
 send m ea = do
     case ea of
         Left (DocNotFound _) -> 
@@ -90,7 +78,21 @@ send m ea = do
             json $ Fault "Database Error"
         Right a -> json a 
 
-(++) :: ByteString -> ByteString -> ByteString
-(++) = append
+
+fault :: Fault -> ActionM ()
+fault f = do
+    case f of 
+        NotAuthorized -> status status403
+        NotFound -> status status400
+        _ -> status status500
+    json f
+
+--(++) :: ByteString -> ByteString -> ByteString
+--(++) = append
+
+
+
+
+
 
 

@@ -2,27 +2,40 @@
 
 module Botland.Middleware where
 
-import Botland.Types.Message (Fault(..))
+import Botland.Types.Message
+import Botland.Control
+import Botland.Helpers
 
-import Botland.Helpers (queryRedis, send)
-import Botland.Actions (authorized)
+import Control.Monad.IO.Class (liftIO)
 
-import Data.Maybe (fromMaybe)
-import Database.Redis (Connection)
+import Data.Aeson (FromJSON, decode)
+import Data.ByteString.Lazy.Char8 (ByteString, unpack)
 
-import Network.Wai (requestHeaders)
-import Web.Scotty (ActionM, request, raise, status, text, redirect, rescue, header, json, param)
+import Database.MongoDB (Action, Pipe, access, master, Database)
+
+import Network.HTTP.Types (status400)
+
+import Web.Scotty
 
 
-ownsUnit :: Connection -> ActionM () -> ActionM ()
-ownsUnit db k = do
-    uid <- param "unitId"
-    r <- request
+runAuth :: Pipe -> Database -> ActionM () -> ActionM ()
+runAuth pipe d k = do
+    let mongo action = liftIO $ access pipe master d action 
 
-    let headers = requestHeaders r
-        token = fromMaybe "" $ lookup "X-Auth-Token" headers
+    botId <- param "botId"
+    mcpId <- param "mcpId"
+    ok <- mongo $ botOwner mcpId botId
+    case ok of
+        Right True -> k
+        _ -> fault NotAuthorized
 
-    isAuth <- queryRedis db $ authorized uid token
-    if (not isAuth) then
-        send $ (Left NotAuthorized :: Either Fault String)
-        else k 
+
+decodeBody :: (FromJSON a) => (a -> ActionM ()) -> ActionM ()
+decodeBody k = do
+    b <- body
+    let mo = decode b
+    case mo of
+        Just o -> k o  
+        Nothing -> do
+            status status400
+            json $ Fault ("Invalid Body JSON: " ++ (unpack b))

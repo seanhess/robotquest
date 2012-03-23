@@ -6,9 +6,7 @@ import Botland.Types
 
 import Control.Monad.IO.Class (liftIO)
 
---import Data.Int 
-import Database.MongoDB (insert_, Action, Document, Field(..), Value(..), ensureIndex, Index(..), (=:), rest, find, select, Query(..))
-import Data.Bson (val)
+import Database.MongoDB
 
 import Web.Scotty (ActionM(..))
 
@@ -27,7 +25,10 @@ ensureIndexes :: Action IO ()
 ensureIndexes = do
     ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)
 
-
+botOwner :: String -> String -> Action IO Bool
+botOwner mcpId botId = do
+    n <- count $ select ["mcpId" =: mcpId, "_id" =: botId] "bots"
+    return (n > 0)
 
 createMcp :: ActionM Id
 createMcp = do
@@ -45,6 +46,11 @@ createBot mcpId b = do
 
     insert_ "bots" (toDoc ub)
     return $ Id id 
+
+setAction :: String -> BotAction -> Action IO Ok
+setAction id a = do
+    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (showAction a)]]
+    return Ok 
 
 
 locations :: Action IO [Bot]
