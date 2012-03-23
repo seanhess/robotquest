@@ -30,3 +30,5 @@ Library
                     , datetime                  >= 0.2.1    && < 0.3
                     , either-unwrap             >= 1.1      && < 1.2
 
+                    , mongoDB                   >= 1.2      && < 1.3
+

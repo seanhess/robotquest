@@ -6,7 +6,11 @@ import Botland.Helpers (decodeBody, body, queryRedis, uuid, l2b, b2l, b2t, send)
 import Botland.Types
 import Botland.Control
 
+import Database.MongoDB (runIOE, connect, access, master, host)
+
 import Control.Monad.IO.Class (liftIO)
+
+import Data.Text.Lazy (Text, pack)
 
 import Network.Wai.Middleware.Headers (cors)
 import Network.Wai.Middleware.Static (staticRoot)
@@ -19,6 +23,11 @@ game = Game 10 10 1000
 
 main :: IO ()
 main = do
+
+    pipe <- runIOE $ connect (host "127.0.0.1")
+    let mongo action = liftIO $ access pipe master "botland" action
+    mongo ensureIndexes
+
     scotty 3000 $ do
 
         middleware $ staticRoot "public"
@@ -34,8 +43,26 @@ main = do
 
         -- returns all the bots, obstacles and whathaveyounots
         -- everything except MCPId
-        get "/game/positions" $ do
-            json fake 
+        get "/game/locations" $ do
+            res <- mongo $ locations
+            send "" res 
+
+        -- really, just gives you a session id, but pretend that it matters :)
+        -- works because it's a secret number, never sent to anyone
+        post "/mcps" $ do
+            id <- createMcp
+            json id
+
+        post "/mcps/:mcpId/bots" $ decodeBody $ \b -> do
+            mcpId <- param "mcpId"
+            id <- mongo $ createBot mcpId b
+            send "Invalid Starting Location" id
+
+
+
+
+
+
 
 
 

@@ -9,6 +9,8 @@ import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Error (throwError)
 import qualified Control.Monad.State as MS 
 
+import Database.MongoDB (Failure(..))
+
 import Botland.Types.Message (Fault(..))
 
 import Data.Aeson (decode, ToJSON, FromJSON, encode)
@@ -40,14 +42,12 @@ body = do
 -- because I can't leap out and do something fancy (unfortunately)
 decodeBody :: (FromJSON a) => (a -> ActionM ()) -> ActionM ()
 decodeBody k = do
-    -- return ()
-    -- return $ Creature Player
     b <- body
     let mo = decode b
     case mo of
         Just o -> k o  
         Nothing -> do
-            liftIO $ print b
+            --liftIO $ print b
             status statusBadRequest
             json $ Fault "Could not parse body"
 
@@ -74,20 +74,21 @@ b2t :: B.ByteString -> T.Text
 b2t = T.pack . unpack 
 
 -- handles the fault checking, sending proper stuff
-send :: (ToJSON a) => Either Fault a -> ActionM ()
-send ea = do
+send :: (ToJSON a) => ByteString -> Either Failure a -> ActionM ()
+send m ea = do
     case ea of
-        Left NotFound -> do
+        Left (DocNotFound _) -> 
             status status404
-            json $ Fault "Not Found"
-        Left NotAuthorized -> do
-            status status401
-            json $ Fault "Not Authorized"
+        Left (QueryFailure _ _) -> do
+            status status400
+            json $ Fault m
+        Left (WriteFailure _ _) -> do
+            status status400
+            json $ Fault m
         Left f -> do
-            status status400 -- always a bad request. Their fault right? :)
-            json f
-        Right a -> do
-            json a 
+            status status500
+            json $ Fault "Database Error"
+        Right a -> json a 
 
 (++) :: ByteString -> ByteString -> ByteString
 (++) = append
