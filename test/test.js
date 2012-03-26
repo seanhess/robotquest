@@ -62,6 +62,16 @@ describe('botland api', function() {
 
     describe('spawn', function() {
 
+        it('should not allow me to spawn off field', function(done) {
+            var bot = {x:-1, y:0, name:'test', source:'test', color:"#F00"} 
+            request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, data) {
+                assert.ifError(err)
+                assert.equal(rs.statusCode, 400, 'missing 400 status code')
+                assert.ok(data.message, 'missing error message')
+                done()
+            }) 
+        })
+
         it('should allow me to spawn a bot', function(done) {
             request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, body) {
                 assert.ifError(err)
@@ -96,14 +106,6 @@ describe('botland api', function() {
     })
 
     describe('movement', function() {
-        it("should out-of-bounds error", function(done) {
-            request.put({url: Server + "/mcps/" + mcpId + "/bots/" + botId + "/action", json:{action:"Move", direction:"Left"}}, function(err, rs, data) {
-                assert.ifError(err)
-                assert.equal(rs.statusCode, 400, 'missing 400 status code')
-                assert.ok(data.message, 'missing error message')
-                done()
-            })
-        })
 
         it('should let me move', function(done) {
             request.put({url: Server + "/mcps/" + mcpId + "/bots/" + botId + "/action", json:{action:"Move", direction:"Right"}}, function(err, rs, data) {
@@ -122,6 +124,15 @@ describe('botland api', function() {
                 assert.equal(me.id, botId)
                 assert.equal(me.x, 1)
                 assert.equal(me.y, 0)
+                done()
+            })
+        })
+
+        it("should out-of-bounds error", function(done) {
+            request.put({url: Server + "/mcps/" + mcpId + "/bots/" + botId + "/action", json:{action:"Move", direction:"Left"}}, function(err, rs, data) {
+                assert.ifError(err)
+                assert.equal(rs.statusCode, 400, 'missing 400 status code')
+                assert.ok(data.message, 'missing error message')
                 done()
             })
         })

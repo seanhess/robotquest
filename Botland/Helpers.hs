@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, FlexibleInstances, UndecidableInstances #-}
 
 module Botland.Helpers where
 
@@ -40,22 +40,56 @@ b2l l = L.fromChunks [l]
 b2t :: B.ByteString -> T.Text
 b2t = T.pack . unpack 
 
+
+
+--class Sendable a where
+--    send :: a -> ActionM ()
+
+--class Woot where
+--    woot :: String
+
+--instance (ToJSON a) Response a where
+--instance Response Fault where
+
 -- handles the fault checking, sending proper stuff
-send :: (ToJSON a) => String -> Either Failure a -> ActionM ()
-send m ea = do
-    case ea of
-        Left (DocNotFound _) -> 
-            status status404
-        Left (QueryFailure _ _) -> do
-            status status400
-            json $ Fault m
-        Left (WriteFailure _ _) -> do
-            status status400
-            json $ Fault m
-        Left f -> do
-            status status500
-            json $ Fault "Database Error"
-        Right a -> json a 
+
+--instance (Sendable a) => Sendable (Either Failure a) where
+--    send m ea
+
+--instance (ToJSON a) => Sendable a where
+--    send a = do
+--        status status200
+--        json a
+
+
+-- I want the method to work on all sorts of different stuff
+-- bah, lame-pants
+-- well, wait, all I have to do is CONVERT the different types of things to other things
+-- I could write a bunch of functions to do that
+-- unique functions, with unique names.
+
+-- just make different functions for the different things, and don't call them "send"
+
+
+sendAction :: (ToJSON a) => String -> Either Failure a -> ActionM ()
+sendAction _ (Left (DocNotFound _)) = do
+    status status404
+sendAction m (Left (QueryFailure _ _)) = do
+    status status400
+    json $ Fault m
+sendAction m (Left (WriteFailure _ _)) = do
+    status status400
+    json $ Fault m
+sendAction _ (Left _) = do
+    status status500
+    json $ Fault "Database Error"
+sendAction _ (Right a) = json a
+
+sendActionFault :: (ToJSON a) => String -> Either Failure (Either Fault a) -> ActionM()
+sendActionFault m (Right efa) = case efa of 
+    Left f -> fault f 
+    Right a -> json a
+sendActionFault m f = sendAction m f
 
 
 -- send a non-mongo fault
@@ -64,6 +98,7 @@ fault f = do
     case f of 
         NotAuthorized -> status status403
         NotFound -> status status400
+        InvalidPosition -> status status400
         _ -> status status500
     json f
 

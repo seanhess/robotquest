@@ -2,7 +2,7 @@
 
 module Botland.Control where
 
-import Botland.Types
+import Botland.Types hiding (Direction(..))
 
 import Control.Monad.IO.Class (liftIO)
 
@@ -16,7 +16,7 @@ import Numeric (showIntAtBase)
 import Data.Char (intToDigit)
 
 
-
+-- SETUP ----------------------------------------------------------
 ensureIndexes :: Action IO ()
 ensureIndexes = do
     ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)
@@ -26,29 +26,45 @@ botOwner mcpId botId = do
     n <- count $ select ["mcpId" =: mcpId, "_id" =: botId] "bots"
     return (n > 0)
 
+
+-- CREATION -------------------------------------------------------
+
+-- we don't actually care what id you use as an MCP, but we provide a way to generate one here, so you don't have to hard-code it in your source and expose yourself to other people controlling your bots. Later we will store details about your mcp
 createMcp :: ActionM Id
 createMcp = do
     id <- liftIO $ randomId
     return $ Id id
 
--- use a mongo thang
--- if it fails, it exists EVERYTHING with either Failure a
-createBot :: String -> Bot -> Action IO Id
-createBot mcpId b = do
+createBot :: Game -> String -> Bot -> Action IO (Either Fault Id)
+createBot g mcpId b = do
     id <- liftIO $ randomId
     let ub = b { botId = Just id, mcpId = Just mcpId }
 
-    -- TODO: validate starting location for boundaries
+    let v = validPosition g (x b) (y b)
 
+    if (not v) then 
+        return $ Left InvalidPosition 
+    else do
+
+    -- this insert will fail if the location is occupied
     insert_ "bots" (toDoc ub)
-    return $ Id id 
 
--- Just saves an action
+    return $ Right $ Id id 
+
+
+
+-- ACTIONS --------------------------------------------------------
+
 setAction :: String -> BotAction -> Action IO Ok
 setAction id a = do
     modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (show a)]]
     return Ok 
 
+
+
+
+
+-- THE WORLD -------------------------------------------------------
 
 locations :: Action IO [Bot]
 locations = do
@@ -59,7 +75,9 @@ locations = do
 
 
 
--- most likely you want this
+
+-- HELPERS ----------------------------------------------------------
+
 randomId :: IO String
 randomId = do
     i <- randomIO
@@ -68,13 +86,5 @@ randomId = do
 intToHex :: Int -> String
 intToHex i = showIntAtBase 16 intToDigit (abs i) "" 
 
-
---validPoint :: FieldInfo -> Point -> Bool
---validPoint f p = xmin <= px && px < xmax && ymin <= py && py < ymax
---    where px = x p
---          py = y p
---          xmin = x $ fieldStart f
---          xmax = xmin + (width $ fieldSize f)
---          ymin = y $ fieldStart f
---          ymax = ymin + (height $ fieldSize f)
-
+validPosition :: Game -> Int -> Int -> Bool
+validPosition g x y = 0 <= x && x < (width g) && 0 <= y && y < (height g)

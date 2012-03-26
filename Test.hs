@@ -25,3 +25,13 @@ either = do
 
 --test :: Either Bool String
 --test = do
+
+class Response where
+    response :: (ToJSON b) => a -> (Status, b)
+
+instance (ToJSON a) => Response a where
+    response a = (status200, a)
+
+instance (Response a, Response b) => (Either a b) where
+    response (Left a) = response a
+    response (Right b) = response b

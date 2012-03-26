@@ -50,6 +50,7 @@ data BotAction = Stop | Move | Attack deriving (Show, Read)
 data Fault = Fault String
            | NotFound
            | NotAuthorized
+           | InvalidPosition
            deriving (Generic, Show)
 
 -- when I just want to send back an id
@@ -114,7 +115,10 @@ instance FromJSON Bot where
 
     parseJSON _ = mzero
 
--- fault 
+
+
+-- SERVER MESSAGES ----------------------------------------------------------
+
 instance FromJSON Fault where
     parseJSON (Object v) = Fault <$> v .: "message"
 
@@ -124,6 +128,7 @@ instance ToJSON Fault where
 message :: Fault -> String 
 message NotFound = "Not Found"
 message NotAuthorized = "Not Authorized"
+message InvalidPosition = "Invalid Position"
 message (Fault m) = m
 
 
@@ -156,7 +161,6 @@ fromDoc d = Bot (at "x" d)
 
 
 
--- SERVER MESSAGES ----------------------------------------------------------
 
 
 
