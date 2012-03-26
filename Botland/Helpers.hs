@@ -2,7 +2,7 @@
 
 module Botland.Helpers where
 
-import Botland.Types
+import Botland.Types hiding (Direction(..))
 
 import Control.Monad.Trans.Resource (runResourceT)
 import Control.Monad.IO.Class (liftIO)

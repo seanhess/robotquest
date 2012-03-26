@@ -43,9 +43,10 @@ createBot mcpId b = do
     insert_ "bots" (toDoc ub)
     return $ Id id 
 
+-- Just saves an action
 setAction :: String -> BotAction -> Action IO Ok
 setAction id a = do
-    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (showAction a)]]
+    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (show a)]]
     return Ok 
 
 
@@ -64,11 +65,8 @@ randomId = do
     i <- randomIO
     return $ intToHex i
 
-
-
 intToHex :: Int -> String
 intToHex i = showIntAtBase 16 intToDigit (abs i) "" 
-
 
 
 --validPoint :: FieldInfo -> Point -> Bool

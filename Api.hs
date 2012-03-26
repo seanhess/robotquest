@@ -9,6 +9,7 @@ import Botland.Middleware
 
 import Database.MongoDB (runIOE, connect, access, master, host, Pipe, Action)
 
+import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad.IO.Class (liftIO)
 
 import Data.Text.Lazy (Text, pack)
@@ -67,8 +68,13 @@ main = do
             res <- db $ setAction botId (action c)
             send "Could not set action" res
 
+        -- TODO: real tests - api + functional
+        -- TODO: attack
+        -- TODO: better, less obtrusive bot harness (not the same as the viewer?)
 
-        -- now make the game timer!
+        -- AFTER LAUNCH
+        -- TODO: Add bulk requests? (launch first)
+        -- TODO: Encforce movement limit (launch first) 
 
 connectMongo :: IO (Pipe) 
 connectMongo = runIOE $ connect (host "127.0.0.1")

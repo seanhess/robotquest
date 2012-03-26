@@ -2,7 +2,7 @@
 
 module Botland.Middleware where
 
-import Botland.Types
+import Botland.Types hiding (Direction(..))
 import Botland.Control
 import Botland.Helpers
 

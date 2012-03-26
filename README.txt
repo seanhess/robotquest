@@ -4,7 +4,29 @@ Robotocalypseopolis
 Visit http://dev.i.tv:3000/
 
 
+so you'd have per player (maybe set up when starting the game) a TVar (Maybe Command)
+10:14 PM
+once you've got a request, atomically (writeTVar myTVar mycommand)
+10:14 PM
+in the request handler, run in whatever thread the server feels like
+10:15 PM
+then when the game loop wants to proces it does something like atomically (sequence [swapTVar player Nothing | player <- players)
+10:15 PM seanhess
+super cool
+10:15 PM nexx has left IRC (Ping timeout: 265 seconds)
+10:15 PM napping
+which will get the orders, zero them out, and not have any risk of erasing an order if a new one arrives at the wrong time
+10:16 PM
+sequence [atomically (swapTVar player Nothing) | player <- players]
+10:16 PM seanhess
+I'll go play with it. Thanks so much for your help!
 
+when you make an action, does it automatically set you to stop afterwards? (YES)
+    - how can you make sure you're not losing information?
+    - you need a big atomic operation: find and update
+
+    - or do the easier thing and articifically rate-limit people
+    !! Do that. It's WAY easier
 
 Installing robolis
 ------------------
