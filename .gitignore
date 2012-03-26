@@ -6,3 +6,5 @@ sandbox
 dist/*
 *.sublime*
 Api
+node_modules
+*.log
