@@ -31,7 +31,7 @@ main = do
     let auth = runAuth pipe "botland"
     db ensureIndexes
 
-    scotty 3000 $ do
+    scotty 3026 $ do
 
         middleware $ staticRoot "public"
         middleware cors
