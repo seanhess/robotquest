@@ -68,12 +68,6 @@ main = do
             res <- db $ performCommand c game botId
             sendActionFault "Invalid Space: Occupied?" res
 
-        -- TODO: better, less obtrusive bot harness (not the same as the viewer?)
-        -- TODO: dom viewer, so you can animate movements, deaths, etc. easy-peasy
-
-        -- don't put any bots in the browser. People will click it too often
-        -- or at most, only allow browsers to submit one bot at a time. Multiple bots makes them freak out.
-
         -- TODO: cleanup (should be easyish with forkIO, update date, etc)
             -- mcp last action?
             -- or per bot?
@@ -84,6 +78,9 @@ main = do
             -- disconnect them on an error? That would be mean :)
             -- on too many errors, perhaps...
 
+        -- TODO: bot removal
+        -- TODO: mcp removal
+        
 
         -- ????? 
         -- TODO: read config from the command-line so you can test better (use a test db, for example)
