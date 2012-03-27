@@ -17,7 +17,7 @@ import Data.ByteString.Char8 (ByteString, pack, unpack, append)
 import Data.Conduit.Lazy (lazyConsume)
 import qualified Data.Text.Lazy as T
 
-import Network.HTTP.Types (status404, status500, status400, status401, status200, status403)
+import Network.HTTP.Types (status404, status500, status400, status401, status200, status403, status501)
 import Network.Wai (requestBody)
 
 import Web.Scotty (ActionM, request, raise, status, text, redirect, rescue, header, json, param)
@@ -99,6 +99,7 @@ fault f = do
         NotAuthorized -> status status403
         NotFound -> status status400
         InvalidPosition -> status status400
+        NotImplemented -> status status501
         _ -> status status500
     json f
 

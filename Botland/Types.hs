@@ -34,6 +34,9 @@ data Bot = Bot { x :: Int
                , mcpId :: Maybe String
                } deriving (Show)
 
+-- sometimes you just need to talk about a point
+data Point = Point { px :: Int, py :: Int } deriving (Show)
+
 -- gives the field and interval
 data Game = Game { width :: Int
                  , height :: Int
@@ -43,13 +46,14 @@ data Game = Game { width :: Int
 
 -- available actions
 data BotCommand = BotCommand { action :: BotAction, direction :: Direction } deriving (Show, Generic)
-data Direction = Left | Right | Up | Down deriving (Show, Read)
+data Direction = DLeft | DRight | DUp | DDown deriving (Show, Read)
 data BotAction = Stop | Move | Attack deriving (Show, Read)
 
 -- things that can go wrong
 data Fault = Fault String
            | NotFound
            | NotAuthorized
+           | NotImplemented
            | InvalidPosition
            deriving (Generic, Show)
 
@@ -86,10 +90,13 @@ instance FromJSON BotAction where
     parseJSON = typeParseJSON readMay
 
 instance ToJSON Direction where
-    toJSON = typeToJSON show
+    toJSON = typeToJSON (removeFirstLetter.show)
 
 instance FromJSON Direction where
-    parseJSON = typeParseJSON readMay
+    parseJSON = typeParseJSON (readMay.addD)
+
+removeFirstLetter = tail
+addD cs = 'D':cs
 
 -- Bot --
 instance ToJSON Bot where
@@ -128,6 +135,7 @@ instance ToJSON Fault where
 message :: Fault -> String 
 message NotFound = "Not Found"
 message NotAuthorized = "Not Authorized"
+message NotImplemented = "Not Implemented"
 message InvalidPosition = "Invalid Position"
 message (Fault m) = m
 
@@ -135,36 +143,34 @@ message (Fault m) = m
 
 
 -- MONGODB -----------------------------------------------------------------
-toDoc :: Bot -> Document
-toDoc b = [ "x" := val (x b)
-          , "y" := val (y b)
-          , "name" := val (name b)
-          , "source" := val (source b)
-          , "color" := val (color b)
-          , "_id" := val (fromMaybe "" (botId b))
-          , "mcpId" := val (fromMaybe "" (mcpId b))
-          ]
 
+class ToDoc a where
+    toDoc :: a -> Document
 
--- TODO: actually read action
-fromDoc :: Document -> Bot
-fromDoc d = Bot (at "x" d) 
-                (at "y" d) 
-                (at "name" d) 
-                (at "source" d) 
-                (at "color" d)
-                (lookup "_id" d) 
-                (lookup "mcpId" d)
+class FromDoc a where
+    fromDoc :: Document -> a
 
+instance ToDoc Bot where
+    toDoc b = [ "x" := val (x b)
+              , "y" := val (y b)
+              , "name" := val (name b)
+              , "source" := val (source b)
+              , "color" := val (color b)
+              , "_id" := val (fromMaybe "" (botId b))
+              , "mcpId" := val (fromMaybe "" (mcpId b))
+              ]
 
+instance FromDoc Bot where
+    fromDoc d = Bot (at "x" d) 
+                    (at "y" d) 
+                    (at "name" d) 
+                    (at "source" d) 
+                    (at "color" d)
+                    (lookup "_id" d) 
+                    (lookup "mcpId" d)
 
-
-
-
-
-
-
-
+instance FromDoc Point where
+    fromDoc p = Point (at "x" p) (at "y" p)
 
 
 

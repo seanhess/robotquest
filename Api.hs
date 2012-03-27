@@ -65,11 +65,24 @@ main = do
         -- sets the bot's action
         put "/mcps/:mcpId/bots/:botId/action" $ auth $ decodeBody $ \c -> do
             botId <- param "botId"
-            res <- db $ setAction botId (action c)
-            sendAction "Could not set action" res
+            res <- db $ performCommand c game botId
+            sendActionFault "Invalid Space: Occupied?" res
 
-        -- Better Errors:
-            -- requests: their return, a db error, or an expected error/fault
+        --routeAction :: BotAction -> (String -> Direction -> ActionM ())
+        --routeAction Move = move
+        --routeAction Attack = attack
+        --routeAction
+
+        ---- different actions can return different errors
+        --move :: String -> Direction -> ActionM ()
+        --move id d = do
+        --    res <- db $ move botId d
+        --    sendAction "Could not move"
+
+        --notImplemented :: String -> Direction -> ActionM()
+        --notImplemented _ _ = fault NotImplemented
+
+
 
         -- TOOD: movement should move you
         -- TODO: disallow movement off-screen (or just allow it. Who cares?)

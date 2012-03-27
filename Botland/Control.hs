@@ -2,10 +2,11 @@
 
 module Botland.Control where
 
-import Botland.Types hiding (Direction(..))
+import Botland.Types
 
 import Control.Monad.IO.Class (liftIO)
 
+import Data.Maybe (isNothing, fromJust)
 import Database.MongoDB
 
 import Web.Scotty (ActionM(..))
@@ -55,12 +56,49 @@ createBot g mcpId b = do
 
 -- ACTIONS --------------------------------------------------------
 
-setAction :: String -> BotAction -> Action IO Ok
-setAction id a = do
-    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (show a)]]
-    return Ok 
+--setAction :: String -> BotAction -> Action IO Ok
+--setAction id a = do
+--    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (show a)]]
+--    return Ok 
+
+performCommand :: BotCommand -> Game -> String -> Action IO (Either Fault Ok)
+performCommand (BotCommand Move d) g id = moveAction g id d
+performCommand (BotCommand Attack d) g id = attackAction id d
+
+moveAction :: Game -> String -> Direction -> Action IO (Either Fault Ok)
+moveAction g id d = do
+
+    -- I need to GET their current position
+    doc <- findOne (select ["_id" =: id] "bots") {project = ["x" =: 1, "y" =: 1, "_id" =: 0]}
+
+    if (isNothing doc) then
+        return $ Left NotFound
+    else do
+
+    let bp = fromDoc (fromJust doc)
+    let (Point x y) = move d bp
+
+    let v = validPosition g x y
+    if (not v) then 
+        return $ Left InvalidPosition 
+    else do 
+
+    -- throws an error if someone is there
+    modify (select ["_id" =: id] "bots") ["$set" =: ["x" =: x, "y" =: y]]
+
+    return $ Right Ok
+
+attackAction = undefined
+        
 
 
+-- movement helpers --
+move :: Direction -> Point -> Point
+move d (Point x y) = case d of
+    DLeft -> Point (x-1) y
+    DRight -> Point (x+1) y
+    DUp -> Point x (y-1)
+    DDown -> Point x (y+1)
 
 
 

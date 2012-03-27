@@ -129,7 +129,7 @@ describe('botland api', function() {
         })
 
         it("should out-of-bounds error", function(done) {
-            request.put({url: Server + "/mcps/" + mcpId + "/bots/" + botId + "/action", json:{action:"Move", direction:"Left"}}, function(err, rs, data) {
+            request.put({url: Server + "/mcps/" + mcpId + "/bots/" + botId + "/action", json:{action:"Move", direction:"Up"}}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 400, 'missing 400 status code')
                 assert.ok(data.message, 'missing error message')
