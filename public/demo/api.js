@@ -1,4 +1,9 @@
-function request(method, url, body, authToken, cb) {
+function request(method, url, body, cb) {
+
+    if (typeof body === 'function') {
+        cb = body
+        body = {}
+    }
 
     var b = JSON.stringify(body)
     $.ajax( { type: method
@@ -6,7 +11,6 @@ function request(method, url, body, authToken, cb) {
             , contentType: 'application/json'
             , data: b
             , dataType: "json"
-            , headers: {"X-Auth-Token":authToken}
             , error: function(xhr) {
                 cb(new Error(xhr.responseText))
             }

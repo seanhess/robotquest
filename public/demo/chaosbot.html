@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/async.min.js"></script>
+<script src="/demo/api.js"></script>
+
+<script>
+    $(function() {
+
+        $launch = $("#launch")
+        $stop = $("#stop")
+        $output = $("#output")
+
+        $stop.hide()
+
+        var currentBot = null
+        var w, h, ms, g
+
+        // get the game details when we load the page
+        request("GET", '/game', function(err, game) {
+            g = game
+            w = game.width
+            h = game.height
+            ms = game.tick
+        })
+
+        $launch.click(function() {
+            $launch.hide()
+            $stop.show()
+            $output.text("")
+
+            currentBot = start()
+        })
+
+        $stop.click(function() {
+            $stop.hide()
+            $launch.show()
+
+            currentBot.stop()
+            currentBot = null
+        })
+
+        function start() {
+
+            log("Starting w=" + w + " h=" + h + " t=" + ms)
+
+            var botId, mcpId, interval
+            var currentAction = randomAction()
+
+            function connect() {
+                request("POST", "/mcps", function(err, mcp) {
+                    mcpId = mcp.id
+                    log("MCP " + mcpId)
+
+                    var p = randomPoint(g)
+
+                    var bot = {name: "chaosbot", source: "http://github.com/seanhess/botland", x: p.x, y: p.y, color: "#000"}
+
+                    log("Spawning at " + p.x + " " + p.y)
+
+                    request("POST", "/mcps/" + mcpId + "/bots", bot, function(err, bot) {
+                        if (err) return log("Error: " + err.message) 
+                        botId = bot.id
+                        interval = setInterval(poll, ms)
+                    })
+                })
+            }
+
+            function stop() {
+                clearInterval(interval)
+            }
+
+            function poll() {
+                request("GET", "/game/locations", function(err, bots) {
+                    tick(bots)
+                })
+            }
+
+            function tick(bots) {
+                ids = byId(bots)
+
+                if (!ids[botId]) {
+                    log("Missing from world")
+                    return stop()
+                }
+
+                log("Location: " + ids[botId].x + " " + ids[botId].y)
+
+                request("PUT", "/mcps/" + mcpId + "/bots/" + botId +"/action", currentAction, function(err) {
+                    if (err) {
+                        // change directions!
+                        currentAction = randomAction()
+                        log("New Direction: " + currentAction.direction)
+                    }
+                })
+            }
+
+            connect()
+
+            return {stop: stop}
+        }
+
+        function log(stuff) {
+            console.log(stuff)
+            $output.append(stuff + "\n")
+        }
+
+
+        // var unitId, unitToken, currentAction
+        // var currentAction = randomAction()
+
+        // var dead = false
+
+        // // we ignore the world. Easier to rely on failures
+        // function tick(locations, units) {
+
+        //     if (dead) return
+
+        //     // make a map of unitId -> location
+        //     var map = {}
+        //     for (var i = 0; i < locations.length; i++) {
+        //         var l = locations[i]
+        //         map[l.unitId] = l.point
+        //     }
+
+        //     // get our current position
+        //     var currentPoint = map[unitId]
+
+        //     if (!currentPoint) {
+        //         dead = true
+        //         return
+        //         // probably means we've been cleaned up
+        //     }
+                
+
+        //     var newPoint = currentAction(currentPoint)
+        //     request("POST", "/units/" + unitId + "/move", newPoint, unitToken, function(err) {
+        //         // this probably means we hit something. Change actions
+        //         if (err) currentAction = randomAction()
+        //     })
+        // }
+
+        // function start() {
+        //     request("POST", "/units", {requestedPoint: randomPoint(worldInfo.fieldSize), unitDescription: description}, "", function(err, spawn) {
+
+        //         if (err) throw err
+
+        //         unitId = spawn.unitId
+        //         unitToken = spawn.unitToken
+
+        //     })
+        // }
+
+        function byId(bots) {
+            var map = {}
+            bots.forEach(function(b) {
+                map[b.id] = b
+            })
+            return map
+        }
+
+        function randomAction() {
+            var directions = ["Up", "Right", "Left", "Down"]
+            var index = Math.floor(Math.random() * directions.length)
+            return {action: "Move", direction: directions[index]}
+        }
+
+
+    })
+</script>
+
+</head>
+<body>
+    <button id="launch">Launch Chaosbot</button>
+    <button id="stop">Stop</button>
+    <pre id="output"></pre>
+</body>
+</html>

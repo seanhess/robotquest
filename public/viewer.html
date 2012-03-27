@@ -5,9 +5,6 @@
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/js/async.min.js"></script>
 <script src="/demo/api.js"></script>
-<script src="/demo/viewer.js"></script>
-<script src="/demo/chaosbot.js"></script>
-<script src="/demo/cleanupbot.js"></script>
 <style>
 
     body {
@@ -15,23 +12,30 @@
         margin: 0px;
     }
 
-    #controls {
-        position: absolute;
-        padding: 5px;
+    .bg {
+        padding: 15px;
+        background-color: #070;
+        width: 630px;
     }
 
     #viewer {
-        height: 100%;
-        width: 100%;
-        display: block;
-        position: absolute;
+        margin: 15px;
+        height: 600px;
+        width: 600px;
+        background-color: #0c0;
+        position: relative;
     }
 
-    canvas.viewer {
-        border: solid 1px black;
+    .bot {
+        width: 58px;
+        height: 58px;
+        background-color: #000;
+        border-radius: 30px;
         position: absolute;
-        top: 5px;
-        left: 150px;
+        opactiy: 1;
+
+        transition: all ease 500ms;
+        -webkit-transition: all ease 300ms;
     }
 
 </style>
@@ -40,62 +44,62 @@
 
         var bots = []
 
+
+        var $window = $(window)
+        var $viewer = $("#viewer")
+
+        var PX = 60 
+        var PY = 60
+
+        var padding = 1 
+
+        $window.on('resize', function() {
+            console.log("RESIZE")
+        })
+
         // first, get the world
         $.get("/game", function(gameInfo) {
-            var tickInterval = gameInfo.msTickInterval
-            var worldInfo = gameInfo.worldFieldInfo
-            var viewer = new Viewer($("#viewer"), worldInfo.fieldSize)
 
-            var units = {}
+            var w = gameInfo.width
+            var h = gameInfo.height
+            var ms = gameInfo.tick
 
-            function tick() {
-                $.get("/world/locations", function(locations) {
+            console.log("GAME INFO", w, h, ms)
 
-                    var unknownUnits = locations.filter(function(l) {
-                        return !units[l.unitId]
-                    }).map(function(l) {
-                        return l.unitId
-                    })
+            function poll() {
+                $.get("/game/locations", function(bots) {
+                    tick(bots)
+                })
+            }
 
-                    async.forEach(unknownUnits, function(unitId, done) {
-                        units[unitId] = {} // so we don't fetch them twice
-                        getUnitDescription(unitId, function(d) {
-                            units[unitId] = d
-                            done()
-                        })
-                    }, function() {
+            function tick(bots) {
 
-                    })
+                $(".bot").addClass("inactive")
 
-                    viewer.draw(locations, units)
-                    for (var i = 0; i < bots.length; i++) {
-                        bots[i].tick(locations, units)
+                bots.forEach(function(bot) {
+                    var $bot = $("#" + bot.id)
+
+                    if (!$bot.length) {
+                        console.log("NEW BOT", bot.id, bot.name, bot.x, bot.y)
+                        $bot = botView(bot)
+                        $viewer.append($bot)
                     }
+
+                    $bot.css({left: bot.x * PX + padding, top: bot.y * PY + padding})
+                    $bot.removeClass("inactive")
                 })
+
+                $(".bot.inactive").remove()
             }
 
-            tick()
-            var interval = setInterval(tick, tickInterval)
-
-            $("#ChaosBot").click(function() {
-                spawn(ChaosBot)
-            })
-
-            $("#CleanupBot").click(function() {
-                spawn(CleanupBot)
-            })
-
-            function spawn(Class) {
-                var bot = new Class(worldInfo, $("#color").val())
-                bot.start()
-                bots.push(bot)
+            function botView(bot) {
+                var $bot = $("<div class='bot' id='"+bot.id+"' style='color:"+bot.color+"'></div>")
+                $bot.data(bot)
+                return $bot
             }
 
-            function getUnitDescription(unitId, cb) {
-                $.get("/units/" + unitId + "/description", function(description) {
-                    cb(description)
-                })
-            }
+            poll()
+            setInterval(poll, ms)
         })
 
 
@@ -104,12 +108,5 @@
 
 </head>
 <body>
-    <div id="viewer">
-    </div>
-    <div id="controls">
-        <div>Color</div>
-        <div><input name="color" id="color" value="#000"></input></div>
-        <div><button id="ChaosBot">ChaosBot</button></div>
-        <div><button id="CleanupBot">CleanupBot</button></div>
-    </div>
+    <div class="bg"><div id="viewer"></div></div>
 </body>
