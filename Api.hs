@@ -68,6 +68,20 @@ main = do
             res <- db $ performCommand c game botId
             sendActionFault "Invalid Space: Occupied?" res
 
+        -- delete all bots associated with the mcp
+        delete "/mcps/:mcpId" $ do
+            mcpId <- param "mcpId"
+            ok <- db $ cleanupMcp mcpId
+            sendAction "Could not delete mcp" ok
+
+        delete "/mcps/:mcpId/bots/:botId" $ auth $ do
+            botId <- param "botId"
+            ok <- db $ cleanupBot botId 
+            sendAction "Could not delete bot" ok
+
+        -- TODO: bot removal
+        -- TODO: mcp removal
+
         -- TODO: cleanup (should be easyish with forkIO, update date, etc)
             -- mcp last action?
             -- or per bot?
@@ -78,9 +92,6 @@ main = do
             -- disconnect them on an error? That would be mean :)
             -- on too many errors, perhaps...
 
-        -- TODO: bot removal
-        -- TODO: mcp removal
-        
 
         -- ????? 
         -- TODO: read config from the command-line so you can test better (use a test db, for example)

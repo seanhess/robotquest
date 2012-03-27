@@ -181,6 +181,56 @@ describe('botland api', function() {
             })
         })
     })
+
+    describe('cleanup', function() {
+        var botId = null
+        it('should spawn another bot', function(done) {
+            var bot = {x:1, y:1, name:'cleanup', source:'test', color:"#F00"} 
+            request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, body) {
+                assert.ifError(err)
+                assert.equal(rs.statusCode, 200, body.message)
+                botId = body.id
+                assert.ok(botId, 'botId was undefined')
+                done()
+            }) 
+        })
+
+        it('should delete botId', function(done) {
+            request.del({url: Server + "/mcps/" + mcpId + "/bots/" + botId, json: true}, function(err, rs, body) {
+                assert.ifError(err)
+                assert.equal(rs.statusCode, 200, body.message)
+                done()
+            })
+        })
+
+        it('should be gone', function(done) {
+            request.get({url:Server + "/game/locations", json:true}, function(err, rs, locations) {
+                assert.ifError(err)
+                assert.ok(locations)
+                assert.equal(locations.length, 1)
+                var b2 = locations[0]
+                assert.notEqual(b2.id, botId)
+                done()
+            }) 
+        })
+
+        it('should delete mcp', function(done) {
+            request.del({url: Server + "/mcps/" + mcpId, json: true}, function(err, rs, body) {
+                assert.ifError(err)
+                assert.equal(rs.statusCode, 200, body.message)
+                done()
+            })
+        })
+
+        it('should be empty', function(done) {
+            request.get({url:Server + "/game/locations", json:true}, function(err, rs, locations) {
+                assert.ifError(err)
+                assert.ok(locations)
+                assert.equal(locations.length, 0)
+                done()
+            })  
+        })
+    })
 })
 
 

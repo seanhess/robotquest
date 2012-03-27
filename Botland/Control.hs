@@ -119,6 +119,18 @@ move d (Point x y) = case d of
     DDown -> Point x (y+1)
 
 
+-- CLEANUP ---------------------------------------------------------
+
+cleanupMcp :: String -> Action IO Ok
+cleanupMcp mcpId = do
+    delete (select ["mcpId" =: mcpId] "bots")
+    return Ok
+
+cleanupBot :: String -> Action IO Ok
+cleanupBot botId = do
+    delete (select ["_id" =: botId] "bots")
+    return Ok
+
 
 -- THE WORLD -------------------------------------------------------
 

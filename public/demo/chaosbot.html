@@ -40,6 +40,7 @@
 
             currentBot.stop()
             currentBot = null
+
         })
 
         function start() {
@@ -69,7 +70,12 @@
             }
 
             function stop() {
-                clearInterval(interval)
+                log("Cleaning up")
+                request("DELETE", "/mcps/" + mcpId, function(err) {
+                    if (err) return log("Error: " + err.message)
+                    clearInterval(interval)
+                    log("Stopped")
+                })
             }
 
             function poll() {
