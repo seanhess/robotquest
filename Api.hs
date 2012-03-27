@@ -68,24 +68,6 @@ main = do
             res <- db $ performCommand c game botId
             sendActionFault "Invalid Space: Occupied?" res
 
-        --routeAction :: BotAction -> (String -> Direction -> ActionM ())
-        --routeAction Move = move
-        --routeAction Attack = attack
-        --routeAction
-
-        ---- different actions can return different errors
-        --move :: String -> Direction -> ActionM ()
-        --move id d = do
-        --    res <- db $ move botId d
-        --    sendAction "Could not move"
-
-        --notImplemented :: String -> Direction -> ActionM()
-        --notImplemented _ _ = fault NotImplemented
-
-
-
-        -- TOOD: movement should move you
-        -- TODO: disallow movement off-screen (or just allow it. Who cares?)
         -- TODO: attack
         -- TODO: better, less obtrusive bot harness (not the same as the viewer?)
 

@@ -58,12 +58,12 @@ describe('botland api', function() {
 
     // keep track of our botId for later tests
     var botId = null
-    var bot = {x:0, y:0, name:'test', source:'test', color:"#F00"}
+    var bot = {x:0, y:0, name:'bot1', source:'test', color:"#F00"}
 
     describe('spawn', function() {
 
         it('should not allow me to spawn off field', function(done) {
-            var bot = {x:-1, y:0, name:'test', source:'test', color:"#F00"} 
+            var bot = {x:-1, y:0, name:'offfield', source:'test', color:"#F00"} 
             request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 400, 'missing 400 status code')
@@ -133,6 +133,50 @@ describe('botland api', function() {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 400, 'missing 400 status code')
                 assert.ok(data.message, 'missing error message')
+                done()
+            })
+        })
+    })
+
+    describe('attack', function() {
+        var bot2Id = null
+        it('should spawn a second bot', function(done) {
+            var bot = {x: 0, y: 0, name: 'bot2', source: 'test', color: "#00F"}
+            request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, body) {
+                assert.ifError(err)
+                assert.equal(rs.statusCode, 200, body.message)
+                bot2Id = body.id
+                assert.ok(bot2Id, 'botId was undefined')
+                done()
+            })
+        })
+
+        it('should both appear in the world', function(done) {
+            request.get({url:Server + "/game/locations", json:true}, function(err, rs, locations) {
+                assert.ifError(err)
+                assert.ok(locations)
+                assert.equal(locations.length, 2)
+                var b2 = locations[1]
+                assert.equal(b2.id, bot2Id)
+                done()
+            })
+        })
+
+        it('should attack bot1', function(done) {
+            request.put({url: Server + "/mcps/" + mcpId + "/bots/" + bot2Id + "/action", json:{action:"Attack", direction:"Right"}}, function(err, rs, data) {
+                assert.ifError(err)
+                assert.equal(rs.statusCode, 200)
+                done()
+            })
+        })
+
+        it('should remove bot1', function(done) {
+            request.get({url:Server + "/game/locations", json:true}, function(err, rs, locations) {
+                assert.ifError(err)
+                assert.ok(locations)
+                assert.equal(locations.length, 1)
+                var b2 = locations[0]
+                assert.equal(b2.id, bot2Id)
                 done()
             })
         })

@@ -63,7 +63,7 @@ createBot g mcpId b = do
 
 performCommand :: BotCommand -> Game -> String -> Action IO (Either Fault Ok)
 performCommand (BotCommand Move d) g id = moveAction g id d
-performCommand (BotCommand Attack d) g id = attackAction id d
+performCommand (BotCommand Attack d) g id = attackAction g id d
 
 moveAction :: Game -> String -> Direction -> Action IO (Either Fault Ok)
 moveAction g id d = do
@@ -88,8 +88,26 @@ moveAction g id d = do
 
     return $ Right Ok
 
-attackAction = undefined
-        
+attackAction :: Game -> String -> Direction -> Action IO (Either Fault Ok)
+attackAction g id d = do
+
+    -- I need to GET their current position
+    doc <- findOne (select ["_id" =: id] "bots") {project = ["x" =: 1, "y" =: 1, "_id" =: 0]}
+
+    if (isNothing doc) then
+        return $ Left NotFound
+    else do
+
+    let bp = fromDoc (fromJust doc)
+    let (Point x y) = move d bp
+
+    -- remove anybody there. Die sucka die
+    delete (select ["x" =: x, "y" =: y] "bots")
+
+    return $ Right Ok
+
+
+
 
 
 -- movement helpers --
