@@ -19,9 +19,10 @@
 
         <hr/>
 
-        <h2>Methods</h2>
+        <h2>API</h2>
 
-        <p>Any method can return a <a href="#Fault">Fault</a> instead of its regular response.</p>
+        <p>Any method can return a <code>Fault {message}</code> instead of its regular response.</p>
+        <p>All coordinates and sizes are in discreet squares, not pixels</p>
 
         <table class="methods">
             <tr>
@@ -29,61 +30,124 @@
                 <th></th>
                 <th>Body</th>
                 <th>Returns</th>
-                <th>Description</th>
+                <!-- <th>Description</th> -->
             </tr>
             <tr>
                 <td>GET</td>
                 <td class="url">/game</td>
                 <td></td>
-                <td><a href="#GameInfo">GameInfo</a></td>
-                <td>The tick interval, size and coordinates of the world</td>
+                <td><code><a href="#Game">Game</a> {width, height, tick (ms)}</code></td>
+                <!-- <td></td> -->
             </tr>
             <tr>
                 <td>GET</td>
-                <td class="url">/world/locations</td>
+                <td class="url">/game/bots</td>
                 <td></td>
-                <td>[<a href="#Location">Location</a>]</td>
-                <td>All locations in the world. Poll for updates</td>
-            </tr>
-            <tr>
-                <td>GET</td>
-                <td class="url">/units/:<a href="#UnitId">unitId</a>/description</td>
-                <td></td>
-                <td><a href="#UnitDescription">UnitDescription</a></td>
-                <td>Returns the description for a unit given by <a href="#UnitId">UnitId</a></td>
+                <td><code>[<a href="#Bot">Bot</a> {id, x, y, name, source, color}]</code></td>
+                <!-- <td>All locations in the world. Poll for updates</td> -->
             </tr>
             <tr>
                 <td>POST</td>
-                <td class="url">/units</td>
-                <td><a href="#SpawnRequest">SpawnRequest</a></td>
-                <td><a href="#Spawn">Spawn</a></td>
-                <td>Create a new bot and get enough information to control it. See <a href="#Authentication">Authentication</a></td>
+                <td class="url">/mcps</td>
+                <td></td>
+                <td><code>{id}</code></td>
+                <!-- <td></td> -->
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td class="url">/mcps/:mcpId/bots</td>
+                <td><code><a href="#Bot">Bot</a> {x, y, name, source, color}</code></td>
+                <td><code>{id}</code></td>
+                <!-- <td>Create a new bot and get enough information to control it. See <a href="#Authentication">Authentication</a></td> -->
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td class="url">/mcps/:mcpId/bots/:botId/command</td>
+                <td><pre><code>Command {
+    <a href="#actions">action</a>:Move|Attack,
+    direction:Up|Down|Left|Right
+}</code></pre></td>
+                <td><code>{ok}</code></td>
+                <!-- <td><a href="#Authentication">Authentication</a> required.</td> -->
             </tr>
             <tr>
                 <td>DELETE</td>
-                <td class="url">/units/:<a href="#UnitId">unitId</a></td>
+                <td class="url">/mcps/:mcpId</td>
                 <td></td>
-                <td></td>
-                <td>Removes a unit you control. <a href="#Authentication">Authentication</a> required.</td>
+                <td><code>{ok}</code></td>
+                <!-- <td></td> -->
             </tr>
             <tr>
-                <td>POST</td>
-                <td class="url">/units/:<a href="#UnitId">unitId</a>/move</td>
-                <td><a href="#Point">Point</a></td>
+                <td>DELETE</td>
+                <td class="url">/mcps/:mcpId/bots/:botId</td>
                 <td></td>
-                <td><a href="#Authentication">Authentication</a> required.</td>
-            </tr>
-            <tr>
-                <td>POST</td>
-                <td class="url">/units/:<a href="#UnitId">unitId</a>/attack</td>
-                <td><a href="#Point">Point</a></td>
-                <td></td>
-                <td>Attack a point near you. Must be a position next to a unit you control. If a unit is in that spot, it will be eliminated. <a href="#Authentication">Authentication</a> required.</td>
+                <td><code>{ok}</code></td>
+                <!-- <td>Removes a unit you control. <a href="#Authentication">Authentication</a> required.</td> -->
             </tr>
         </table>
 
         <hr/>
-        <h2 id="Game">Game</h2>
+        <h3 id="Game">Game</h3>
+        <ul>
+            <li><strong>width, height</strong> - Int - number of squares wide and high.</li>
+            <li><strong>tick</strong> - Int (ms) - How often you can send commands, and poll for /game/locations</li>
+        </ul>
+
+
+        <h3 id="Bot">Bot</h3>
+        <ul>
+            <li><strong>id</strong> - String</li>
+            <li><strong>x, y</strong> - Int - square coordinate</li>
+            <li><strong>name</strong> - String - identify this bot to humans and other programs</li>
+            <li><strong>source</strong> - String - link to repo or homepage for this bot</li>
+            <li><strong>color</strong> - String (websafe color) - preferred display color</li>
+        </ul>
+
+        <h3 id="actions">Actions</h3>
+        <ul>
+            <li><strong>"Move"</strong> Moves your bot the direciton indicated</li>
+            <li><strong>"Attack"</strong> If something exists in the direction indicated, remove it</li>
+        </ul> 
+
+        <h3 id="Fault">Fault</h3>
+        <p>Any route can return a fault instead of its normal result. It will be accompanied by a 400 or 500 status code</p> 
+        <ul>
+            <li><strong>message</strong> - String - human readable error message</li>
+        </ul>
+        <hr/>
+
+        <h3 id="game_bots">POST /game/bots</h3>
+        <p>Use this route to poll for state changes in the game. Do not poll more often than the ms <code>tick</code> returned from <code>/game</code></p>
+
+        <h3 id="mcps">POST /mcps</h3>
+        <p>You must create a Master Control Program before you can create a bot. Your <code>mcpId</code> is your secret key to controlling your bots. It is not shared with anyone</p>
+
+        <h3 id="mcps">POST /mcps/:mcpId/bots/:botId/command</h3>
+        <p>Do something with one of your bots. You may only perform one command per tick.</p>
+
+        <hr/>
+
+        <h2>Examples</h2>
+        <p>These examples are in pseudocode. For complete examples, see the <a href="https://github.com/seanhess/botland/blob/master/public/viewer.html">viewer</a> and <a href="https://github.com/seanhess/botland/blob/master/public/viewer.html">chaosbot</a></p>
+        <h3>Control a Bot</h3>
+        <pre><code>game = GET "/game"
+mcp = POST "/mcps"
+bot = POST "/mcps/$mcp.id/bots" {x: 0, y: 5, name:"example1", source:"http://github.com/seanhess/botland", color: "#03F"}
+POST "/mcps/$mcp.id/bots/$bot.id" {action: "move", direction: "right"} 
+bots = GET "/game/bots"
+print bots[0] // x = 1, y = 5, ...
+DELETE "/mcps/$mcp.id/bots/$bot.id"
+</code></pre>
+
+        <h3>Poll the World</h3>
+        <pre><code>game = GET "/game"
+timer game.tick 
+    bots = GET "/game/bots"
+    each bots (bot)
+        print bot # x, y, id, name, color, source
+</code></pre>
+
+        <!--
         <div class="object" id="GameInfo">
             <h4>GameInfo</h4>
             <pre>{ worldFieldInfo: <a href="#FieldInfo">FieldInfo</a>, msTickInterval: Int }</pre>
@@ -115,64 +179,10 @@
         </div>
 
 
-        <hr/>
-        <h2 id="Units">Units</h2>
 
-        <div class="object" id="UnitId">
-            <h4>UnitId</h4>
-            <pre>String | <a href="#BlockType">BlockType</a></pre>
-            <div>Unit id is either a unique id for a unit, or a <a href="#BlockType">BlockType</a></div>
-        </div>
-
-        <div class="object" id="UnitDescription">
-            <h4>UnitDescription</h4>
-            <pre>{ source: <a href="#Url">Url</a>, notes: String, name: String, kind: String, color: String }</pre>
-            <p>Name: for use within your bot. Can be anything</p> 
-            <p>Kind: unique type name for that kind of bot</p>
-            <p>Source: URL to the source for your bot</p>
-            <p>Color: Web-safe color, like "#FFF"</p>
-        </div>
-
-        <div class="object" id="BlockType">
-            <h4>BlockType</h4>
-            <pre>"Wood" | "Stone"</pre>
-        </div>
+-->
 
 
-        <div class="object" id="SpawnRequest">
-            <h4>SpawnRequest</h4>
-            <pre>{ requestedPoint: <a href="#Point">Point</a>, unitDescription: <a href="#UnitDescription">UnitDescription</a> }</pre>
-        </div>
-
-        <div class="object" id="Spawn">
-            <h4>Spawn</h4>
-            <pre>{ unitId: <a href="#UnitId">UnitId</a>, unitToken: <a href="#UnitToken">UnitToken</a>, spawnPoint: <a href="#Point">Point</a> }</pre>
-        </div>
-
-
-
-
-
-
-        <hr/>
-        <h2 id="Authentication">Authentication</h2>
-        <p>Some routes, like <code>/units/:unitId/move</code>, require you to prove you have control of a given unit. You will receive a <a href="#UnitToken">UnitToken</a> when you call <code>/units/spawn</code>. Simply set the <code>X-Auth-Token</code> header to this token to call any route that requires authentication. </p>
-
-
-        <div class="object" id="UnitToken">
-            <h4>UnitToken</h4>
-            <pre>String</pre>
-        </div>
-
-        <hr/>
-        <h2 id="Faults">Faults</h2>
-
-        <p>Any route can return a Fault instead of its normal response. It will always be accompanied by a non-standard http status code.</p>
-
-        <div class="object" id="Fault">
-            <h4>Fault</h4>
-            <pre>{ message: String }</pre>
-        </div>
 
     </div>
 

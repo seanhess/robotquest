@@ -56,7 +56,7 @@ main = do
 
         -- returns all the bots, obstacles and whathaveyounots
         -- everything except MCPId
-        get "/game/locations" $ do
+        get "/game/bots" $ do
             res <- db $ locations
             sendAction "" res
 
@@ -74,7 +74,7 @@ main = do
             sendActionFault "Invalid Starting Location" id
 
         -- sets the bot's action
-        put "/mcps/:mcpId/bots/:botId/action" $ auth $ decodeBody $ \c -> do
+        post "/mcps/:mcpId/bots/:botId/command" $ auth $ decodeBody $ \c -> do
             botId <- param "botId"
             mcpId <- param "mcpId"
             res <- db $ performCommand c game mcpId botId
@@ -92,8 +92,6 @@ main = do
             ok <- db $ cleanupBot mcpId botId 
             sendAction "Could not delete bot" ok
 
-        -- TODO: cleanup
-        -- TODO: pubnub (just POST to pubnub every time something happens. It's easy)
         -- TODO: documentation
         -- TODO: better graphics
 
@@ -111,6 +109,7 @@ main = do
         -- write a couple bots that stay in there, doing something interesting
 
         -- AFTER LAUNCH
+        -- TODO: pubnub XXX (requires clients to know all the logic (delete, etc))
         -- TODO: Add bulk requests? (launch first)
         -- TODO: Encforce movement limit (launch first) 
 
