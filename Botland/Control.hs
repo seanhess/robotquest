@@ -7,6 +7,8 @@ import Botland.Types
 import Control.Monad.IO.Class (liftIO)
 
 import Data.Maybe (isNothing, fromJust)
+import Data.DateTime (DateTime, addSeconds, getCurrentTime)
+
 import Database.MongoDB
 
 import Web.Scotty (ActionM(..))
@@ -31,15 +33,16 @@ botOwner mcpId botId = do
 -- CREATION -------------------------------------------------------
 
 -- we don't actually care what id you use as an MCP, but we provide a way to generate one here, so you don't have to hard-code it in your source and expose yourself to other people controlling your bots. Later we will store details about your mcp
-createMcp :: ActionM Id
+createMcp :: Action IO Id
 createMcp = do
     id <- liftIO $ randomId
+    updateHeartbeat id
     return $ Id id
 
 createBot :: Game -> String -> Bot -> Action IO (Either Fault Id)
 createBot g mcpId b = do
     id <- liftIO $ randomId
-    let ub = b { botId = Just id, mcpId = Just mcpId }
+    let ub = b { botId = Just id, botMcpId = Just mcpId }
 
     let v = validPosition g (x b) (y b)
 
@@ -61,9 +64,12 @@ createBot g mcpId b = do
 --    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (show a)]]
 --    return Ok 
 
-performCommand :: BotCommand -> Game -> String -> Action IO (Either Fault Ok)
-performCommand (BotCommand Move d) g id = moveAction g id d
-performCommand (BotCommand Attack d) g id = attackAction g id d
+performCommand :: BotCommand -> Game -> String -> String -> Action IO (Either Fault Ok)
+performCommand c g mcpId id = do
+    updateHeartbeat mcpId
+    case c of 
+        BotCommand Move d -> moveAction g id d
+        BotCommand Attack d -> attackAction g id d
 
 moveAction :: Game -> String -> Direction -> Action IO (Either Fault Ok)
 moveAction g id d = do
@@ -121,15 +127,39 @@ move d (Point x y) = case d of
 
 -- CLEANUP ---------------------------------------------------------
 
+-- save when the mcp last completed an action
+updateHeartbeat :: String -> Action IO ()
+updateHeartbeat mcpId = do
+    time <- liftIO $ getCurrentTime
+    save "mcps" ["_id" =: mcpId, "heartbeat" =: time]
+
 cleanupMcp :: String -> Action IO Ok
 cleanupMcp mcpId = do
+    liftIO $ putStrLn ("Cleaning Up " ++ mcpId)
     delete (select ["mcpId" =: mcpId] "bots")
+    delete (select ["_id" =: mcpId] "mcps")
     return Ok
 
-cleanupBot :: String -> Action IO Ok
-cleanupBot botId = do
+cleanupBot :: String -> String -> Action IO Ok
+cleanupBot mcpId botId = do
+    updateHeartbeat mcpId
     delete (select ["_id" =: botId] "bots")
     return Ok
+
+cleanupInactives :: Integer -> Action IO Ok
+cleanupInactives delay = do
+
+    time <- liftIO $ getCurrentTime
+    let tenSecondsAgo = addSeconds (-delay) time
+
+    c <- find (select ["heartbeat" =: ["$lt" =: tenSecondsAgo]] "mcps")
+    docs <- rest c
+
+    let mcpIds = map mcpId $ map fromDoc docs
+
+    mapM_ cleanupMcp mcpIds 
+    return Ok
+
 
 
 -- THE WORLD -------------------------------------------------------

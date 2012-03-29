@@ -8,6 +8,7 @@ import qualified Data.Aeson.Types as AT
 import Data.Aeson.Types (Parser)
 import Data.Maybe (fromMaybe, isJust, fromJust)
 import qualified Data.Text as T
+import Data.DateTime (DateTime)
 
 import Database.MongoDB (val, Document, Field(..), at, lookup)
 
@@ -21,7 +22,11 @@ import Prelude hiding (lookup)
 import Safe (readMay)
 
 
+
 -- DATA TYPES ---------------------------------------------------------------
+
+-- stored in the database as an Int
+data Mcp = Mcp { mcpId :: String, heartbeat :: DateTime } deriving (Show)
 
 -- this is roughly what it looks like in the database
 -- {x, y, _id, color, mcpId, name, source}
@@ -31,7 +36,7 @@ data Bot = Bot { x :: Int
                , source :: String
                , color :: String
                , botId :: Maybe String
-               , mcpId :: Maybe String
+               , botMcpId :: Maybe String
                } deriving (Show)
 
 -- sometimes you just need to talk about a point
@@ -157,7 +162,7 @@ instance ToDoc Bot where
               , "source" := val (source b)
               , "color" := val (color b)
               , "_id" := val (fromMaybe "" (botId b))
-              , "mcpId" := val (fromMaybe "" (mcpId b))
+              , "mcpId" := val (fromMaybe "" (botMcpId b))
               ]
 
 instance FromDoc Bot where
@@ -172,6 +177,13 @@ instance FromDoc Bot where
 instance FromDoc Point where
     fromDoc p = Point (at "x" p) (at "y" p)
 
+instance FromDoc Mcp where
+    fromDoc m = Mcp (at "_id" m) (at "heartbeat" m)
+
+instance ToDoc Mcp where
+    toDoc m = [ "_id" := val (mcpId m)
+              , "heartbeat" := val (heartbeat m)
+              ]
 
 
 

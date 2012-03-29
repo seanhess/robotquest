@@ -19,9 +19,11 @@ import Network.Wai.Middleware.Static (staticRoot)
 import Network.HTTP.Types (status200)
 import Web.Scotty
 
-
 game :: Game
 game = Game 10 10 1000 
+
+cleanupDelay :: Integer
+cleanupDelay = 2 
 
 main :: IO ()
 main = do
@@ -30,6 +32,14 @@ main = do
     let db action = liftIO $ access pipe master "botland" action
     let auth = runAuth pipe "botland"
     db ensureIndexes
+
+    let cleanup = do 
+        db $ cleanupInactives cleanupDelay
+        threadDelay ((fromIntegral cleanupDelay)*1000000)
+        cleanup
+
+    -- run cleanup every so often
+    forkIO $ cleanup
 
     scotty 3026 $ do
 
@@ -53,19 +63,21 @@ main = do
         -- really, just gives you a session id, but pretend that it matters :)
         -- works because it's a secret number, never sent to anyone
         post "/mcps" $ do
-            id <- createMcp
-            json id
+            id <- db $ createMcp
+            sendAction "" id
 
         -- spawn them immediately, don't wait for the tick
         post "/mcps/:mcpId/bots" $ decodeBody $ \b -> do
             mcpId <- param "mcpId"
             id <- db $ createBot game mcpId b
+            --updateHeartbeat mcpId
             sendActionFault "Invalid Starting Location" id
 
         -- sets the bot's action
         put "/mcps/:mcpId/bots/:botId/action" $ auth $ decodeBody $ \c -> do
             botId <- param "botId"
-            res <- db $ performCommand c game botId
+            mcpId <- param "mcpId"
+            res <- db $ performCommand c game mcpId botId
             sendActionFault "Invalid Space: Occupied?" res
 
         -- delete all bots associated with the mcp
@@ -76,26 +88,27 @@ main = do
 
         delete "/mcps/:mcpId/bots/:botId" $ auth $ do
             botId <- param "botId"
-            ok <- db $ cleanupBot botId 
+            mcpId <- param "mcpId"
+            ok <- db $ cleanupBot mcpId botId 
             sendAction "Could not delete bot" ok
 
-        -- TODO: bot removal
-        -- TODO: mcp removal
+        -- TODO: cleanup
+        -- TODO: pubnub (just POST to pubnub every time something happens. It's easy)
+        -- TODO: documentation
+        -- TODO: better graphics
 
-        -- TODO: cleanup (should be easyish with forkIO, update date, etc)
-            -- mcp last action?
-            -- or per bot?
-            -- I like that it be per mcp. It's simpler
-            -- mcp heartbeat: sure, it just updates you. It should be fast
-            -- then every N seconds, remove any mcps that aren't active
-            -- don't allow a heartbeat route. They have to be DOING something to stay alive (and something valid)
-            -- disconnect them on an error? That would be mean :)
-            -- on too many errors, perhaps...
+        -- TEST
+        -- if I do something long-running, it will still respond, correct?
+        -- if I post to pubnub, it will delay responses, I think. (but that's ok)
 
+        -- OPTIMIZE
+        -- keepalive
+        -- varnish
 
-        -- ????? 
-        -- TODO: read config from the command-line so you can test better (use a test db, for example)
-        -- TODO: Keep alive and other optimizations. PubNub?
+        -- LAUNCH
+        -- better home page / logo?
+        -- make it bigger
+        -- write a couple bots that stay in there, doing something interesting
 
         -- AFTER LAUNCH
         -- TODO: Add bulk requests? (launch first)
@@ -103,6 +116,7 @@ main = do
 
 connectMongo :: IO (Pipe) 
 connectMongo = runIOE $ connect (host "127.0.0.1")
+
 
 
 

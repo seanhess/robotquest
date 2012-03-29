@@ -70,12 +70,8 @@
             }
 
             function stop() {
-                log("Cleaning up")
-                request("DELETE", "/mcps/" + mcpId, function(err) {
-                    if (err) return log("Error: " + err.message)
-                    clearInterval(interval)
-                    log("Stopped")
-                })
+                clearInterval(interval)
+                log("Stopped")
             }
 
             function poll() {
