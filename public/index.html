@@ -5,24 +5,162 @@
     <link href="/assets/css/bootstrap.css" rel="stylesheet">
     <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="/assets/css/style.css" rel="stylesheet">
+
+    <style>
+
+    #frameViewer {
+        width: 800px;
+        height: 800px;
+        overflow: hidden;
+        border: none;
+    }
+
+    </style>
 </head>
 <body>
     
-    <div class="container">
+    <div class="container documentation main">
         <a id="logo" href="/">
             <img src="/assets/img/logo.png">
             <div class="main name">
-                <div>Robot</div>
-                <div>ocalypse</div>
-                <div>opolis</div>
+                <div>Robot-ocalypse-opolis</div>
             </div>
         </a>
 
-        <div id="nav">
-            <div><a href="/viewer.html">Viewer</a></div>
-            <div><a href="/documentation.html">Documentation</a></div>
-        </div>
-    </div>
+        <iframe id="frameViewer" src="/viewer.html">
+        </iframe>
+
+        <hr/>
+
+        <h2 id="api">API Documentation</h2>
+
+        <p>Any method can return a <code>Fault {message}</code> instead of its regular response.</p>
+        <p>All coordinates and sizes are in discreet squares, not pixels</p>
+
+        <table class="methods">
+            <tr>
+                <th>Url</th>
+                <th></th>
+                <th>Body</th>
+                <th>Returns</th>
+                <!-- <th>Description</th> -->
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td class="url">/game</td>
+                <td></td>
+                <td><code><a href="#Game">Game</a> {width, height, tick (ms)}</code></td>
+                <!-- <td></td> -->
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td class="url">/game/bots</td>
+                <td></td>
+                <td><code>[<a href="#Bot">Bot</a> {id, x, y, name, source, color}]</code></td>
+                <!-- <td>All locations in the world. Poll for updates</td> -->
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td class="url">/mcps</td>
+                <td></td>
+                <td><code>{id}</code></td>
+                <!-- <td></td> -->
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td class="url">/mcps/:mcpId/bots</td>
+                <td><code><a href="#Bot">Bot</a> {x, y, name, source, color}</code></td>
+                <td><code>{id}</code></td>
+                <!-- <td>Create a new bot and get enough information to control it. See <a href="#Authentication">Authentication</a></td> -->
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td class="url">/mcps/:mcpId/bots/:botId/command</td>
+                <td><pre><code>Command {
+    <a href="#actions">action</a>:Move|Attack,
+    direction:Up|Down|Left|Right
+}</code></pre></td>
+                <td><code>{ok}</code></td>
+                <!-- <td><a href="#Authentication">Authentication</a> required.</td> -->
+            </tr>
+            <tr>
+                <td>DELETE</td>
+                <td class="url">/mcps/:mcpId</td>
+                <td></td>
+                <td><code>{ok}</code></td>
+                <!-- <td></td> -->
+            </tr>
+            <tr>
+                <td>DELETE</td>
+                <td class="url">/mcps/:mcpId/bots/:botId</td>
+                <td></td>
+                <td><code>{ok}</code></td>
+                <!-- <td>Removes a unit you control. <a href="#Authentication">Authentication</a> required.</td> -->
+            </tr>
+        </table>
+
+        <hr/>
+        <h3 id="Game">Game</h3>
+        <ul>
+            <li><strong>width, height</strong> - Int - number of squares wide and high.</li>
+            <li><strong>tick</strong> - Int (ms) - How often you can send commands, and poll for /game/locations</li>
+        </ul>
+
+
+        <h3 id="Bot">Bot</h3>
+        <ul>
+            <li><strong>id</strong> - String</li>
+            <li><strong>x, y</strong> - Int - square coordinate</li>
+            <li><strong>name</strong> - String - identify this bot to humans and other programs</li>
+            <li><strong>source</strong> - String - link to repo or homepage for this bot</li>
+            <li><strong>color</strong> - String (websafe color) - preferred display color</li>
+        </ul>
+
+        <h3 id="actions">Actions</h3>
+        <ul>
+            <li><strong>"Move"</strong> Moves your bot the direciton indicated</li>
+            <li><strong>"Attack"</strong> If something exists in the direction indicated, remove it</li>
+        </ul> 
+
+        <h3 id="Fault">Fault</h3>
+        <p>Any route can return a fault instead of its normal result. It will be accompanied by a 400 or 500 status code</p> 
+        <ul>
+            <li><strong>message</strong> - String - human readable error message</li>
+        </ul>
+        <hr/>
+
+        <h3 id="game_bots">POST /game/bots</h3>
+        <p>Use this route to poll for state changes in the game. Do not poll more often than the ms <code>tick</code> returned from <code>/game</code></p>
+
+        <h3 id="mcps">POST /mcps</h3>
+        <p>You must create a Master Control Program before you can create a bot. Your <code>mcpId</code> is your secret key to controlling your bots. It is not shared with anyone. Use the same mcpId to create and control multiple bots.</p>
+
+        <h3 id="mcps">POST /mcps/:mcpId/bots/:botId/command</h3>
+        <p>Do something with one of your bots. You may only perform one command per tick.</p>
+
+        <hr/>
+
+        <h2>Examples</h2>
+        <p>These examples are in pseudocode. For complete examples in JavaScript, see the <a href="https://github.com/seanhess/botland/blob/master/public/viewer.html">viewer</a> and <a href="https://github.com/seanhess/botland/blob/master/public/demo/chaosbot.html">chaosbot</a></p>
+        <h3>Control a Bot</h3>
+        <pre><code>game = GET "/game"
+mcp = POST "/mcps"
+bot = POST "/mcps/$mcp.id/bots" {x: 0, y: 5, name:"example1", source:"http://github.com/seanhess/botland", color: "#03F"}
+POST "/mcps/$mcp.id/bots/$bot.id" {action: "move", direction: "right"} 
+bots = GET "/game/bots"
+print bots[0] // x = 1, y = 5, ...
+DELETE "/mcps/$mcp.id/bots/$bot.id"
+</code></pre>
+
+        <h3>Poll the World</h3>
+        <pre><code>game = GET "/game"
+timer game.tick 
+    bots = GET "/game/bots"
+    each bots (bot)
+        print bot # x, y, id, name, color, source
+</code></pre>
+</div>
+
 
    <a href="http://github.com/seanhess/botland"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/30f550e0d38ceb6ef5b81500c64d970b7fb0f028/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub"></a> 
     

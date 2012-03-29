@@ -75,7 +75,7 @@
             }
 
             function poll() {
-                request("GET", "/game/locations", function(err, bots) {
+                request("GET", "/game/bots", function(err, bots) {
                     tick(bots)
                 })
             }
@@ -90,7 +90,7 @@
 
                 log("Location: " + ids[botId].x + " " + ids[botId].y)
 
-                request("PUT", "/mcps/" + mcpId + "/bots/" + botId +"/action", currentAction, function(err) {
+                request("POST", "/mcps/" + mcpId + "/bots/" + botId +"/command", currentAction, function(err) {
                     if (err) {
                         // change directions!
                         currentAction = randomAction()
@@ -108,52 +108,6 @@
             console.log(stuff)
             $output.append(stuff + "\n")
         }
-
-
-        // var unitId, unitToken, currentAction
-        // var currentAction = randomAction()
-
-        // var dead = false
-
-        // // we ignore the world. Easier to rely on failures
-        // function tick(locations, units) {
-
-        //     if (dead) return
-
-        //     // make a map of unitId -> location
-        //     var map = {}
-        //     for (var i = 0; i < locations.length; i++) {
-        //         var l = locations[i]
-        //         map[l.unitId] = l.point
-        //     }
-
-        //     // get our current position
-        //     var currentPoint = map[unitId]
-
-        //     if (!currentPoint) {
-        //         dead = true
-        //         return
-        //         // probably means we've been cleaned up
-        //     }
-                
-
-        //     var newPoint = currentAction(currentPoint)
-        //     request("POST", "/units/" + unitId + "/move", newPoint, unitToken, function(err) {
-        //         // this probably means we hit something. Change actions
-        //         if (err) currentAction = randomAction()
-        //     })
-        // }
-
-        // function start() {
-        //     request("POST", "/units", {requestedPoint: randomPoint(worldInfo.fieldSize), unitDescription: description}, "", function(err, spawn) {
-
-        //         if (err) throw err
-
-        //         unitId = spawn.unitId
-        //         unitToken = spawn.unitToken
-
-        //     })
-        // }
 
         function byId(bots) {
             var map = {}

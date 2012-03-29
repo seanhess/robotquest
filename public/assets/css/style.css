@@ -5,38 +5,39 @@
 
 body {}
 
+.container.main {
+    position: relative;
+}
+
 #logo {
-    height: 250px;
     margin-bottom: 30px;
     display: block;
     color: #000;
+    height: 10px;
 }
 
 #logo img {
-    float: left;
+    position: absolute;
+    height: 80px;
 }
 
 #logo .main.name {
     font-family: robot;
-    font-size: 80px;
-    margin: 10px;
+    font-size: 50px;
+    margin-top: 40px;
+    margin-left: 100px;
     position: relative;
-    top: 70px;
 }
-
-#logo .main.name div {
-    height: 60px; 
-}
-
-#nav {
-    margin: 30px; 
-}
-
 
 pre {
     color: #D14;
 }
 
+
+#frameViewer {
+    margin-top: 20px;
+    clear: both;
+}
 
 
 .documentation h2 {

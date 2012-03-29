@@ -12,12 +12,6 @@
         margin: 0px;
     }
 
-    .bg {
-        padding: 15px;
-        background-color: #070;
-        width: 630px;
-    }
-
     #viewer {
         margin: 15px;
         height: 600px;
@@ -27,8 +21,6 @@
     }
 
     .bot {
-        width: 58px;
-        height: 58px;
         background-color: #000;
         border-radius: 30px;
         position: absolute;
@@ -53,8 +45,8 @@
         var $window = $(window)
         var $viewer = $("#viewer")
 
-        var PX = 60 
-        var PY = 60
+        var PX = null 
+        var PY = null 
 
         var padding = 1 
 
@@ -69,10 +61,13 @@
             var h = gameInfo.height
             var ms = gameInfo.tick
 
+            PX = Math.floor(600/w)
+            PY = Math.floor(600/h)
+
             console.log("GAME INFO", w, h, ms)
 
             function poll() {
-                $.get("/game/locations", function(bots) {
+                $.get("/game/bots", function(bots) {
                     tick(bots)
                 })
             }
@@ -90,7 +85,7 @@
                         $viewer.append($bot)
                     }
 
-                    $bot.css({left: bot.x * PX + padding, top: bot.y * PY + padding})
+                    $bot.css({left: bot.x * PX + padding, top: bot.y * PY + padding, width: PX, height: PY})
                     $bot.removeClass("inactive")
                 })
 
@@ -113,8 +108,6 @@
 
 </head>
 <body>
-    <div class="info">
-        <li><a href="/demo/chaosbot.html" target="_blank">Chaos Bot</a>
-    </div>
-    <div class="bg"><div id="viewer"></div></div>
+<div id="viewer">
+</div>
 </body>
