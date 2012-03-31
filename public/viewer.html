@@ -75,18 +75,20 @@ http://opengameart.org/content/more-rpg-enemies
 
     #viewer {
         background-color: #0c0;
-        background: url(/assets/cute/GrassBlockTile.png) #5c5;
+        background: url(/assets/angbandtk/bgtile.png) #5c5;
         position: relative;
     }
 
     .bot {
         /*background-color: #000;*/
-        border-radius: 30px;
+        width: 32px;
+        height: 32px;
         position: absolute;
-        opactiy: 1;
 
-        transition: all ease 500ms;
-        -webkit-transition: all ease 300ms;
+        background: url(/assets/angbandtk/dg_classm32.gif);
+
+        transition: all linear 1000ms;
+        -webkit-transition: all linear 1000ms;
     }
 
     .info {
@@ -106,10 +108,10 @@ http://opengameart.org/content/more-rpg-enemies
         var $window = $(window)
         var $viewer = $("#viewer")
 
-        var PX = 100
-        var PY = 80
+        var PX = 32
+        var PY = 32
 
-        var alignBottom = -(171-80)
+        // var alignBottom = -(171-80)
 
         var padding = 0
 
@@ -136,8 +138,8 @@ http://opengameart.org/content/more-rpg-enemies
             var ms = gameInfo.tick
 
             // this will make it scroll
-            $viewer.width((w+2) * PX)
-            $viewer.height((h+2) * PY)
+            $viewer.width((w) * PX)
+            $viewer.height((h) * PY)
 
             // PX = Math.floor(600/w)
             // PY = Math.floor(600/h)
@@ -163,7 +165,7 @@ http://opengameart.org/content/more-rpg-enemies
                         $viewer.append($bot)
                     }
 
-                    $bot.css({left: (bot.x+1) * PX + padding, top: (bot.y+1) * PY + padding + alignBottom})
+                    $bot.css({left: (bot.x) * PX + padding, top: (bot.y) * PY + padding})
                     // $bot.css({width: PX, height: PY})
                     $bot.removeClass("inactive")
                 })
@@ -172,7 +174,7 @@ http://opengameart.org/content/more-rpg-enemies
             }
 
             function botView(bot) {
-                var $bot = $("<img src='/assets/cute/CharacterBoy.png' class='bot' id='"+bot.id+"' style='color:"+bot.color+"'></div>")
+                var $bot = $("<div class='bot' id='"+bot.id+"'></div>")
                 $bot.data(bot)
                 return $bot
             }
