@@ -92,26 +92,41 @@ main = do
             ok <- db $ cleanupBot mcpId botId 
             sendAction "Could not delete bot" ok
 
+        -- TODO: implement planet cute graphics
+            -- then start making up mini games
+            -- random terrain generation (grow)
+            -- spawn some stars. keep track of how many you've collected
+
+        -- TODO: stats! to give it a point. Just list everything
+            -- mcps connected the longest
+            -- currently connected mcps
+            -- bots that survived the longest
+            -- resources collected
+
+        -- TODO: resources / blocks (little gold coins?)
+
         -- TODO: documentation
         -- TODO: better graphics
+        -- TODO: figure out what the launch site will be like 
 
-        -- TEST
-        -- if I do something long-running, it will still respond, correct?
-        -- if I post to pubnub, it will delay responses, I think. (but that's ok)
+        -- TODO: write some more interesting bots 
 
-        -- OPTIMIZE
-        -- keepalive
-        -- varnish
-
-        -- LAUNCH
-        -- better home page / logo?
-        -- make it bigger
-        -- write a couple bots that stay in there, doing something interesting
+        -- TODO: varnish, caching. 
 
         -- AFTER LAUNCH
         -- TODO: pubnub XXX (requires clients to know all the logic (delete, etc))
-        -- TODO: Add bulk requests? (launch first)
+        -- TODO: Add bulk requests? (launch first) (need to figure out new locking mechanism)
         -- TODO: Encforce movement limit (launch first) 
+
+        -- XXXX: pipelining won't work. The clients don't really do it.
+        -- send an array of requests, and get an array of responses
+        -- request: METHOD URL BODY
+        -- returns: STATUS BODY
+        -- or: create mcpId body
+        --     command mcpId botId body
+        --     delete mcpId botId body
+        -- naw, they already know how to do the routes, just use that. You have to write a parser anyway, and you can copy scotty's
+        -- post "/pipeline" $ decodeBody $ \cs -> do 
 
 connectMongo :: IO (Pipe) 
 connectMongo = runIOE $ connect (host "127.0.0.1")

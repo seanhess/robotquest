@@ -2,6 +2,67 @@
 <html>
 <head>
 
+<!-- <meta name="viewport" content="width=device-width, initial-scale=2.0, user-scalable=yes"> -->
+
+<!--
+http://hasgraphics.com/free-sprites/
+
+
+http://protomansprites.webs.com/customsprites.htm - has some small sheets with some cool robots. can't find license. 
+http://marioshi64.deviantart.com/art/MegaMan-IDK-Robot-Sprites-119661029 - mega man sprites.     
+http://sebamkfan.deviantart.com/art/DizCreator-s-Robot-Master-sprites-278946621
+http://nwinmore.deviantart.com/art/RPG-Maker-VX-Sprites-95545909
+
+whole bunch of sprites! only characters. Everything is 32x32
+http://blogoscoped.com/archive/2006-08-08-n51.html
+
+
+http://pousse.rapiere.free.fr/tome/
+Andband tiles
+Silmar - less complete
+
+
+http://gamemaking.indiangames.net/index_files/FreeSpritesforGames.htm - links to everything else
+
+http://www.lostgarden.com/2007/04/free-game-graphics-tyrian-ships-and.html - tyrian - woot - high tech stuff. kind of hard to see - no 2D
+
+http://www.lostgarden.com/2005/03/download-complete-set-of-sweet-8-bit.html - Great theme, not really enough stuff though 
+
+http://www.lostgarden.com/2005/03/game-post-mortem-hard-vacuum.html - good terrain, tanks, etc. 
+
+http://www.widgetworx.com/widgetworx/portfolio/spritelib.html - got some cool stuff, similar.
+
+
+ADVICE
+http://www.anotherearlymorning.com/2008/09/how-to-find-and-use-artwork-for-tile-based-games/
+
+INDEXES
+http://funplosion.com/free-assets.html
+http://gamedev.stackexchange.com/questions/20/where-can-i-find-free-sprites-and-images
+http://opengameart.org/
+
+FROM REAL GAMES
+http://www.videogamesprites.net/
+http://www.bogleech.com/games.html - from real SNES games, probably not legal
+
+
+SMALL SETS
+http://www.over00.com/?p=1941 - some monsters
+http://www.over00.com/?p=1844 - wrong resolution? spaceships :(
+http://www.squidi.net/pixel/char.default.php - some chars and monsters. Non-commercial license
+http://rltiles.sourceforge.net/ - plenty of monsters, limited players + clothes
+http://www.reinerstilesets.de/2d-grafiken/ - iso, blah 
+
+BIG SETS
+http://untamed.wild-refuge.net/rmxpresources.php?characters - many characters!
+
+MONSTERS
+http://opengameart.org/content/more-rpg-enemies
+
+
+
+-->
+
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/js/async.min.js"></script>
 <script src="/demo/api.js"></script>
@@ -13,15 +74,13 @@
     }
 
     #viewer {
-        margin: 15px;
-        height: 600px;
-        width: 600px;
         background-color: #0c0;
+        background: url(/assets/cute/GrassBlockTile.png) #5c5;
         position: relative;
     }
 
     .bot {
-        background-color: #000;
+        /*background-color: #000;*/
         border-radius: 30px;
         position: absolute;
         opactiy: 1;
@@ -35,20 +94,24 @@
         margin: 15px;
     }
 
+
+    /* let's go for 30% */
+
 </style>
 <script>
     $(function() {
 
         var bots = []
 
-
         var $window = $(window)
         var $viewer = $("#viewer")
 
-        var PX = null 
-        var PY = null 
+        var PX = 100
+        var PY = 80
 
-        var padding = 1 
+        var alignBottom = -(171-80)
+
+        var padding = 0
 
         $window.on('resize', function() {
             console.log("RESIZE")
@@ -57,12 +120,27 @@
         // first, get the world
         $.get("/game", function(gameInfo) {
 
+            // draw a bunch of tiles
+
+            // 101x171
+            // $viewer.append($("<img src='/assets/cute/WoodBlock.png' style='position:absolute;left:101px;top:-11px'>"))
+            // $viewer.append($("<img src='/assets/cute/WoodBlock.png' style='position:absolute;left:101px;top:72px'>"))
+
+            // $viewer.append($("<img src='/assets/cute/TreeShort.png' style='position:absolute;left:201px;top:-11px'>"))
+
+            // it MUST be 8-bit
+
+
             var w = gameInfo.width
             var h = gameInfo.height
             var ms = gameInfo.tick
 
-            PX = Math.floor(600/w)
-            PY = Math.floor(600/h)
+            // this will make it scroll
+            $viewer.width((w+2) * PX)
+            $viewer.height((h+2) * PY)
+
+            // PX = Math.floor(600/w)
+            // PY = Math.floor(600/h)
 
             console.log("GAME INFO", w, h, ms)
 
@@ -85,7 +163,8 @@
                         $viewer.append($bot)
                     }
 
-                    $bot.css({left: bot.x * PX + padding, top: bot.y * PY + padding, width: PX, height: PY})
+                    $bot.css({left: (bot.x+1) * PX + padding, top: (bot.y+1) * PY + padding + alignBottom})
+                    // $bot.css({width: PX, height: PY})
                     $bot.removeClass("inactive")
                 })
 
@@ -93,7 +172,7 @@
             }
 
             function botView(bot) {
-                var $bot = $("<div class='bot' id='"+bot.id+"' style='color:"+bot.color+"'></div>")
+                var $bot = $("<img src='/assets/cute/CharacterBoy.png' class='bot' id='"+bot.id+"' style='color:"+bot.color+"'></div>")
                 $bot.data(bot)
                 return $bot
             }
