@@ -62,8 +62,8 @@ main = do
 
         -- really, just gives you a session id, but pretend that it matters :)
         -- works because it's a secret number, never sent to anyone
-        post "/players" $ do
-            id <- db $ createMcp
+        post "/players" $ decodeBody $ \p -> do
+            id <- db $ createMcp p
             sendAction "" id
 
         -- spawn them immediately, don't wait for the tick

@@ -46,8 +46,10 @@ describe('botland api', function() {
 
     describe("mcp", function() {
         it("should give me a token", function(done) {
-            request.post({url:Server + "/players", json:true}, function(err, rs, data) {
+            var player = {name:"test"}
+            request.post({url:Server + "/players", json:player}, function(err, rs, data) {
                 assert.ifError(err)
+                assert.equal(rs.statusCode, 200, data.message)
                 mcpId = data.id
                 assert.ok(mcpId, 'should have returned an id')
                 done()

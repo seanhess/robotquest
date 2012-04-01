@@ -33,9 +33,11 @@ botOwner mcpId botId = do
 -- CREATION -------------------------------------------------------
 
 -- we don't actually care what id you use as an MCP, but we provide a way to generate one here, so you don't have to hard-code it in your source and expose yourself to other people controlling your bots. Later we will store details about your mcp
-createMcp :: Action IO Id
-createMcp = do
+createMcp :: Player -> Action IO Id
+createMcp p = do
     id <- liftIO $ randomId
+    let p' = p { mcpId = id }
+    save "mcps" (toDoc p')
     updateHeartbeat id
     return $ Id id
 
@@ -129,9 +131,9 @@ move d (Point x y) = case d of
 
 -- save when the mcp last completed an action
 updateHeartbeat :: String -> Action IO ()
-updateHeartbeat mcpId = do
+updateHeartbeat pid = do
     time <- liftIO $ getCurrentTime
-    save "mcps" ["_id" =: mcpId, "heartbeat" =: time]
+    modify (select ["_id" =: pid] "mcps") ["$set" =: ["heartbeat" =: time]]
 
 cleanupMcp :: String -> Action IO Ok
 cleanupMcp mcpId = do

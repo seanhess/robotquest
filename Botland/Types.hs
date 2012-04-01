@@ -25,8 +25,8 @@ import Safe (readMay)
 
 -- DATA TYPES ---------------------------------------------------------------
 
--- stored in the database as an Int
-data Mcp = Mcp { mcpId :: String, heartbeat :: DateTime } deriving (Show)
+-- heartbeat doesn't need to be a part of the client-side logic, just in the db
+data Player = Player { mcpId :: String, playerName :: String } deriving (Show)
 
 -- this is roughly what it looks like in the database
 -- {x, y, _id, color, mcpId, name, source}
@@ -128,6 +128,14 @@ instance FromJSON Bot where
     parseJSON _ = mzero
 
 
+-- Player: json only has a name (not the id) --
+instance FromJSON Player where
+    parseJSON (Object v) = do
+        name <- v .: "name"
+        return $ Player "" name
+    parseJSON _ = mzero
+
+
 
 -- SERVER MESSAGES ----------------------------------------------------------
 
@@ -177,12 +185,12 @@ instance FromDoc Bot where
 instance FromDoc Point where
     fromDoc p = Point (at "x" p) (at "y" p)
 
-instance FromDoc Mcp where
-    fromDoc m = Mcp (at "_id" m) (at "heartbeat" m)
+instance FromDoc Player where
+    fromDoc p = Player (at "_id" p) (at "name" p)
 
-instance ToDoc Mcp where
-    toDoc m = [ "_id" := val (mcpId m)
-              , "heartbeat" := val (heartbeat m)
+instance ToDoc Player where
+    toDoc p = [ "_id" := val (mcpId p)
+              , "name" := val (playerName p)
               ]
 
 
