@@ -30,10 +30,9 @@ describe('botland api', function() {
         db.bots.remove(done)
     })
 
-
     describe('game', function() {
         it('should return an empty world', function(done) {
-            request.get({url:Server + "/game/bots", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 0)
@@ -47,7 +46,7 @@ describe('botland api', function() {
 
     describe("mcp", function() {
         it("should give me a token", function(done) {
-            request.post({url:Server + "/mcps", json:true}, function(err, rs, data) {
+            request.post({url:Server + "/players", json:true}, function(err, rs, data) {
                 assert.ifError(err)
                 mcpId = data.id
                 assert.ok(mcpId, 'should have returned an id')
@@ -64,7 +63,7 @@ describe('botland api', function() {
 
         it('should not allow me to spawn off field', function(done) {
             var bot = {x:-1, y:0, name:'offfield', source:'test', color:"#F00"} 
-            request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, data) {
+            request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 400, 'missing 400 status code')
                 assert.ok(data.message, 'missing error message')
@@ -73,7 +72,7 @@ describe('botland api', function() {
         })
 
         it('should allow me to spawn a bot', function(done) {
-            request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, body) {
+            request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, body) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, body.message)
                 botId = body.id
@@ -83,7 +82,7 @@ describe('botland api', function() {
         })
 
         it('should error if I try to spawn in the same place twice', function(done) {
-            request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, body) {
+            request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, body) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 400)
                 assert.ok(body.message)
@@ -92,7 +91,7 @@ describe('botland api', function() {
         })
 
         it('should show me in the game', function(done) {
-            request.get({url:Server + "/game/bots", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 1)
@@ -108,15 +107,16 @@ describe('botland api', function() {
     describe('movement', function() {
 
         it('should let me move', function(done) {
-            request.post({url: Server + "/mcps/" + mcpId + "/bots/" + botId + "/command", json:{action:"Move", direction:"Right"}}, function(err, rs, data) {
+            var url = Server + "/players/" + mcpId + "/minions/" + botId + "/command"
+            request.post({url: url, json:{action:"Move", direction:"Right"}}, function(err, rs, data) {
                 assert.ifError(err)
-                assert.equal(rs.statusCode, 200)
+                assert.equal(rs.statusCode, 200, data)
                 done()
             })
         })
 
         it('should update the game', function(done) {
-            request.get({url:Server + "/game/bots", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 1)
@@ -129,7 +129,7 @@ describe('botland api', function() {
         })
 
         it("should out-of-bounds error", function(done) {
-            request.post({url: Server + "/mcps/" + mcpId + "/bots/" + botId + "/command", json:{action:"Move", direction:"Up"}}, function(err, rs, data) {
+            request.post({url: Server + "/players/" + mcpId + "/minions/" + botId + "/command", json:{action:"Move", direction:"Up"}}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 400, 'missing 400 status code')
                 assert.ok(data.message, 'missing error message')
@@ -142,7 +142,7 @@ describe('botland api', function() {
         var bot2Id = null
         it('should spawn a second bot', function(done) {
             var bot = {x: 0, y: 0, name: 'bot2', source: 'test', color: "#00F"}
-            request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, body) {
+            request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, body) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, body.message)
                 bot2Id = body.id
@@ -152,7 +152,7 @@ describe('botland api', function() {
         })
 
         it('should both appear in the world', function(done) {
-            request.get({url:Server + "/game/bots", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 2)
@@ -163,7 +163,7 @@ describe('botland api', function() {
         })
 
         it('should attack bot1', function(done) {
-            request.post({url: Server + "/mcps/" + mcpId + "/bots/" + bot2Id + "/command", json:{action:"Attack", direction:"Right"}}, function(err, rs, data) {
+            request.post({url: Server + "/players/" + mcpId + "/minions/" + bot2Id + "/command", json:{action:"Attack", direction:"Right"}}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200)
                 done()
@@ -171,7 +171,7 @@ describe('botland api', function() {
         })
 
         it('should remove bot1', function(done) {
-            request.get({url:Server + "/game/bots", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 1)
@@ -186,7 +186,7 @@ describe('botland api', function() {
         var botId = null
         it('should spawn another bot', function(done) {
             var bot = {x:1, y:1, name:'cleanup', source:'test', color:"#F00"} 
-            request.post({url: Server + "/mcps/" + mcpId + "/bots", json: bot}, function(err, rs, body) {
+            request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, body) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, body.message)
                 botId = body.id
@@ -196,7 +196,7 @@ describe('botland api', function() {
         })
 
         it('should delete botId', function(done) {
-            request.del({url: Server + "/mcps/" + mcpId + "/bots/" + botId, json: true}, function(err, rs, body) {
+            request.del({url: Server + "/players/" + mcpId + "/minions/" + botId, json: true}, function(err, rs, body) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, body.message)
                 done()
@@ -204,7 +204,7 @@ describe('botland api', function() {
         })
 
         it('should be gone', function(done) {
-            request.get({url:Server + "/game/bots", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 1)
@@ -215,7 +215,7 @@ describe('botland api', function() {
         })
 
         it('should delete mcp', function(done) {
-            request.del({url: Server + "/mcps/" + mcpId, json: true}, function(err, rs, body) {
+            request.del({url: Server + "/players/" + mcpId, json: true}, function(err, rs, body) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, body.message)
                 done()
@@ -223,7 +223,7 @@ describe('botland api', function() {
         })
 
         it('should be empty', function(done) {
-            request.get({url:Server + "/game/bots", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 0)

@@ -61,6 +61,15 @@ http://opengameart.org/content/more-rpg-enemies
 
 
 
+TODO
+1. "player" / "minion"
+    - player info
+2. track kills (per minion/player), time alive (same), stars collected
+3. randomly spawn monsters, stars
+4. add blocks, randomly spawn them. 
+5. allow them to pick up blocks
+
+
 -->
 
 <script src="/assets/js/jquery.min.js"></script>
@@ -147,7 +156,7 @@ http://opengameart.org/content/more-rpg-enemies
             console.log("GAME INFO", w, h, ms)
 
             function poll() {
-                $.get("/game/bots", function(bots) {
+                $.get("/game/minions", function(bots) {
                     tick(bots)
                 })
             }

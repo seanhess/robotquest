@@ -56,40 +56,41 @@ main = do
 
         -- returns all the bots, obstacles and whathaveyounots
         -- everything except MCPId
-        get "/game/bots" $ do
+        get "/game/minions" $ do
             res <- db $ locations
             sendAction "" res
 
         -- really, just gives you a session id, but pretend that it matters :)
         -- works because it's a secret number, never sent to anyone
-        post "/mcps" $ do
+        post "/players" $ do
             id <- db $ createMcp
             sendAction "" id
 
         -- spawn them immediately, don't wait for the tick
-        post "/mcps/:mcpId/bots" $ decodeBody $ \b -> do
-            mcpId <- param "mcpId"
-            id <- db $ createBot game mcpId b
+        post "/players/:playerId/minions" $ decodeBody $ \b -> do
+            pid <- param "playerId"
+            id <- db $ createBot game pid b
             --updateHeartbeat mcpId
             sendActionFault "Invalid Starting Location" id
 
         -- sets the bot's action
-        post "/mcps/:mcpId/bots/:botId/command" $ auth $ decodeBody $ \c -> do
-            botId <- param "botId"
-            mcpId <- param "mcpId"
-            res <- db $ performCommand c game mcpId botId
+        post "/players/:playerId/minions/:minionId/command" $ auth $ decodeBody $ \c -> do
+            mid <- param "minionId"
+            pid <- param "playerId"
+
+            res <- db $ performCommand c game pid mid
             sendActionFault "Invalid Space: Occupied?" res
 
         -- delete all bots associated with the mcp
-        delete "/mcps/:mcpId" $ do
-            mcpId <- param "mcpId"
-            ok <- db $ cleanupMcp mcpId
-            sendAction "Could not delete mcp" ok
+        delete "/players/:playerId" $ do
+            pid <- param "playerId"
+            ok <- db $ cleanupMcp pid
+            sendAction "Could not delete player" ok
 
-        delete "/mcps/:mcpId/bots/:botId" $ auth $ do
-            botId <- param "botId"
-            mcpId <- param "mcpId"
-            ok <- db $ cleanupBot mcpId botId 
+        delete "/players/:playerId/minions/:minionId" $ auth $ do
+            mid <- param "minionId"
+            pid <- param "playerId"
+            ok <- db $ cleanupBot pid mid 
             sendAction "Could not delete bot" ok
 
         -- TODO: implement planet cute graphics

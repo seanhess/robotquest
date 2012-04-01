@@ -8,3 +8,4 @@ dist/*
 Api
 node_modules
 *.log
+public/assets/cute

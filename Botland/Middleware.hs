@@ -22,9 +22,9 @@ runAuth :: Pipe -> Database -> ActionM () -> ActionM ()
 runAuth pipe d k = do
     let mongo action = liftIO $ access pipe master d action 
 
-    botId <- param "botId"
-    mcpId <- param "mcpId"
-    ok <- mongo $ botOwner mcpId botId
+    mid <- param "minionId"
+    pid <- param "playerId"
+    ok <- mongo $ botOwner pid mid
     case ok of
         Right True -> k
         _ -> fault NotAuthorized

@@ -51,7 +51,7 @@
             var currentAction = randomAction()
 
             function connect() {
-                request("POST", "/mcps", function(err, mcp) {
+                request("POST", "/players", function(err, mcp) {
                     mcpId = mcp.id
                     log("MCP " + mcpId)
 
@@ -61,7 +61,7 @@
 
                     log("Spawning at " + p.x + " " + p.y)
 
-                    request("POST", "/mcps/" + mcpId + "/bots", bot, function(err, bot) {
+                    request("POST", "/players/" + mcpId + "/minions", bot, function(err, bot) {
                         if (err) return log("Error: " + err.message) 
                         botId = bot.id
                         interval = setInterval(poll, ms)
@@ -75,7 +75,7 @@
             }
 
             function poll() {
-                request("GET", "/game/bots", function(err, bots) {
+                request("GET", "/game/minions", function(err, bots) {
                     tick(bots)
                 })
             }
@@ -90,7 +90,7 @@
 
                 log("Location: " + ids[botId].x + " " + ids[botId].y)
 
-                request("POST", "/mcps/" + mcpId + "/bots/" + botId +"/command", currentAction, function(err) {
+                request("POST", "/players/" + mcpId + "/minions/" + botId +"/command", currentAction, function(err) {
                     if (err) {
                         // change directions!
                         currentAction = randomAction()
