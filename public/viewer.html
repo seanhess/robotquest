@@ -63,15 +63,22 @@ http://opengameart.org/content/more-rpg-enemies
 
 TODO
 √ 2a. Track kills
-2b. Track time alive
-2c. Kills/ time alive leaderboards
+√ 2b. Track time alive
+√ 2c. Kills/ time alive leaderboards
 2d. Display leaderboards somewhere
 2e. Click on bot for information / links
+
+[ ] Choose any image for bot. (URL Based (or should I provide the options?)) - it will have more uniform art if I provide the options. Just provide an index.
+    - make a single sprite sheet
+
+CLEANUP
+don't send down as many fields to the /minions call
 
 MAKE A BOT THAT
 3. randomly spawn monsters, and stars
 
 ///// ??? ///////
+try switching to single game tick/loop
 
 LATER
 4. randomly spawn stars. collect stars. stars leaderboard
@@ -105,10 +112,10 @@ DONT DO THESE
         height: 32px;
         position: absolute;
 
-        background: url(/assets/angbandtk/dg_classm32.gif);
+        /*background: url(/assets/angbandtk/dg_classm32.gif);*/
 
-        transition: all linear 1000ms;
-        -webkit-transition: all linear 1000ms;
+        transition: all linear 300ms;
+        -webkit-transition: all linear 300ms;
     }
 
     .info {
@@ -116,6 +123,68 @@ DONT DO THESE
         margin: 15px;
     }
 
+    /* set background-position with javascript */
+
+    .sprite {
+        width: 32px;
+        height: 32px;
+    }
+
+    .sprite.classm {
+        background: url(/assets/angbandtk/dg_classm32.gif);
+    }
+
+    .sprite.dragon {
+        background: url(/assets/angbandtk/dg_dragon32.gif);
+    }
+
+    .sprite.humans {
+        background: url(/assets/angbandtk/dg_humans32.gif);
+    }
+
+    .sprite.misc {
+        background: url(/assets/angbandtk/dg_misc32.gif);
+    }
+
+    .sprite.people {
+        background: url(/assets/angbandtk/dg_people32.gif);
+    }
+
+    .sprite.undead {
+        background: url(/assets/angbandtk/dg_undead32.gif);
+    }
+
+    .sprite.uniques {
+        background: url(/assets/angbandtk/dg_uniques32.gif);
+    }
+
+    .sprite.monster1 {
+        background: url(/assets/angbandtk/dg_monster132.gif);
+    }
+
+    .sprite.monster2 {
+        background: url(/assets/angbandtk/dg_monster232.gif);
+    }
+
+    .sprite.monster3 {
+        background: url(/assets/angbandtk/dg_monster332.gif);
+    }
+    
+    .sprite.monster4 {
+        background: url(/assets/angbandtk/dg_monster432.gif);
+    }
+
+    .sprite.monster5 {
+        background: url(/assets/angbandtk/dg_monster532.gif);
+    }
+
+    .sprite.monster6 {
+        background: url(/assets/angbandtk/dg_monster632.gif);
+    }
+
+    .sprite.monster7 {
+        background: url(/assets/angbandtk/dg_monster732.gif);
+    }
 
     /* let's go for 30% */
 
@@ -194,8 +263,13 @@ DONT DO THESE
             }
 
             function botView(bot) {
-                var $bot = $("<div class='bot' id='"+bot.id+"'></div>")
+                var $bot = $("<div class='bot sprite monster4' id='"+bot.id+"'></div>")
                 $bot.data(bot)
+                // compute offset mathematically
+                // dragon-3-4
+                var xi = 3
+                var yi = 4
+                $bot.css({'background-position': '-' + xi*32 + 'px -' + yi*32 + 'px'})
                 return $bot
             }
 
