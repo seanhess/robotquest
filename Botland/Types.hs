@@ -8,7 +8,7 @@ import qualified Data.Aeson.Types as AT
 import Data.Aeson.Types (Parser)
 import Data.Maybe (fromMaybe, isJust, fromJust)
 import qualified Data.Text as T
-import Data.DateTime (DateTime)
+import Data.DateTime (DateTime, fromSeconds)
 
 import Database.MongoDB (val, Document, Field(..), at, lookup)
 
@@ -37,6 +37,8 @@ data Bot = Bot { x :: Int
                , color :: String
                , botId :: Maybe String
                , botMcpId :: Maybe String
+               , kills :: Int
+               , created :: DateTime
                } deriving (Show)
 
 -- sometimes you just need to talk about a point
@@ -113,6 +115,8 @@ instance ToJSON Bot where
                    , "name" .= name b
                    , "source" .= source b
                    , "color" .= color b 
+                   , "kills" .= kills b
+                   , "created" .= created b
                    ]
 
 instance FromJSON Bot where 
@@ -122,7 +126,7 @@ instance FromJSON Bot where
         name <- v .: "name"
         source <- v .: "source"
         color <- v .: "color"
-        return $ Bot x y name source color Nothing Nothing
+        return $ Bot x y name source color Nothing Nothing 0 (fromSeconds 0)
         -- you don't have read the action, mcpId or id from the client, ever.
 
     parseJSON _ = mzero
@@ -171,6 +175,7 @@ instance ToDoc Bot where
               , "color" := val (color b)
               , "_id" := val (fromMaybe "" (botId b))
               , "mcpId" := val (fromMaybe "" (botMcpId b))
+              , "created" := val (created b)
               ]
 
 instance FromDoc Bot where
@@ -181,6 +186,9 @@ instance FromDoc Bot where
                     (at "color" d)
                     (lookup "_id" d) 
                     (lookup "mcpId" d)
+                    (fromMaybe 0 (lookup "kills" d))
+                    (fromMaybe (fromSeconds 0) (lookup "created" d))
+
 
 instance FromDoc Point where
     fromDoc p = Point (at "x" p) (at "y" p)

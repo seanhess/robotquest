@@ -73,6 +73,21 @@ main = do
             --updateHeartbeat mcpId
             sendActionFault "Invalid Starting Location" id
 
+        get "/minions/:minionId" $ do
+            id <- param "minionId"
+            bot <- db $ botDetails id
+            sendActionFault "" bot
+
+        -- leaderboards
+        get "/top/killers" $ do
+            bots <- db $ topKillers
+            sendAction "" bots
+
+        get "/top/survivors" $ do
+            bots <- db $ topSurvivors
+            sendAction "" bots
+
+
         -- sets the bot's action
         post "/players/:playerId/minions/:minionId/command" $ auth $ decodeBody $ \c -> do
             mid <- param "minionId"

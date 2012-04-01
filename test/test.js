@@ -182,6 +182,39 @@ describe('botland api', function() {
                 done()
             })
         })
+
+        it('should give kill to bot2', function(done) {
+            request.get({url:Server + "/minions/" + bot2Id, json:true}, function(err, rs, bot) {
+                assert.ifError(err)
+                assert.ok(bot)
+                assert.equal(bot.kills, 1)
+                done()
+            })
+        })
+    })
+
+    describe('leaderboard', function() {
+        // requires the kill stuff right before this
+        it('should have kill registered from last attack', function(done) {
+            request.get({url:Server + "/top/killers", json:true}, function(err, rs, bots) {
+                assert.ifError(err)
+                assert.ok(bots)
+                assert.equal(bots.length, 1)
+                assert.equal(bots[0].kills, 1)
+                done()
+            })
+        })
+
+        it('should track connection times', function(done) {
+            request.get({url:Server + "/top/survivors", json:true}, function(err, rs, bots) {
+                assert.ifError(err)
+                assert.ok(bots)
+                assert.ok(bots.length)
+                assert.ok(bots[0].created)
+                assert.ok(bots[0].id, botId) // is the oldest
+                done()
+            })
+        })
     })
 
     describe('cleanup', function() {

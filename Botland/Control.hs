@@ -30,6 +30,31 @@ botOwner mcpId botId = do
     return (n > 0)
 
 
+-- DETAILS --------------------------------------------------------
+
+botDetails :: String -> Action IO (Either Fault Bot)
+botDetails id = do
+    d <- findOne (select ["_id" =: id] "bots")
+
+    if (isNothing d) then
+        return $ Left NotFound
+    else do
+
+    return $ Right $ fromDoc (fromJust d)
+
+topKillers :: Action IO [Bot]
+topKillers = do
+    c <- find (select ["kills" =: ["$gt" =: 0]] "bots") {sort = ["kills" =: -1], limit = 20}
+    ds <- rest c
+    return $ map fromDoc ds
+
+topSurvivors :: Action IO [Bot]
+topSurvivors = do
+    c <- find (select [] "bots") {sort = ["created" =: 1], limit = 20}
+    ds <- rest c
+    return $ map fromDoc ds
+
+
 -- CREATION -------------------------------------------------------
 
 -- we don't actually care what id you use as an MCP, but we provide a way to generate one here, so you don't have to hard-code it in your source and expose yourself to other people controlling your bots. Later we will store details about your mcp
@@ -44,7 +69,8 @@ createMcp p = do
 createBot :: Game -> String -> Bot -> Action IO (Either Fault Id)
 createBot g mcpId b = do
     id <- liftIO $ randomId
-    let ub = b { botId = Just id, botMcpId = Just mcpId }
+    time <- now
+    let ub = b { botId = Just id, botMcpId = Just mcpId, created = time }
 
     let v = validPosition g (x b) (y b)
 
@@ -110,7 +136,20 @@ attackAction g id d = do
     let (Point x y) = move d bp
 
     -- remove anybody there. Die sucka die
-    delete (select ["x" =: x, "y" =: y] "bots")
+    -- see if anyone is there 
+    targetDoc <- findOne (select ["x" =: x, "y" =: y] "bots") { project = ["_id" =: 1] }
+
+    if (isNothing doc) then
+        return $ Right Ok
+    else do
+
+    let tb = fromDoc (fromJust targetDoc) :: Bot
+
+    -- nuke them!
+    delete (select ["_id" =: botId tb] "bots")
+
+    -- give the bot a kill
+    modify (select ["_id" =: id] "bots") ["$inc" =: ["kills" =: 1]]
 
     return $ Right Ok
 
@@ -132,7 +171,7 @@ move d (Point x y) = case d of
 -- save when the mcp last completed an action
 updateHeartbeat :: String -> Action IO ()
 updateHeartbeat pid = do
-    time <- liftIO $ getCurrentTime
+    time <- now
     modify (select ["_id" =: pid] "mcps") ["$set" =: ["heartbeat" =: time]]
 
 cleanupMcp :: String -> Action IO Ok
@@ -151,7 +190,7 @@ cleanupBot mcpId botId = do
 cleanupInactives :: Integer -> Action IO Ok
 cleanupInactives delay = do
 
-    time <- liftIO $ getCurrentTime
+    time <- now
     let tenSecondsAgo = addSeconds (-delay) time
 
     c <- find (select ["heartbeat" =: ["$lt" =: tenSecondsAgo]] "mcps")
@@ -177,6 +216,9 @@ locations = do
 
 
 -- HELPERS ----------------------------------------------------------
+
+now :: Action IO DateTime
+now = liftIO $ getCurrentTime
 
 randomId :: IO String
 randomId = do
