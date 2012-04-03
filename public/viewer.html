@@ -87,6 +87,8 @@ DONT DO THESE
 4. add blocks, randomly spawn them. 
 5. allow them to pick up blocks
 
+[ ] 
+
 
 -->
 
@@ -200,8 +202,6 @@ DONT DO THESE
         var PX = 32
         var PY = 32
 
-        // var alignBottom = -(171-80)
-
         var padding = 0
 
         $window.on('resize', function() {
@@ -211,17 +211,6 @@ DONT DO THESE
         // first, get the world
         $.get("/game", function(gameInfo) {
 
-            // draw a bunch of tiles
-
-            // 101x171
-            // $viewer.append($("<img src='/assets/cute/WoodBlock.png' style='position:absolute;left:101px;top:-11px'>"))
-            // $viewer.append($("<img src='/assets/cute/WoodBlock.png' style='position:absolute;left:101px;top:72px'>"))
-
-            // $viewer.append($("<img src='/assets/cute/TreeShort.png' style='position:absolute;left:201px;top:-11px'>"))
-
-            // it MUST be 8-bit
-
-
             var w = gameInfo.width
             var h = gameInfo.height
             var ms = gameInfo.tick
@@ -229,9 +218,6 @@ DONT DO THESE
             // this will make it scroll
             $viewer.width((w) * PX)
             $viewer.height((h) * PY)
-
-            // PX = Math.floor(600/w)
-            // PY = Math.floor(600/h)
 
             console.log("GAME INFO", w, h, ms)
 
@@ -263,7 +249,7 @@ DONT DO THESE
             }
 
             function botView(bot) {
-                var $bot = $("<div class='bot sprite monster4' id='"+bot.id+"'></div>")
+                var $bot = $("<div class='bot sprite undead' id='"+bot.id+"'></div>")
                 $bot.data(bot)
                 // compute offset mathematically
                 // dragon-3-4
