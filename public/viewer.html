@@ -97,15 +97,80 @@ DONT DO THESE
 <script src="/demo/api.js"></script>
 <style>
 
+@font-face {
+    font-family: robot;
+    src: url('/assets/robot.ttf')  format('truetype');
+}
+
+@font-face {
+    font-family: robothead;
+    src: url(/assets/robothead.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: knightsquest;
+    src: url(/assets/knightsquest.ttf) format('truetype');
+}
+
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         padding: 0px;
         margin: 0px;
+        background: url(/assets/headerbg2.png);
+    }
+
+    header {
+        color: #FFF;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        background: url(/assets/headerbg2.png);
+        height: 42px;
+        padding: 5px;
+    }
+
+    header #logo {
+        display: block;
+        float: left;
+    }
+
+    header .title {
+        float: left;
+        font-size: 32px;
+        text-transform: uppercase;
+        margin-top: -3px;
+        margin-left: 10px;
+    }
+
+    header .links {
+        float: right;
+        margin-right: 10px;
+    }
+
+    header .links a {
+        font-family: knightsquest; 
+        color: #FFF;
+        font-size: 26px;
+        padding: 5px;
+    }
+
+    header span.robot {
+        font-family: robothead;
+    }
+
+    header span.quest {
+        font-family: knightsquest;
+        font-size: 40px;
     }
 
     #viewer {
-        background-color: #0c0;
         background: url(/assets/angbandtk/bgtile.png) #5c5;
         position: relative;
+        margin: 40px auto;
     }
 
     .bot {
@@ -269,6 +334,15 @@ DONT DO THESE
 
 </head>
 <body>
+
 <div id="viewer">
 </div>
+<header>
+    <img id="logo" src="/assets/logo2.png"></div>
+    <div class="title"><span class='robot'>Robot</span><span class='quest'>Quest</span></div>
+    <div class="links">
+        <a href="/leaderboards.html">wartzog has 345 kills!</a>
+        <a href="/documentation.html">Wat?</a>
+    </div>
+</header>
 </body>
