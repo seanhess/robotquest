@@ -20,7 +20,7 @@ import Network.HTTP.Types (status200)
 import Web.Scotty
 
 game :: Game
-game = Game 30 30 1000 
+game = Game 25 20 1000 
 
 cleanupDelay :: Integer
 cleanupDelay = 2 
