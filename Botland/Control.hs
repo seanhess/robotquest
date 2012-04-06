@@ -25,8 +25,8 @@ ensureIndexes = do
     ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)
 
 botOwner :: String -> String -> Action IO Bool
-botOwner mcpId botId = do
-    n <- count $ select ["mcpId" =: mcpId, "_id" =: botId] "bots"
+botOwner pid botId = do
+    n <- count $ select ["playerId" =: pid, "_id" =: botId] "bots"
     return (n > 0)
 
 
@@ -55,22 +55,49 @@ topSurvivors = do
     return $ map fromDoc ds
 
 
--- CREATION -------------------------------------------------------
 
--- we don't actually care what id you use as an MCP, but we provide a way to generate one here, so you don't have to hard-code it in your source and expose yourself to other people controlling your bots. Later we will store details about your mcp
-createMcp :: Player -> Action IO Id
-createMcp p = do
-    id <- liftIO $ randomId
-    let p' = p { mcpId = id }
-    save "mcps" (toDoc p')
+-- PLAYER ---------------------------------------------------------
+
+getPlayerByName :: String -> Action IO (Maybe Player)
+getPlayerByName n = getPlayer ["name" =: n]
+
+getPlayerById :: String -> Action IO (Maybe Player)
+getPlayerById id = getPlayer ["_id" =: id]
+
+{-getPlayer :: Field -> Action IO (Maybe Player)-}
+getPlayer s = do
+    md <- findOne (select s "players") {project = ["_id" =: 0]}
+    case md of
+        Nothing -> return Nothing
+        Just d -> return $ Just $ fromDoc d
+    
+-- we provide a random id. It is your secret id from now on, and you use it to control your bots
+createPlayer :: Player -> Action IO Id
+createPlayer p = do
+    id <- randomId
+    let p' = p { playerId = id }
+    save "players" (toDoc p')
     updateHeartbeat id
     return $ Id id
 
+
+-- CREATION -------------------------------------------------------
+
+
 createBot :: Game -> String -> Bot -> Action IO (Either Fault Id)
-createBot g mcpId b = do
-    id <- liftIO $ randomId
+createBot g pid b = do
+    id <- randomId
     time <- now
-    let ub = b { botId = Just id, botMcpId = Just mcpId, created = time }
+    mp <- getPlayerById pid
+
+    if (isNothing mp) then
+        return $ Left NotFound
+    else do
+
+    let p = fromJust mp
+        pn = playerName p
+
+    let ub = b { botId = id, botPlayerId = pid, player = pn, created = time }
 
     let v = validPosition g (x b) (y b)
 
@@ -93,8 +120,8 @@ createBot g mcpId b = do
 --    return Ok 
 
 performCommand :: BotCommand -> Game -> String -> String -> Action IO (Either Fault Ok)
-performCommand c g mcpId id = do
-    updateHeartbeat mcpId
+performCommand c g pid id = do
+    updateHeartbeat pid
     case c of 
         BotCommand Move d -> moveAction g id d
         BotCommand Attack d -> attackAction g id d
@@ -168,22 +195,21 @@ move d (Point x y) = case d of
 
 -- CLEANUP ---------------------------------------------------------
 
--- save when the mcp last completed an action
+-- save when the player last completed an action
 updateHeartbeat :: String -> Action IO ()
 updateHeartbeat pid = do
     time <- now
-    modify (select ["_id" =: pid] "mcps") ["$set" =: ["heartbeat" =: time]]
+    modify (select ["_id" =: pid] "players") ["$set" =: ["heartbeat" =: time]]
 
-cleanupMcp :: String -> Action IO Ok
-cleanupMcp mcpId = do
-    liftIO $ putStrLn ("Cleaning Up " ++ mcpId)
-    delete (select ["mcpId" =: mcpId] "bots")
-    delete (select ["_id" =: mcpId] "mcps")
+cleanupPlayer :: String -> Action IO Ok
+cleanupPlayer id = do
+    liftIO $ putStrLn ("Cleaning Up " ++ id)
+    delete (select ["playerId" =: id] "bots")
+    delete (select ["_id" =: id] "players")
     return Ok
 
-cleanupBot :: String -> String -> Action IO Ok
-cleanupBot mcpId botId = do
-    updateHeartbeat mcpId
+cleanupBot :: String -> Action IO Ok
+cleanupBot botId = do
     delete (select ["_id" =: botId] "bots")
     return Ok
 
@@ -193,12 +219,12 @@ cleanupInactives delay = do
     time <- now
     let tenSecondsAgo = addSeconds (-delay) time
 
-    c <- find (select ["heartbeat" =: ["$lt" =: tenSecondsAgo]] "mcps")
+    c <- find (select ["heartbeat" =: ["$lt" =: tenSecondsAgo]] "players")
     docs <- rest c
 
-    let mcpIds = map mcpId $ map fromDoc docs
+    let ids = map playerId $ map fromDoc docs
 
-    mapM_ cleanupMcp mcpIds 
+    mapM_ cleanupPlayer ids 
     return Ok
 
 
@@ -207,7 +233,7 @@ cleanupInactives delay = do
 
 locations :: Action IO [Bot]
 locations = do
-    c <- find (select [] "bots") {project = ["mcpId" =: 0]}
+    c <- find (select [] "bots") {project = ["playerId" =: 0]}
     bs <- rest c
     --return bs
     return $ map fromDoc bs 
@@ -220,9 +246,9 @@ locations = do
 now :: Action IO DateTime
 now = liftIO $ getCurrentTime
 
-randomId :: IO String
+randomId :: Action IO String
 randomId = do
-    i <- randomIO
+    i <- liftIO $ randomIO
     return $ intToHex i
 
 intToHex :: Int -> String

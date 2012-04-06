@@ -1,17 +1,17 @@
+NEXT STEPS
+[ ] Get the leaderboards to display (and refresh?)
+[ ] Click on bot for information
+[ ] API: pick your own image
+[ ] Simple page that shows images
 
-LAUNCH
-[ ] Click on bot for information / links
-[ ] Display leaderboards somewhere
-[ ] Api lets you choose an image
-[ ] page that helps you select an image
-[ ] New name / theme / documentation
+AFTER THAT
+[ ] Game Timer
+[ ] Documentation
+[ ] Evil Monsters! Bwa ha ha
 
 CLEANUP
 [ ] Tighter /game/minions call
 [ ] Gzip / Varnish / Cache-Control header
-
-TRY
-[ ] to move to game tick? to simplify?
 
 BOTS
 [ ] write a simple monster bot

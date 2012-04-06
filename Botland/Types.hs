@@ -26,17 +26,17 @@ import Safe (readMay)
 -- DATA TYPES ---------------------------------------------------------------
 
 -- heartbeat doesn't need to be a part of the client-side logic, just in the db
-data Player = Player { mcpId :: String, playerName :: String } deriving (Show)
+data Player = Player { playerId :: String, playerName :: String, source :: String } deriving (Show)
 
 -- this is roughly what it looks like in the database
--- {x, y, _id, color, mcpId, name, source}
+-- {x, y, _id, color, playerId, name, source}
 data Bot = Bot { x :: Int
                , y :: Int
                , name :: String
-               , source :: String
-               , color :: String
-               , botId :: Maybe String
-               , botMcpId :: Maybe String
+               , player :: String
+               , sprite :: String
+               , botId :: String
+               , botPlayerId :: String
                , kills :: Int
                , created :: DateTime
                } deriving (Show)
@@ -113,8 +113,8 @@ instance ToJSON Bot where
                    , "x" .= x b
                    , "y" .= y b
                    , "name" .= name b
-                   , "source" .= source b
-                   , "color" .= color b 
+                   , "player" .= player b
+                   , "sprite" .= sprite b 
                    , "kills" .= kills b
                    , "created" .= created b
                    ]
@@ -124,10 +124,9 @@ instance FromJSON Bot where
         x <- v .: "x"
         y <- v .: "y" 
         name <- v .: "name"
-        source <- v .: "source"
-        color <- v .: "color"
-        return $ Bot x y name source color Nothing Nothing 0 (fromSeconds 0)
-        -- you don't have read the action, mcpId or id from the client, ever.
+        sprite <- v .: "sprite"
+        return $ Bot x y name "" sprite "" "" 0 (fromSeconds 0)
+        -- you don't have read the action, PlayerId or id from the client, ever.
 
     parseJSON _ = mzero
 
@@ -136,9 +135,12 @@ instance FromJSON Bot where
 instance FromJSON Player where
     parseJSON (Object v) = do
         name <- v .: "name"
-        return $ Player "" name
+        source <- v .: "source"
+        return $ Player "" name source
     parseJSON _ = mzero
 
+instance ToJSON Player where
+    toJSON (Player id name source) = object ["name" .= name, "source" .= source]
 
 
 -- SERVER MESSAGES ----------------------------------------------------------
@@ -171,10 +173,10 @@ instance ToDoc Bot where
     toDoc b = [ "x" := val (x b)
               , "y" := val (y b)
               , "name" := val (name b)
-              , "source" := val (source b)
-              , "color" := val (color b)
-              , "_id" := val (fromMaybe "" (botId b))
-              , "mcpId" := val (fromMaybe "" (botMcpId b))
+              , "player" := val (player b)
+              , "sprite" := val (sprite b)
+              , "_id" := val (botId b)
+              , "playerId" := val (botPlayerId b)
               , "created" := val (created b)
               ]
 
@@ -182,10 +184,10 @@ instance FromDoc Bot where
     fromDoc d = Bot (at "x" d) 
                     (at "y" d) 
                     (at "name" d) 
-                    (at "source" d) 
-                    (at "color" d)
-                    (lookup "_id" d) 
-                    (lookup "mcpId" d)
+                    (at "player" d) 
+                    (at "sprite" d)
+                    (fromMaybe "" (lookup "_id" d))
+                    (fromMaybe "" (lookup "playerId" d))
                     (fromMaybe 0 (lookup "kills" d))
                     (fromMaybe (fromSeconds 0) (lookup "created" d))
 
@@ -194,11 +196,12 @@ instance FromDoc Point where
     fromDoc p = Point (at "x" p) (at "y" p)
 
 instance FromDoc Player where
-    fromDoc p = Player (at "_id" p) (at "name" p)
+    fromDoc p = Player (fromMaybe "" (lookup "_id" p)) (at "name" p) (at "source" p)
 
 instance ToDoc Player where
-    toDoc p = [ "_id" := val (mcpId p)
+    toDoc p = [ "_id" := val (playerId p)
               , "name" := val (playerName p)
+              , "source" := val (source p)
               ]
 
 

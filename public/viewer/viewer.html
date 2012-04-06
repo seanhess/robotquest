@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RobotQuest: Viewer</title>
+
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/async.min.js"></script>
+<script src="/assets/js/moment.min.js"></script>
+<script src="/demo/api.js"></script>
+
+<link rel="stylesheet" href="/assets/css/lib.css"/>
+<link rel="stylesheet" href="/assets/css/sprites.css"/>
+<link rel="stylesheet" href="/viewer/viewer.css"/>
+
+<script src="/viewer/viewer.js"></script>
+
+</head>
+<body>
+
+<!-- THE VIEWER -->
+<div id="container">
+<div id="viewer">
+</div>
+</div>
+
+<!-- HEADER -->
+<header>
+    <img id="logo" src="/assets/logo2.png" alt="RobotQuest">
+    <div class="title"><div class='robot'>Robot</div><div class='quest'>Quest</div></div>
+
+    <div class="links">
+        <a href="/documentation.html">What is this?</a>
+    </div>
+
+    <h2>Killers</h2>
+    <table>
+        <tr><th>Kills</th><th>Bot</th><th>Player</th></tr>
+        <tr><td>245</td><td>wozniak-1</td><td>Bob</td></tr>
+        <tr><td>31</td><td>Henry</td></tr>
+    </table>
+    <h2>Survivors</h2>
+</header>
+
+<!-- INFO MODAL -->
+<div id="botInfo">
+    <div class="inside">
+        <div class="sprite"></div>
+        <h3 class="name"></h3>
+        <table>
+          <tr><td>Player</td><td class="player"></td></tr>
+          <tr><td>Kills</td><td class="kills"></td></tr>
+          <tr><td>Age</td><td class="age"></td></tr>
+          <tr><td><a href='' class='source' target="_blank">Source</a></td></tr>
+    </div>
+</div>
+
+</body>

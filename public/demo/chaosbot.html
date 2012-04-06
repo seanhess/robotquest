@@ -17,6 +17,7 @@
 
         var currentBot = null
         var w, h, ms, g
+        var uid=0
 
         // get the game details when we load the page
         request("GET", '/game', function(err, game) {
@@ -51,14 +52,14 @@
             var currentAction = randomAction()
 
             function connect() {
-                var player = {name:"chaosbot"}
+                var player = {name:"chaosbot", source:"http://github.com/seanhess/botland"}
                 request("POST", "/players", player, function(err, mcp) {
                     mcpId = mcp.id
                     log("MCP " + mcpId)
 
                     var p = randomPoint(g)
 
-                    var bot = {name: "chaosbot", source: "http://github.com/seanhess/botland", x: p.x, y: p.y, color: "#000"}
+                    var bot = {name: "minion"+(uid++), x: p.x, y: p.y, sprite: "monster1-3-4"}
 
                     log("Spawning at " + p.x + " " + p.y)
 

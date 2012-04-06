@@ -1,0 +1,20 @@
+* {
+    box-sizing: border-box;
+    padding: 0px;
+    margin: 0px;
+}
+
+@font-face {
+    font-family: robot;
+    src: url('/assets/robot.ttf')  format('truetype');
+}
+
+@font-face {
+    font-family: robothead;
+    src: url(/assets/robothead.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: knightsquest;
+    src: url(/assets/knightsquest.ttf) format('truetype');
+}

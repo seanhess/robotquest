@@ -50,12 +50,16 @@ main = do
             header "Content-Type" "text/html"
             file "public/index.html"
 
+        get "/viewer" $ do
+            header "Content-Type" "text/html"
+            file "public/viewer/viewer.html"
+
         get "/version" $ text "Botland 0.2.0"
 
         get "/game" $ json game
 
         -- returns all the bots, obstacles and whathaveyounots
-        -- everything except MCPId
+        -- everything except playerId
         get "/game/minions" $ do
             res <- db $ locations
             sendAction "" res
@@ -63,14 +67,18 @@ main = do
         -- really, just gives you a session id, but pretend that it matters :)
         -- works because it's a secret number, never sent to anyone
         post "/players" $ decodeBody $ \p -> do
-            id <- db $ createMcp p
+            id <- db $ createPlayer p
             sendAction "" id
+
+        get "/players/:name" $ do
+            n <- param "name"
+            p <- db $ getPlayerByName n
+            sendActionMaybe "Could not find player" p
 
         -- spawn them immediately, don't wait for the tick
         post "/players/:playerId/minions" $ decodeBody $ \b -> do
             pid <- param "playerId"
             id <- db $ createBot game pid b
-            --updateHeartbeat mcpId
             sendActionFault "Invalid Starting Location" id
 
         get "/minions/:minionId" $ do
@@ -96,17 +104,16 @@ main = do
             res <- db $ performCommand c game pid mid
             sendActionFault "Invalid Space: Occupied?" res
 
-        -- delete all bots associated with the mcp
+        -- delete all bots associated with the player
         delete "/players/:playerId" $ do
             pid <- param "playerId"
-            ok <- db $ cleanupMcp pid
+            ok <- db $ cleanupPlayer pid
             sendAction "Could not delete player" ok
 
         delete "/players/:playerId/minions/:minionId" $ auth $ do
             mid <- param "minionId"
-            pid <- param "playerId"
-            ok <- db $ cleanupBot pid mid 
-            sendAction "Could not delete bot" ok
+            ok <- db $ cleanupBot mid 
+            sendAction "Could not delete minion" ok
 
         -- TODO: implement planet cute graphics
             -- then start making up mini games
@@ -114,8 +121,8 @@ main = do
             -- spawn some stars. keep track of how many you've collected
 
         -- TODO: stats! to give it a point. Just list everything
-            -- mcps connected the longest
-            -- currently connected mcps
+            -- player connected the longest
+            -- currently connected player
             -- bots that survived the longest
             -- resources collected
 
@@ -138,9 +145,9 @@ main = do
         -- send an array of requests, and get an array of responses
         -- request: METHOD URL BODY
         -- returns: STATUS BODY
-        -- or: create mcpId body
-        --     command mcpId botId body
-        --     delete mcpId botId body
+        -- or: create player body
+        --     command playerId botId body
+        --     delete playerId botId body
         -- naw, they already know how to do the routes, just use that. You have to write a parser anyway, and you can copy scotty's
         -- post "/pipeline" $ decodeBody $ \cs -> do 
 

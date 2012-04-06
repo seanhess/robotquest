@@ -1,0 +1,63 @@
+/* set background-position with javascript */
+
+.sprite {
+    width: 32px;
+    height: 32px;
+}
+
+.sprite.classm {
+    background: url(/assets/angbandtk/dg_classm32.gif);
+}
+
+.sprite.dragon {
+    background: url(/assets/angbandtk/dg_dragon32.gif);
+}
+
+.sprite.humans {
+    background: url(/assets/angbandtk/dg_humans32.gif);
+}
+
+.sprite.misc {
+    background: url(/assets/angbandtk/dg_misc32.gif);
+}
+
+.sprite.people {
+    background: url(/assets/angbandtk/dg_people32.gif);
+}
+
+.sprite.undead {
+    background: url(/assets/angbandtk/dg_undead32.gif);
+}
+
+.sprite.uniques {
+    background: url(/assets/angbandtk/dg_uniques32.gif);
+}
+
+.sprite.monster1 {
+    background: url(/assets/angbandtk/dg_monster132.gif);
+}
+
+.sprite.monster2 {
+    background: url(/assets/angbandtk/dg_monster232.gif);
+}
+
+.sprite.monster3 {
+    background: url(/assets/angbandtk/dg_monster332.gif);
+}
+
+.sprite.monster4 {
+    background: url(/assets/angbandtk/dg_monster432.gif);
+}
+
+.sprite.monster5 {
+    background: url(/assets/angbandtk/dg_monster532.gif);
+}
+
+.sprite.monster6 {
+    background: url(/assets/angbandtk/dg_monster632.gif);
+}
+
+.sprite.monster7 {
+    background: url(/assets/angbandtk/dg_monster732.gif);
+}
+

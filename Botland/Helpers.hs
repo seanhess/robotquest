@@ -92,6 +92,13 @@ sendActionFault m (Right efa) = case efa of
 sendActionFault m f = sendAction m f
 
 
+sendActionMaybe :: (ToJSON a) => String -> Either Failure (Maybe a) -> ActionM()
+sendActionMaybe m (Right ma) = case ma of 
+    Nothing -> fault $ NotFound
+    Just a -> json a
+sendActionMaybe m failure = sendAction "" failure
+
+
 -- send a non-mongo fault
 fault :: Fault -> ActionM ()
 fault f = do
