@@ -42,7 +42,7 @@ $(function() {
                 var $bot = $("#" + bot.id)
 
                 if (!$bot.length) {
-                    console.log("NEW BOT", bot.id, bot.name, bot.x, bot.y)
+                    console.log("NEW BOT", bot.id, bot.name, bot.x, bot.y, bot.sprite)
                     $bot = botView(bot)
                     $viewer.append($bot)
                 }
@@ -56,13 +56,9 @@ $(function() {
         }
 
         function botView(bot) {
-            var $bot = $("<a href='/bots/"+bot.id+"' class='bot sprite undead' id='"+bot.id+"'></a>")
+            var $bot = $("<a href='/bots/"+bot.id+"' class='bot sprite' id='"+bot.id+"'></a>")
             $bot.data(bot)
-            // compute offset mathematically
-            // dragon-3-4
-            var xi = 3
-            var yi = 4
-            $bot.css({'background-position': '-' + xi*32 + 'px -' + yi*32 + 'px'})
+            sprite($bot, bot.sprite)
             return $bot
         }
 
@@ -72,6 +68,20 @@ $(function() {
 
 
 
+    function sprite($el, s) {
+
+        // compute offset mathematically
+        // dragon-3-4
+
+        var parts = s.split('-')
+
+        var sheet = parts[0]
+        var xi = parseInt(parts[1], 10)
+        var yi = parseInt(parts[2], 10)
+
+        $el.addClass(sheet)
+        $el.css({'background-position': '-' + xi*32 + 'px -' + yi*32 + 'px'})       
+    }
 
     // require moment.js
     function age(created) {
@@ -87,7 +97,8 @@ $(function() {
         $botInfo.find(".age").text(age(bot.created))
         $botInfo.find(".kills").text(bot.kills)
         $botInfo.find(".player").text(bot.player)
-        $botInfo.find(".sprite").addClass('monster1').css({'background-position': '0px 0px'})
+
+        sprite($botInfo.find(".sprite"), bot.sprite)
 
         // get player information
         $.get('/players/' + bot.player, function(player) {

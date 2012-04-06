@@ -17,7 +17,6 @@
 
         var currentBot = null
         var w, h, ms, g
-        var uid=0
 
         // get the game details when we load the page
         request("GET", '/game', function(err, game) {
@@ -59,7 +58,7 @@
 
                     var p = randomPoint(g)
 
-                    var bot = {name: "minion"+(uid++), x: p.x, y: p.y, sprite: "monster1-3-4"}
+                    var bot = {name: "minion"+random(100), x: p.x, y: p.y, sprite: "monster" + (rand(7)+1) + "-" + rand(6) + "-" + rand(6)}
 
                     log("Spawning at " + p.x + " " + p.y)
 
@@ -123,6 +122,10 @@
             var directions = ["Up", "Right", "Left", "Down"]
             var index = Math.floor(Math.random() * directions.length)
             return {action: "Move", direction: directions[index]}
+        }
+
+        function rand(n) {
+            return Math.floor(Math.random() * n)
         }
 
 
