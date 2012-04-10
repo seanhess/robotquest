@@ -3,8 +3,7 @@
 # dependencies
 apt-get -y install git make wget
 
-# redis
-apt-get -y install redis-server
+# TODO mongodb!
 
 # install old versions to get cabal & deps
 apt-get -y install ghc cabal-install
@@ -23,5 +22,3 @@ ln -s /usr/lib/libgmp.so.10.0.1 /usr/lib/libgmp.so.3
 ./configure
 make install
 
-# and ... clone it for the first time
-git clone git://github.com/seanhess/botland.git

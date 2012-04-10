@@ -1,0 +1,8 @@
+{
+  "name": "botland",
+  "version": "0.0.0",
+  "scripts": {
+    "install":"bin/install",
+    "start":"./Api"
+  }
+}

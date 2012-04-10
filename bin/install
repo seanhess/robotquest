@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "CABAL INSTALL"
+cabal update 
+cabal install --only-dependencies
+
+echo "COMPILING"
+ghc --make Api.hs

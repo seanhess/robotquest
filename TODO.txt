@@ -1,7 +1,7 @@
 NEXT STEPS
 [ ] Get the leaderboards to display (and refresh?)
-[ ] Click on bot for information
-[ ] API: pick your own image
+[x] Click on bot for information
+[x] API: pick your own image
 [ ] Simple page that shows images
 
 AFTER THAT
@@ -12,6 +12,7 @@ AFTER THAT
 CLEANUP
 [ ] Tighter /game/minions call
 [ ] Gzip / Varnish / Cache-Control header
+[ ] Indexes (player name, etc)
 
 BOTS
 [ ] write a simple monster bot
