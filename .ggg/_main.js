@@ -1,1 +1,1 @@
-module.exports = {"name":"dev","branch":null}
+module.exports = {"name":"dev","branch":"master"}
