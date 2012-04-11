@@ -2,6 +2,12 @@
 $(function() {
     var bots = []
 
+    var MINUTE = 60
+    var HOUR = 60*MINUTE
+    var DAY = 24*HOUR
+    var MONTH = 30*DAY
+    var YEAR = 365*DAY
+
     var $window = $(window)
     var $viewer = $("#viewer")
     var $container = $("#container")
@@ -85,14 +91,15 @@ $(function() {
 
     // require moment.js
     function age(created) {
-        return moment(created).fromNow().replace(/ (minute|second|day|month|year)(s?) ago/, function(match, name, s){
-            if (name == "minute") return 'm'
-            else if (name == "second") return 's'
-            else if (name == "hour") return 'h'
-            else if (name == "month") return 'month'+s
-            else if (name == "year") return 'year'+s
-            return "(((" + name +"|" + match + ")))"
-        })
+        var date = new Date(created)
+        var ds = Math.floor((Date.now() - date.getTime())/1000)
+
+        console.log("DS", ds)
+
+        if (ds < MINUTE) return ds + "s"
+        if (ds < HOUR) return Math.floor(ds/MINUTE)  + "m"
+        if (ds < DAY) return Math.floor(ds/HOUR) + "h"
+        return Math.floor(ds/DAY) + "d"
     }
 
     // BOT INFORMATION

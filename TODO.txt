@@ -11,6 +11,16 @@ AFTER THAT
 [ ] Documentation
 [ ] Evil Monsters! Bwa ha ha
 
+
+IDEAS
+[ ] Have a store. Collect coins, not powerups. BUY powerups. Multiple kinds of powerfuls (Gold, Crystal)
+[ ] Powerups: shoot 2 spaces. Multiple actions per actions
+[ ] Have spawning guys be a resource of some kind. Kills or money let you spawn. start with 1, you can spend 1 spawn any time something dies.
+[ ] Multiple types of creeps: Troll, vs little animals. They use different AI/strategy. Worth different amounts of money.
+[ ] Blocks - requires belt of giant strength. stone requires belt of awesome giant strength
+[ ] Trading
+[ ] If you die you lose all your gold, so you have an incentive to drop it.
+
 CLEANUP
 [ ] Tighter /game/minions call
 [ ] Gzip / Varnish / Cache-Control header
