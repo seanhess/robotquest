@@ -46,7 +46,7 @@ describe('botland api', function() {
 
     describe("mcp", function() {
         it("should give me a token", function(done) {
-            var player = {name:"test"}
+            var player = {name:"test", source:'fake'}
             request.post({url:Server + "/players", json:player}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, data.message)
@@ -59,12 +59,12 @@ describe('botland api', function() {
 
     // keep track of our botId for later tests
     var botId = null
-    var bot = {x:0, y:0, name:'bot1', source:'test', color:"#F00"}
+    var bot = {x:0, y:0, name:'bot1', sprite:'test'}
 
     describe('spawn', function() {
 
         it('should not allow me to spawn off field', function(done) {
-            var bot = {x:-1, y:0, name:'offfield', source:'test', color:"#F00"} 
+            var bot = {x:-1, y:0, name:'offfield', sprite:'test'} 
             request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 400, 'missing 400 status code')
@@ -143,7 +143,7 @@ describe('botland api', function() {
     describe('attack', function() {
         var bot2Id = null
         it('should spawn a second bot', function(done) {
-            var bot = {x: 0, y: 0, name: 'bot2', source: 'test', color: "#00F"}
+            var bot = {x: 0, y: 0, name: 'bot2', sprite: 'test'}
             request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, body) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, body.message)
@@ -220,7 +220,7 @@ describe('botland api', function() {
     describe('cleanup', function() {
         var botId = null
         it('should spawn another bot', function(done) {
-            var bot = {x:1, y:1, name:'cleanup', source:'test', color:"#F00"} 
+            var bot = {x:1, y:1, name:'cleanup', sprite:'test'} 
             request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, body) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, body.message)
