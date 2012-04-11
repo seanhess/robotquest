@@ -85,7 +85,14 @@ $(function() {
 
     // require moment.js
     function age(created) {
-        return moment(created).fromNow().replace(" ago", "")
+        return moment(created).fromNow().replace(/ (minute|second|day|month|year)(s?) ago/, function(match, name, s){
+            if (name == "minute") return 'm'
+            else if (name == "second") return 's'
+            else if (name == "hour") return 'h'
+            else if (name == "month") return 'month'+s
+            else if (name == "year") return 'year'+s
+            return "(((" + name +"|" + match + ")))"
+        })
     }
 
     // BOT INFORMATION
@@ -119,4 +126,43 @@ $(function() {
         $botInfo.hide()
     })
 
+
+
+
+    // LEADERBOARDS 
+    var $killers = $("#killers")
+    var $survivors = $("#survivors")
+    var $rowTemplate = $survivors.find(".row.template").remove().clone()
+    var $headerTemplate = $survivors.find(".header.template").remove().clone()
+
+
+    console.log("HI")
+    function loadLeaderboards() {
+        $.get('/top/killers', function(bots) {
+            $killers.html($headerTemplate.clone())
+            bots.forEach(function(b) {
+                var $view = leaderboardRow(b)
+                $killers.append($view)
+            })
+        })
+
+        $.get('/top/survivors', function(bots) {
+            $survivors.html($headerTemplate.clone())
+            bots.forEach(function(b) {
+                var $view = leaderboardRow(b)
+                $survivors.append($view)
+            })
+        })
+    }
+
+    function leaderboardRow(b) {
+        var $view = $rowTemplate.clone()
+        $view.find(".kills").text(b.kills)
+        $view.find(".age").text(age(b.created))
+        $view.find(".name").text(b.name)
+        return $view
+    }
+
+    loadLeaderboards()
+    var slowInterval = setInterval(loadLeaderboards, 10*1000)
 })

@@ -1,7 +1,9 @@
 NEXT STEPS
-[ ] Get the leaderboards to display (and refresh?)
+[x] Get the leaderboards to display (and refresh?)
 [x] Click on bot for information
 [x] API: pick your own image
+[x] Leaderboard: top killers
+[ ] Leaderboard: link to bot overlay (url based?)
 [ ] Simple page that shows images
 
 AFTER THAT

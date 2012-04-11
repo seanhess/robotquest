@@ -106,3 +106,40 @@ body {
     float: right;
     margin: 15px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+h2.leaderboard {
+    margin-top: 20px;
+    /*border-bottom: solid 1px #FFF;*/
+    background-color: #FFF;
+    color: #000;
+  
+}
+
+table.leaderboard td {
+    font-size: 14px;
+}
+
+table.leaderboard td.name {
+    max-width: 90px;
+    background-color: #F0
+    overflow: hidden;
+    max-height: 14px;
+    display: block;
+}

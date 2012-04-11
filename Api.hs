@@ -33,12 +33,13 @@ main = do
     let auth = runAuth pipe "botland"
     db ensureIndexes
 
+    -- run cleanup every so often
     let cleanup = do 
         db $ cleanupInactives cleanupDelay
         threadDelay ((fromIntegral cleanupDelay)*1000000)
         cleanup
 
-    -- run cleanup every so often
+    -- continue to accept requests while we run cleanup
     forkIO $ cleanup
 
     scotty 3026 $ do
