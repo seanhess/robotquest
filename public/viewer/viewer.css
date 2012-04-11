@@ -129,17 +129,18 @@ h2.leaderboard {
     /*border-bottom: solid 1px #FFF;*/
     background-color: #FFF;
     color: #000;
-  
 }
+
 
 table.leaderboard td {
     font-size: 14px;
 }
 
-table.leaderboard td.name {
+table.leaderboard td a.name {
     max-width: 90px;
-    background-color: #F0
     overflow: hidden;
     max-height: 14px;
     display: block;
+    color: #FFF;
 }
+

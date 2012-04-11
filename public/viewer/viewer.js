@@ -94,15 +94,31 @@ $(function() {
         var date = new Date(created)
         var ds = Math.floor((Date.now() - date.getTime())/1000)
 
-        console.log("DS", ds)
-
         if (ds < MINUTE) return ds + "s"
         if (ds < HOUR) return Math.floor(ds/MINUTE)  + "m"
         if (ds < DAY) return Math.floor(ds/HOUR) + "h"
         return Math.floor(ds/DAY) + "d"
     }
 
-    // BOT INFORMATION
+
+    // ROUTING //////////////////////////////////////////////
+    $(window).bind('hashchange', function() {
+        console.log("HASH CHANGE", window.location.hash)
+
+        var hash = window.location.hash
+
+        if (!hash) return hideBot()
+
+        var matchBot = hash.match(/#\/bots\/(\w+)/)
+        if (matchBot) {
+            var botId = matchBot[1]
+            var $bot = $("#" + botId)
+            var bot = $bot.data()
+            showBot(bot)
+        }
+    })
+
+    // BOT INFORMATION /////////////////////////////////////
     var $botInfo = $("#botInfo")
 
     function showBot(bot) {
@@ -123,16 +139,21 @@ $(function() {
         // TODO change bot: player (drop source)
     }
 
+    function hideBot() {
+        $botInfo.hide()
+    }
+
     $viewer.on("click", ".bot", function(event) {
-        showBot($(this).data())
+        var bot = $(this).data()
+        //showBot($(this).data())
+        window.location.hash = "/bots/" + bot.id
         return false
     })
 
     // only outside clicks
     $botInfo.on("click", function(e) {
-        $botInfo.hide()
+        window.location.hash = ""
     })
-
 
 
 
@@ -166,7 +187,7 @@ $(function() {
         var $view = $rowTemplate.clone()
         $view.find(".kills").text(b.kills)
         $view.find(".age").text(age(b.created))
-        $view.find(".name").text(b.name)
+        $view.find(".name").text(b.name).attr('href', "#/bots/" + b.id)
         return $view
     }
 

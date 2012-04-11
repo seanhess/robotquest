@@ -4,13 +4,12 @@ NEXT STEPS
 [x] API: pick your own image
 [x] Leaderboard: top killers
 [ ] Leaderboard: link to bot overlay (url based?)
-[ ] Simple page that shows images
+[ ] Simple page that shows images you can pick
 
 AFTER THAT
-[ ] Game Timer
+[ ] Game Timer??
 [ ] Documentation
 [ ] Evil Monsters! Bwa ha ha
-
 
 IDEAS
 [ ] Have a store. Collect coins, not powerups. BUY powerups. Multiple kinds of powerfuls (Gold, Crystal)
