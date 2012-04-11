@@ -103,7 +103,6 @@ $(function() {
 
     // ROUTING //////////////////////////////////////////////
     $(window).bind('hashchange', function() {
-        console.log("HASH CHANGE", window.location.hash)
 
         var hash = window.location.hash
 

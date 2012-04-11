@@ -3,13 +3,25 @@ NEXT STEPS
 [x] Click on bot for information
 [x] API: pick your own image
 [x] Leaderboard: top killers
-[ ] Leaderboard: link to bot overlay (url based?)
-[ ] Simple page that shows images you can pick
+[x] Leaderboard: link to bot overlay (url based?)
 
 AFTER THAT
-[ ] Game Timer??
+[ ] Game Timer
 [ ] Documentation
+  [ ] Simple page that shows images you can pick
 [ ] Evil Monsters! Bwa ha ha
+
+
+GAME TIMER
+Advantages: automatically limits the number of actions you can take. Can write game logic in haskell, instead of mongo. Maybe easier to keep track of events if I want to do things that way. Just try it and see how it feels
+
+Disadvantages: not concurrent. I have to make sure the game can handle all the processing (with 1s ticks? please! I can handle the world on a 1s tick). 
+    can it be parallized? (not without re-introducing mongo)
+    it can by "room" (ah ha!)
+    I don't think this is a good reason not to do it.
+
+EVENT BASED
+You don't have to sent down events. You just send down invalidated units. everything else is the same as before. (more important with blocks, eh?)
 
 IDEAS
 [ ] Have a store. Collect coins, not powerups. BUY powerups. Multiple kinds of powerfuls (Gold, Crystal)
