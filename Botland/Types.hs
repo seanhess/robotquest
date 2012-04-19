@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings, DeriveGeneric, DeriveDataTypeable #-}
 
 module Botland.Types where
 
@@ -6,9 +6,14 @@ import qualified Data.Aeson as A
 import Data.Aeson (FromJSON(..), ToJSON(..), object, (.=), (.:), Value(..))
 import qualified Data.Aeson.Types as AT
 import Data.Aeson.Types (Parser)
+import Data.Bson (Val(..))
+import qualified Data.Bson as B
+import qualified Data.CompactString.UTF8 as C
 import Data.Maybe (fromMaybe, isJust, fromJust)
 import qualified Data.Text as T
 import Data.DateTime (DateTime, fromSeconds)
+import Data.Map (Map)
+import Data.Typeable (Typeable)
 
 import Database.MongoDB (val, Document, Field(..), at, lookup)
 
@@ -39,10 +44,12 @@ data Bot = Bot { x :: Int
                , botPlayerId :: String
                , kills :: Int
                , created :: DateTime
-               } deriving (Show)
+               } deriving (Show, Ord, Eq)
 
 -- sometimes you just need to talk about a point
-data Point = Point { px :: Int, py :: Int } deriving (Show)
+data Point = Point { px :: Int, py :: Int } 
+           | InvalidPoint 
+           deriving (Show, Ord, Eq)
 
 -- gives the field and interval
 data Game = Game { width :: Int
@@ -53,8 +60,8 @@ data Game = Game { width :: Int
 
 -- available actions
 data BotCommand = BotCommand { action :: BotAction, direction :: Direction } deriving (Show, Generic)
-data Direction = DLeft | DRight | DUp | DDown deriving (Show, Read)
-data BotAction = Stop | Move | Attack deriving (Show, Read)
+data Direction = DLeft | DRight | DUp | DDown deriving (Show, Read, Eq, Typeable)
+data BotAction = Stop | Move | Attack deriving (Show, Read, Eq, Typeable)
 
 -- things that can go wrong
 data Fault = Fault String
@@ -72,6 +79,7 @@ data Ok = Ok deriving (Show)
 
 
 
+type Field = Map Point Bot
 
 
 
@@ -204,6 +212,35 @@ instance ToDoc Player where
               , "source" := val (source p)
               ]
 
+
+-- need to make action and direction an instance of value
+commandToDoc :: BotCommand -> String -> Document
+commandToDoc (BotCommand a d) id = ["_id" := val id, "action" := val a, "direction" := val d]
+
+commandFromDoc :: Document -> (String, BotCommand)
+commandFromDoc doc = (at "_id" doc, BotCommand a d)
+    where a = at "action" doc
+          d = at "direction" doc
+
+instance Val BotAction where
+    val = typeToBSON show
+    cast' = typeFromBSON readMay
+
+instance Val Direction where
+    val = typeToBSON (removeFirstLetter.show)
+    cast' = typeFromBSON (readMay.addD)
+
+
+
+-- BSON HELPERS ---------------------------------------------------------------
+
+typeToBSON :: (a -> String) -> a -> B.Value
+typeToBSON show = val . show
+
+typeFromBSON :: (String -> Maybe a) -> B.Value -> Maybe a
+typeFromBSON read (B.String bs) = do
+    m <- read $ C.unpack bs
+    return m
 
 
 -- JSON HELPERS ---------------------------------------------------------------

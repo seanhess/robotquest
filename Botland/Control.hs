@@ -112,6 +112,10 @@ createBot g pid b = do
 
 
 
+-- GAME STATE -----------------------------------------------------
+
+
+
 -- ACTIONS --------------------------------------------------------
 
 --setAction :: String -> BotAction -> Action IO Ok
@@ -119,12 +123,12 @@ createBot g pid b = do
 --    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (show a)]]
 --    return Ok 
 
-performCommand :: BotCommand -> Game -> String -> String -> Action IO (Either Fault Ok)
+performCommand :: BotCommand -> Game -> String -> String -> Action IO ()
 performCommand c g pid id = do
     updateHeartbeat pid
-    case c of 
-        BotCommand Move d -> moveAction g id d
-        BotCommand Attack d -> attackAction g id d
+    save "commands" (commandToDoc c id)
+
+{-
 
 moveAction :: Game -> String -> Direction -> Action IO (Either Fault Ok)
 moveAction g id d = do
@@ -179,18 +183,7 @@ attackAction g id d = do
     modify (select ["_id" =: id] "bots") ["$inc" =: ["kills" =: 1]]
 
     return $ Right Ok
-
-
-
-
-
--- movement helpers --
-move :: Direction -> Point -> Point
-move d (Point x y) = case d of
-    DLeft -> Point (x-1) y
-    DRight -> Point (x+1) y
-    DUp -> Point x (y-1)
-    DDown -> Point x (y+1)
+-}
 
 
 -- CLEANUP ---------------------------------------------------------

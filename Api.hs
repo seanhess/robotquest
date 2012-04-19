@@ -6,6 +6,7 @@ import Botland.Helpers
 import Botland.Types
 import Botland.Control
 import Botland.Middleware
+import Botland.Game
 
 import Database.MongoDB (runIOE, connect, access, master, host, Pipe, Action)
 
@@ -101,9 +102,8 @@ main = do
         post "/players/:playerId/minions/:minionId/command" $ auth $ decodeBody $ \c -> do
             mid <- param "minionId"
             pid <- param "playerId"
-
             res <- db $ performCommand c game pid mid
-            sendActionFault "Invalid Space: Occupied?" res
+            sendAction "" res
 
         -- delete all bots associated with the player
         delete "/players/:playerId" $ do
