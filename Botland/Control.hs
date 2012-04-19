@@ -5,7 +5,9 @@ module Botland.Control where
 import Botland.Types
 
 import Control.Monad.IO.Class (liftIO)
+import Control.Monad (forM_)
 
+import Data.Map (assocs)
 import Data.Maybe (isNothing, fromJust)
 import Data.DateTime (DateTime, addSeconds, getCurrentTime)
 
@@ -129,8 +131,21 @@ allCommands = do
 
 
 saveField :: Field -> Action IO ()
-saveField f = undefined
+saveField f = do
+    -- I need to update A BUNCH of them
+    -- really, I need to update each one
+    forM_ (assocs f) $ \(p,b) -> updateBot b p
+    return ()
 
+updateBot :: Bot -> Point -> Action IO ()
+updateBot b p = do
+    modify (select ["_id" =: botId b] "bots") ["$set" =: ["x" =: px p, "y" =: py p]]
+    -- TODO Add state changes. 
+
+
+clearCommands :: Action IO ()
+clearCommands = do
+    delete (select [] "commands")
 
 -- ACTIONS --------------------------------------------------------
 

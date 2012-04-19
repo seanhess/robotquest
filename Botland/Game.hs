@@ -1,3 +1,10 @@
+{-
+
+Botland Game Timer: gameTick runs once per game tick, updating the world and saving it out
+
+
+-}
+
 
 module Botland.Game where
 
@@ -17,46 +24,7 @@ import Prelude hiding (lookup)
 
 import System.CPUTime (getCPUTime)
 
--- STORAGE: units (bots and blocks), points (x, y, unitId), commands (action, direction, botId),
--- PULL THEM OUT: get all points, get all units, create Map Location Unit, create Map id Unit, [(id, Commands)], for each one, send it along to game. 
--- STORE THEM AGAIN: save all bots (?), save the world locations
-
--- If I'm serializing them like this, I might as well have a single thing, no?
-
--- fields: "world"
--- wait, I don't need to serialize it at all. I can create it, and pass it around in my loop!
--- then, I only need to save it so someone can request it. 
-
--- they have mvars ... ooh, fancy
--- why not eh?
-
--- naw, too complicated. It's easy to serialize it anyway
--- the easiest way to DUMP the data is to have an x, y on the bots themselves. I have to save the bots anyway.
--- so, I'll store the data on the bots, and have a parsing method that can return both
-
--- easy step one 
-
--- CREATION
--- 1. the client could just insert the thang
--- 2. or, have it here. store the command to create somewhere? (in a capped collection)
--- 3. Easiest: assume they have it in there already. THis is just handling movement. 
-
--- EASY
--- 1. allow them to create normally
--- 2. move a guy 
--- 3. make sure he's moved
-
-
-
--- [x] Save Commands
--- [x] Save bots
--- [x] Save positions
--- [ ] Load Commands (+Bot)
--- [x] Load World (+Bot)
-
-
 type IdMap = Map String Bot
-
 
 runTick :: Integer -> (Action IO () -> IO (Either Failure ())) -> IO ()
 runTick delay db = do
@@ -71,8 +39,8 @@ runTick delay db = do
         durationµs = round $ ((fromInteger elapsedps) / 1000000) :: Integer
         waitµs = (delay * 1000000) - durationµs
 
-    putStrLn "GAME TICK: WAITING FOR"
-    print waitµs
+    {-putStrLn "WAITING FOR"-}
+    {-print waitµs-}
     threadDelay $ fromIntegral waitµs
 
     runTick delay db
@@ -84,9 +52,9 @@ gameTick = do
     commands <- allCommands
 
     let newField = processActions bots commands
-    {-saveField newField-}
-    return ()
-  
+    liftIO $ print newField
+    saveField newField
+    clearCommands
 
 
 -- 1. collect all the info (Bot, BotCommand, Point)
