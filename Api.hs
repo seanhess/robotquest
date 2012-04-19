@@ -40,8 +40,13 @@ main = do
         threadDelay ((fromIntegral cleanupDelay)*1000000)
         cleanup
 
+    let startTick = do
+        runTick 1 db
+        return ()
+
     -- continue to accept requests while we run cleanup
     forkIO $ cleanup
+    forkIO $ startTick
 
     scotty 3026 $ do
 

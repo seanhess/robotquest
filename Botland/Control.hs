@@ -9,7 +9,7 @@ import Control.Monad.IO.Class (liftIO)
 import Data.Maybe (isNothing, fromJust)
 import Data.DateTime (DateTime, addSeconds, getCurrentTime)
 
-import Database.MongoDB
+import Database.MongoDB hiding (Field)
 
 import Web.Scotty (ActionM(..))
 
@@ -114,6 +114,22 @@ createBot g pid b = do
 
 -- GAME STATE -----------------------------------------------------
 
+allBots :: Action IO [Bot]
+allBots = do
+    c <- find (select [] "bots")
+    docs <- rest c
+    return $ map fromDoc docs
+
+
+allCommands :: Action IO [(String, BotCommand)]
+allCommands = do
+    cursor <- find (select [] "commands")
+    docs <- rest cursor
+    return $ map commandFromDoc docs
+
+
+saveField :: Field -> Action IO ()
+saveField f = undefined
 
 
 -- ACTIONS --------------------------------------------------------

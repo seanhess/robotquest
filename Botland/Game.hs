@@ -2,14 +2,20 @@
 module Botland.Game where
 
 import Botland.Types
+import Botland.Control
 
 import Control.Concurrent (forkIO, threadDelay)
+import Control.Monad.IO.Class (liftIO)
 
 import qualified Data.Map as M
 import Data.Map (Map, insert, delete, lookup, empty)
 import Data.Maybe (fromMaybe, fromJust, isJust)
 
+import Database.MongoDB (Action, Failure)
+
 import Prelude hiding (lookup)
+
+import System.CPUTime (getCPUTime)
 
 -- STORAGE: units (bots and blocks), points (x, y, unitId), commands (action, direction, botId),
 -- PULL THEM OUT: get all points, get all units, create Map Location Unit, create Map id Unit, [(id, Commands)], for each one, send it along to game. 
@@ -52,29 +58,39 @@ import Prelude hiding (lookup)
 type IdMap = Map String Bot
 
 
-runTick :: Integer -> IO ()
-runTick delay = do
-    putStrLn "WOOT"
-    threadDelay ((fromIntegral delay)*1000000)
-    runTick delay
+runTick :: Integer -> (Action IO () -> IO (Either Failure ())) -> IO ()
+runTick delay db = do
+
+    startTime <- getCPUTime -- picoseconds
+
+    db $ gameTick
+
+    -- we need to wait 1s minus the time taken (setInterval, where are you!)
+    endTime <- getCPUTime
+    let elapsedps = endTime - startTime :: Integer
+        durationµs = round $ ((fromInteger elapsedps) / 1000000) :: Integer
+        waitµs = (delay * 1000000) - durationµs
+
+    putStrLn "GAME TICK: WAITING FOR"
+    print waitµs
+    threadDelay $ fromIntegral waitµs
+
+    runTick delay db
 
 
+gameTick :: Action IO ()
+gameTick = do
+    bots <- allBots
+    commands <- allCommands
 
--- CONVERT IT ALL
-doStuff :: IO ()
-doStuff = do
-  putStrLn "HI"
-    -- you have the commands (Bot, BotCommand)
-    -- you have the bots [Bot]
-    -- you have the field Field
+    let newField = processActions bots commands
+    {-saveField newField-}
+    return ()
+  
 
 
 -- 1. collect all the info (Bot, BotCommand, Point)
 -- 2. then it's easy to fold it over
-
-{-botPoint :: Bot -> Point-}
-{-botPoint f (b, c) = (b, c, p)-}
-    {-where p = fromMaybe InvalidPoint (lookup b f)-}
 
 -- these are the things we get from the database, convert and prepare them!
 processActions :: [Bot] -> [(String, BotCommand)] -> Field
