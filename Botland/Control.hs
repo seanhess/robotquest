@@ -136,11 +136,15 @@ saveState s = do
 updateBot :: Bot -> Action IO ()
 updateBot b = do
     let p = point b
-    modify (select ["_id" =: botId b] "bots") ["$set" =: ["x" =: x p, "y" =: y p, "state" =: botState b]]
+    modify (select ["_id" =: botId b] "bots") ["$set" =: ["x" =: x p, "y" =: y p, "state" =: botState b, "kills" =: kills b]]
 
 clearCommands :: Action IO ()
 clearCommands = do
     modify (select [] "bots") ["$unset" =: ["command" =: 1]]
+
+removeDeadBots :: Action IO ()
+removeDeadBots = do
+    delete (select ["state" =: Dead] "bots")
 
 -- ACTIONS --------------------------------------------------------
 

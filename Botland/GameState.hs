@@ -30,9 +30,21 @@ setBot b (GameState bs ps) =
 isOccupied :: Point -> GameState -> Bool
 isOccupied p s = isJust $ lookup p (points s)
 
+atPoint :: Point -> GameState -> Maybe Bot
+atPoint p s = do
+    let bs = bots s
+        ps = points s
+
+    id <- lookup p ps
+    b <- lookup id bs
+    return b
+
 clearPoint :: Point -> GameState -> GameState
 clearPoint p s = 
     let ps = delete p (points s)
     in s { points = ps }
+
+
+-- TODO Make a freaking monad! It'll be EPIC
 
 

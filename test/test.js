@@ -133,25 +133,20 @@ describe('botland api', function() {
             })
         })
 
-        it('should wait for the tick period to check', function(done) {
-            console.log("Waiting", game.tick)
-            setTimeout(done, game.tick)
-        })
-
         it('should update the game', function(done) {
-            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
-                assert.ifError(err)
-                assert.ok(locations)
-                assert.equal(locations.length, 1)
-                var me = locations[0]
-                assert.equal(me.id, botId)
-                assert.equal(me.x, 1, "did not move right")
-                assert.equal(me.y, 0)
-                done()
-            })
+            setTimeout(function() {
+                request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+                    assert.ifError(err)
+                    assert.ok(locations)
+                    assert.equal(locations.length, 1)
+                    var me = locations[0]
+                    assert.equal(me.id, botId)
+                    assert.equal(me.x, 1, "did not move right")
+                    assert.equal(me.y, 0)
+                    done()
+                })
+            }, game.tick)
         })
-
-        return
 
         it("should not let me move out-of-bounds", function(done) {
             request.post({url: Server + "/players/" + mcpId + "/minions/" + botId + "/command", json:{action:"Move", direction:"Up"}}, function(err, rs, data) {
@@ -174,8 +169,6 @@ describe('botland api', function() {
             })
         })
     })
-
-    return
 
     describe('attack', function() {
         var bot2Id = null
@@ -209,14 +202,15 @@ describe('botland api', function() {
             })
         })
 
-        it('should remove bot1', function(done) {
+        it('bot1 should be dead', function(done) {
             setTimeout(function() {
                 request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
                     assert.ifError(err)
                     assert.ok(locations)
-                    assert.equal(locations.length, 1)
-                    var b2 = locations[0]
-                    assert.equal(b2.id, bot2Id)
+                    assert.equal(locations.length, 2)
+                    var b1 = locations.filter(function(b) { return b.name == 'bot1' })[0]
+                    assert.ok(b1)
+                    assert.equal(b1.state, "Dead")
                     done()
                 })
             }, game.tick)
@@ -230,9 +224,18 @@ describe('botland api', function() {
                 done()
             })
         })
-    })
 
-    return
+        it('should remove bot1 after another tick', function(done) {
+            setTimeout(function() {
+                request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+                    assert.ifError(err)
+                    assert.ok(locations)
+                    assert.equal(locations.length, 1, "did not remove dead unit")
+                    done()
+                })
+            }, game.tick)
+        })
+    })
 
     describe('leaderboard', function() {
         // requires the kill stuff right before this
@@ -260,6 +263,15 @@ describe('botland api', function() {
 
     describe('cleanup', function() {
         var botId = null
+
+        it('should start with only bot2', function(done) {
+            request.get({url: Server + "/game/minions", json:true}, function(err, rs, locations) {
+                assert.ifError(err)
+                assert.equal(locations.length, 1, "Should only have 1 bot to start")
+                done()
+            })
+        })
+
         it('should spawn another bot', function(done) {
             var bot = {x:1, y:1, name:'cleanup', sprite:'test'} 
             request.post({url: Server + "/players/" + mcpId + "/minions", json: bot}, function(err, rs, body) {

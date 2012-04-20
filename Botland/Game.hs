@@ -4,7 +4,6 @@ Botland Game Timer: gameTick runs once per game tick, updating the world and sav
 
 TODO 
 
-
 -}
 
 
@@ -49,12 +48,13 @@ runTick g delay db = do
 
 gameTick :: Game -> Action IO ()
 gameTick game = do
+
+    removeDeadBots
     state <- loadState
     let newState = processActions game state
     liftIO $ print newState
     saveState newState
     clearCommands
-
 
 
 -- these are the things we get from the database, convert and prepare them!
@@ -89,11 +89,20 @@ moveAction g b start d state =
         s' = clearPoint start state
     in setBot b' s'
 
--- I need to state to do this, because if I've deleted them, it won't do any good
--- I Need: a way to return BOT changes separately from FIELD changes
--- Some bots are no longer on the field. Carp!
 attackAction :: Game -> Bot -> Point -> Direction -> GameState -> GameState
-attackAction = undefined 
+attackAction g b p d s = 
+    
+    let dest = destination d p in
+
+    case atPoint dest s of
+      Nothing -> s
+      Just victim -> 
+          let s' = setBot (victim { botState = Dead }) s
+              k = (kills b) + 1
+          in setBot (b { kills = k}) s'
+          
+    -- TODO give kills
+
 {-g b start d f-}
     {-let dest = move d start in-}
     {-case lookup dest f of-}
