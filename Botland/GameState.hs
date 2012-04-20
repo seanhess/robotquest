@@ -9,34 +9,30 @@ import Prelude hiding (lookup)
 
 -- GAME STATE ------------------------------------------------
 
-data GameState = GameState { bots :: Map String Bot, points :: Map Point Bot } deriving (Show)
+data GameState = GameState { bots :: Map String Bot, points :: Map Point String } deriving (Show)
 
 emptyState :: GameState
 emptyState = GameState empty empty
 
 fromBots :: [Bot] -> GameState
-fromBots bs = foldr fold emptyState bs
-    where fold b s = 
-            let bs = insert (botId b) b (bots s)
-                ps = insert (point b) b (points s)
-            in s { points = ps, bots = bs }
+fromBots bs = foldr setBot emptyState bs
 
 toBots :: GameState -> [Bot]
 toBots gs = elems (bots gs)
 
+setBot :: Bot -> GameState -> GameState
+setBot b (GameState bs ps) = 
+    let id = botId b
+        bs' = insert id b bs
+        ps' = insert (point b) id ps
+    in GameState bs' ps'
+
 isOccupied :: Point -> GameState -> Bool
-isOccupied p gs = isJust $ lookup p (points gs)
+isOccupied p s = isJust $ lookup p (points s)
 
 clearPoint :: Point -> GameState -> GameState
 clearPoint p s = 
     let ps = delete p (points s)
     in s { points = ps }
-
-setPoint :: Bot -> Point -> GameState -> GameState
-setPoint b p s = 
-    let b' = b { point = p }
-        bs = insert (botId b) b' (bots s)
-        ps = insert p b' (points s)
-    in s { points = ps, bots = bs }
 
 

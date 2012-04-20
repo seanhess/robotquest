@@ -229,7 +229,7 @@ instance ToDoc Player where
               ]
 
 instance Val BotCommand where
-    val (BotCommand a d) = val ["action" := val a, "direciton" := val d]
+    val (BotCommand a d) = val ["action" := val a, "direction" := val d]
     cast' (Doc d) = Just $ BotCommand (at "action" d) (at "direction" d)
     cast' _ = Nothing
 

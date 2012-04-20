@@ -85,7 +85,9 @@ moveAction g b start d state =
     if not (validPosition g dest) then state else
     if isOccupied dest state then state else
 
-    clearPoint start $ setPoint b dest state
+    let b' = b { point = dest }
+        s' = clearPoint start state
+    in setBot b' s'
 
 -- I need to state to do this, because if I've deleted them, it won't do any good
 -- I Need: a way to return BOT changes separately from FIELD changes
