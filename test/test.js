@@ -134,7 +134,7 @@ describe('botland api', function() {
         })
 
         it('should wait for the tick period to check', function(done) {
-          console.log("Waiting", game.tick)
+            console.log("Waiting", game.tick)
             setTimeout(done, game.tick)
         })
 
@@ -151,19 +151,27 @@ describe('botland api', function() {
             })
         })
 
-        return
-
-        it("should out-of-bounds error", function(done) {
+        it("should not let me move out-of-bounds", function(done) {
             request.post({url: Server + "/players/" + mcpId + "/minions/" + botId + "/command", json:{action:"Move", direction:"Up"}}, function(err, rs, data) {
                 assert.ifError(err)
-                assert.equal(rs.statusCode, 400, 'missing 400 status code')
-                assert.ok(data.message, 'missing error message')
-                done()
+                assert.equal(rs.statusCode, 200, 'should give 200 status code even though the command is invalid')
+
+                setTimeout(function() {
+                    request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+                        assert.ifError(err)
+                        assert.ok(locations)
+                        assert.equal(locations.length, 1)
+                        var me = locations[0]
+                        assert.equal(me.id, botId)
+                        assert.equal(me.x, 1, "did not move right")
+                        assert.notEqual(me.y, -1, "moved off the board!")
+                        assert.equal(me.y, 0, "not in the same y")
+                        done()
+                    })
+                }, game.tick)
             })
         })
     })
-
-    return
 
     describe('attack', function() {
         var bot2Id = null
@@ -198,14 +206,16 @@ describe('botland api', function() {
         })
 
         it('should remove bot1', function(done) {
-            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
-                assert.ifError(err)
-                assert.ok(locations)
-                assert.equal(locations.length, 1)
-                var b2 = locations[0]
-                assert.equal(b2.id, bot2Id)
-                done()
-            })
+            setTimeout(function() {
+                request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+                    assert.ifError(err)
+                    assert.ok(locations)
+                    assert.equal(locations.length, 1)
+                    var b2 = locations[0]
+                    assert.equal(b2.id, bot2Id)
+                    done()
+                })
+            }, game.tick)
         })
 
         it('should give kill to bot2', function(done) {
@@ -217,6 +227,8 @@ describe('botland api', function() {
             })
         })
     })
+
+    return
 
     describe('leaderboard', function() {
         // requires the kill stuff right before this

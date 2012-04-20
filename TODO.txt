@@ -1,3 +1,40 @@
+GAME TIMER
+I need a new data type
+  lookup by point
+  lookup by id
+  
+  (build multiple indexes)
+
+  this could be represented by two maps
+
+  Start With: [Bot]
+  Conver to: GameState
+  
+  data GameState = GameState { game :: Game, bots :: Map String Bot, points :: Map Point String, commands :: [BotCommand] }
+
+  UPDATE A LOCATION: updates points index (re-insert, delete old one), update x & y in bots
+
+  Keep track of updates instead? (nice for saving and notifying people, but who cares?, really, I'm serializing everything anyway)
+
+  Associate Bots and Commands more closely. They are all shared!
+
+  update: updates the bot index
+  move: moves something to x
+
+  All info about a bot:
+    Bot
+    Location
+    Command
+  
+  It's not hard to ignore a bot that has no command. It's not hard to reset them either
+  It will be easier to map them like this 
+  It's sort of like a big ol' index of stuff
+  {command: {direction: action: }}
+
+  Woot = 
+    henry: bob
+
+
 NEXT STEPS
 [x] Get the leaderboards to display (and refresh?)
 [x] Click on bot for information

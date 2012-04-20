@@ -3,6 +3,7 @@
 module Botland.Control where
 
 import Botland.Types
+import Botland.GameState
 
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad (forM_)
@@ -101,7 +102,7 @@ createBot g pid b = do
 
     let ub = b { botId = id, botPlayerId = pid, player = pn, created = time }
 
-    let v = validPosition g (x b) (y b)
+    let v = validPosition g (point b)
 
     if (not v) then 
         return $ Left InvalidPosition 
@@ -122,30 +123,24 @@ allBots = do
     docs <- rest c
     return $ map fromDoc docs
 
+loadState :: Action IO GameState
+loadState = do
+    bots <- allBots
+    return $ fromBots bots
 
-allCommands :: Action IO [(String, BotCommand)]
-allCommands = do
-    cursor <- find (select [] "commands")
-    docs <- rest cursor
-    return $ map commandFromDoc docs
+saveState :: GameState -> Action IO ()
+saveState s = do
+    let bots = toBots s
+    mapM_ updateBot bots 
 
-
-saveField :: Field -> Action IO ()
-saveField f = do
-    -- I need to update A BUNCH of them
-    -- really, I need to update each one
-    forM_ (assocs f) $ \(p,b) -> updateBot b p
-    return ()
-
-updateBot :: Bot -> Point -> Action IO ()
-updateBot b p = do
-    modify (select ["_id" =: botId b] "bots") ["$set" =: ["x" =: px p, "y" =: py p]]
-    -- TODO Add state changes. 
-
+updateBot :: Bot -> Action IO ()
+updateBot b = do
+    let p = point b
+    modify (select ["_id" =: botId b] "bots") ["$set" =: ["x" =: x p, "y" =: y p, "state" =: botState b]]
 
 clearCommands :: Action IO ()
 clearCommands = do
-    delete (select [] "commands")
+    modify (select [] "bots") ["$unset" =: ["command" =: 1]]
 
 -- ACTIONS --------------------------------------------------------
 
@@ -157,33 +152,10 @@ clearCommands = do
 performCommand :: BotCommand -> Game -> String -> String -> Action IO ()
 performCommand c g pid id = do
     updateHeartbeat pid
-    save "commands" (commandToDoc c id)
+    modify (select ["_id" =: id] "bots") ["$set" =: ["command" =: c]]
+
 
 {-
-
-moveAction :: Game -> String -> Direction -> Action IO (Either Fault Ok)
-moveAction g id d = do
-
-    -- I need to GET their current position
-    doc <- findOne (select ["_id" =: id] "bots") {project = ["x" =: 1, "y" =: 1, "_id" =: 0]}
-
-    if (isNothing doc) then
-        return $ Left NotFound
-    else do
-
-    let bp = fromDoc (fromJust doc)
-    let (Point x y) = move d bp
-
-    let v = validPosition g x y
-    if (not v) then 
-        return $ Left InvalidPosition 
-    else do 
-
-    -- throws an error if someone is there
-    modify (select ["_id" =: id] "bots") ["$set" =: ["x" =: x, "y" =: y]]
-
-    return $ Right Ok
-
 attackAction :: Game -> String -> Direction -> Action IO (Either Fault Ok)
 attackAction g id d = do
 
@@ -278,5 +250,5 @@ randomId = do
 intToHex :: Int -> String
 intToHex i = showIntAtBase 16 intToDigit (abs i) "" 
 
-validPosition :: Game -> Int -> Int -> Bool
-validPosition g x y = 0 <= x && x < (width g) && 0 <= y && y < (height g)
+validPosition :: Game -> Point -> Bool
+validPosition g (Point x y) = 0 <= x && x < (width g) && 0 <= y && y < (height g)

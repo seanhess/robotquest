@@ -2,14 +2,17 @@
 
 Botland Game Timer: gameTick runs once per game tick, updating the world and saving it out
 
+TODO 
+
 
 -}
 
 
 module Botland.Game where
 
-import Botland.Types
 import Botland.Control
+import Botland.GameState
+import Botland.Types
 
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad.IO.Class (liftIO)
@@ -26,12 +29,12 @@ import System.CPUTime (getCPUTime)
 
 type IdMap = Map String Bot
 
-runTick :: Integer -> (Action IO () -> IO (Either Failure ())) -> IO ()
-runTick delay db = do
+runTick :: Game -> Integer -> (Action IO () -> IO (Either Failure ())) -> IO ()
+runTick g delay db = do
 
     startTime <- getCPUTime -- picoseconds
 
-    db $ gameTick
+    db $ gameTick g
 
     -- we need to wait 1s minus the time taken (setInterval, where are you!)
     endTime <- getCPUTime
@@ -39,72 +42,61 @@ runTick delay db = do
         durationµs = round $ ((fromInteger elapsedps) / 1000000) :: Integer
         waitµs = (delay * 1000000) - durationµs
 
-    {-putStrLn "WAITING FOR"-}
-    {-print waitµs-}
     threadDelay $ fromIntegral waitµs
 
-    runTick delay db
+    runTick g delay db
 
 
-gameTick :: Action IO ()
-gameTick = do
-    bots <- allBots
-    commands <- allCommands
-
-    let newField = processActions bots commands
-    liftIO $ print newField
-    saveField newField
+gameTick :: Game -> Action IO ()
+gameTick game = do
+    state <- loadState
+    let newState = processActions game state
+    liftIO $ print newState
+    saveState newState
     clearCommands
 
 
--- 1. collect all the info (Bot, BotCommand, Point)
--- 2. then it's easy to fold it over
 
 -- these are the things we get from the database, convert and prepare them!
-processActions :: [Bot] -> [(String, BotCommand)] -> Field
-processActions bs ics = foldl foldField field bcps
-  where field = toField bs
-        idmap = idMap bs
-        cs = map snd ics :: [BotCommand]
-        ids = map fst ics :: [String]
-        mbs = map (botById idmap) ids :: [Maybe Bot]
-        mps = map botPoint mbs :: [Maybe Point]
-        bcps = zip3 mbs cs mps :: [(Maybe Bot, BotCommand, Maybe Point)]
+processActions :: Game -> GameState -> GameState
+processActions g gs = 
+  let bots = toBots gs
+  in foldr (foldField g) gs bots
 
-foldField :: Field -> (Maybe Bot, BotCommand, Maybe Point) -> Field
-foldField f (Nothing, _, _) = f
-foldField f (_, _, Nothing) = f
-foldField f (mb, c, mp) = runAction b p c f
-    where p = fromJust mp
-          b = fromJust mb
-
-  -- HAVE: [Maybe Bot], [BotCommand]
-  -- + [Maybe Point]
-
-  -- NEED: [(Bot, Maybe BotCommand, Maybe Point)]
-  -- I can use zip for that, quite easily.
-  -- just need functions that return the arrays in the same order?
-  -- which one do we use the commands for?
+foldField :: Game -> Bot -> GameState -> GameState
+foldField g b gs = 
+    let p = point b in
+    case command b of 
+        Nothing -> gs
+        Just c -> runAction g b p c gs
 
 -- route the different action functions
-runAction :: Bot -> Point -> BotCommand -> Field -> Field
-runAction b p (BotCommand Move d) w = moveAction b p d w
-runAction b p (BotCommand Attack d) w = attackAction b p d w
-runAction _ _ _ w = w
+runAction :: Game -> Bot -> Point -> BotCommand -> GameState -> GameState
+runAction g b p (BotCommand Move d) gs = moveAction g b p d gs
+runAction g b p (BotCommand Attack d) gs = attackAction g b p d gs
+runAction _ _ _ _ gs = gs
 
 -- get moving working without a monad, then switch
-moveAction :: Bot -> Point -> Direction -> Field -> Field 
-moveAction b start d w = case lookup dest w of 
-      Just u -> w
-      Nothing -> delete start $ insert dest b w
-    where dest = move d start
+moveAction :: Game -> Bot -> Point -> Direction -> GameState -> GameState 
+moveAction g b start d state = 
 
-attackAction :: Bot -> Point -> Direction -> Field -> Field
-attackAction = undefined
+    let dest = destination d start in
 
+    if not (validPosition g dest) then state else
+    if isOccupied dest state then state else
 
+    clearPoint start $ setPoint b dest state
 
-
+-- I need to state to do this, because if I've deleted them, it won't do any good
+-- I Need: a way to return BOT changes separately from FIELD changes
+-- Some bots are no longer on the field. Carp!
+attackAction :: Game -> Bot -> Point -> Direction -> GameState -> GameState
+attackAction = undefined 
+{-g b start d f-}
+    {-let dest = move d start in-}
+    {-case lookup dest f of-}
+        {-Nothing -> w-}
+        {-Just target -> delete dest w-}
 
 
 
@@ -115,28 +107,18 @@ removeMisses ms = map fromJust $ filter isJust $ ms
 botById :: IdMap -> String -> Maybe Bot
 botById m id = lookup id m 
 
-botPoint :: Maybe Bot -> Maybe Point
-botPoint Nothing = Nothing
-
-botPoint mb = Just $ Point (x b) (y b) 
-    where b = fromJust mb
-
 -- creates a map of bot id to bot, for use in the other functions
 idMap :: [Bot] -> IdMap
 idMap bs = foldr a empty bs
     where a b m = insert (botId b) b m
 
-toField :: [Bot] -> Field
-toField bs = foldr a empty bs 
-    where a b f = insert (Point (x b) (y b)) b f
+{-toField :: [Bot] -> Field-}
+{-toField bs = foldr a empty bs -}
+    {-where a b f = insert (Point (x b) (y b)) b f-}
 
-
-
-
-
-
-move :: Direction -> Point -> Point
-move d (Point x y) = case d of
+-- Gives you the point in a given direction
+destination :: Direction -> Point -> Point
+destination d (Point x y) = case d of
     DLeft -> Point (x-1) y
     DRight -> Point (x+1) y
     DUp -> Point x (y-1)

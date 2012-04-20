@@ -41,7 +41,7 @@ main = do
         cleanup
 
     let startTick = do
-        runTick 1 db
+        runTick game 1 db
         return ()
 
     -- continue to accept requests while we run cleanup

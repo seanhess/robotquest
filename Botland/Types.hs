@@ -6,7 +6,7 @@ import qualified Data.Aeson as A
 import Data.Aeson (FromJSON(..), ToJSON(..), object, (.=), (.:), Value(..))
 import qualified Data.Aeson.Types as AT
 import Data.Aeson.Types (Parser)
-import Data.Bson (Val(..))
+import Data.Bson (Val(..), Value(..))
 import qualified Data.Bson as B
 import qualified Data.CompactString.UTF8 as C
 import Data.Maybe (fromMaybe, isJust, fromJust)
@@ -27,6 +27,9 @@ import Prelude hiding (lookup)
 import Safe (readMay)
 
 
+type Field = Map Point Bot
+
+
 
 -- DATA TYPES ---------------------------------------------------------------
 
@@ -35,8 +38,7 @@ data Player = Player { playerId :: String, playerName :: String, source :: Strin
 
 -- this is roughly what it looks like in the database
 -- {x, y, _id, color, playerId, name, source}
-data Bot = Bot { x :: Int
-               , y :: Int
+data Bot = Bot { point :: Point
                , name :: String
                , player :: String
                , sprite :: String
@@ -44,10 +46,12 @@ data Bot = Bot { x :: Int
                , botPlayerId :: String
                , kills :: Int
                , created :: DateTime
-               } deriving (Show, Ord, Eq)
+               , botState :: BotState
+               , command :: Maybe BotCommand
+               } deriving (Show)
 
 -- sometimes you just need to talk about a point
-data Point = Point { px :: Int, py :: Int } 
+data Point = Point { x :: Int, y :: Int } 
            | InvalidPoint 
            deriving (Show, Ord, Eq)
 
@@ -57,11 +61,11 @@ data Game = Game { width :: Int
                  , tick :: Int 
                  } deriving (Show, Generic)
 
-
 -- available actions
-data BotCommand = BotCommand { action :: BotAction, direction :: Direction } deriving (Show, Generic)
+data BotCommand = BotCommand { action :: BotAction, direction :: Direction } deriving (Show, Eq, Typeable, Generic)
 data Direction = DLeft | DRight | DUp | DDown deriving (Show, Read, Eq, Typeable)
 data BotAction = Stop | Move | Attack deriving (Show, Read, Eq, Typeable)
+data BotState = Active | Dead deriving (Show, Read, Eq, Typeable)
 
 -- things that can go wrong
 data Fault = Fault String
@@ -79,9 +83,6 @@ data Ok = Ok deriving (Show)
 
 
 
-type Field = Map Point Bot
-
-
 
 -- JSON SUPPORT --------------------------------------------------------------
 
@@ -91,11 +92,10 @@ instance FromJSON Game
 instance ToJSON Id
 instance FromJSON Id
 
-instance ToJSON BotCommand
-instance FromJSON BotCommand 
-
 instance ToJSON Ok where
     toJSON _ = object ["ok" .= True]
+
+instance FromJSON BotCommand
 
 -- Actions --
 instance ToJSON BotAction where
@@ -104,37 +104,48 @@ instance ToJSON BotAction where
 instance FromJSON BotAction where
     parseJSON = typeParseJSON readMay
 
+
+-- Direction
+removeFirstLetter = tail
+addD cs = 'D':cs
+
 instance ToJSON Direction where
     toJSON = typeToJSON (removeFirstLetter.show)
 
 instance FromJSON Direction where
     parseJSON = typeParseJSON (readMay.addD)
 
-removeFirstLetter = tail
-addD cs = 'D':cs
+-- State
+instance ToJSON BotState where
+    toJSON = typeToJSON show
 
--- Bot --
+instance FromJSON BotState where
+    parseJSON = typeParseJSON readMay
+
+-- Bot
 instance ToJSON Bot where
     toJSON b = object fs 
-        where id = botId b
+        where p = point b
+              id = botId b
               fs = [ "id" .= id 
-                   , "x" .= x b
-                   , "y" .= y b
+                   , "x" .= x p
+                   , "y" .= y p
                    , "name" .= name b
                    , "player" .= player b
                    , "sprite" .= sprite b 
                    , "kills" .= kills b
                    , "created" .= created b
+                   , "state" .= botState b
                    ]
 
+-- you don't need the other fields from the client. So just make them up with defaults
 instance FromJSON Bot where 
     parseJSON (Object v) = do
         x <- v .: "x"
         y <- v .: "y" 
         name <- v .: "name"
         sprite <- v .: "sprite"
-        return $ Bot x y name "" sprite "" "" 0 (fromSeconds 0)
-        -- you don't have read the action, PlayerId or id from the client, ever.
+        return $ Bot (Point x y) name "" sprite "" "" 0 (fromSeconds 0) Active Nothing
 
     parseJSON _ = mzero
 
@@ -178,19 +189,23 @@ class FromDoc a where
     fromDoc :: Document -> a
 
 instance ToDoc Bot where
-    toDoc b = [ "x" := val (x b)
-              , "y" := val (y b)
-              , "name" := val (name b)
-              , "player" := val (player b)
-              , "sprite" := val (sprite b)
-              , "_id" := val (botId b)
-              , "playerId" := val (botPlayerId b)
-              , "created" := val (created b)
-              ]
+    toDoc b = 
+        let p = point b in
+
+        [ "x" := val (x p)
+        , "y" := val (y p)
+        , "name" := val (name b)
+        , "player" := val (player b)
+        , "sprite" := val (sprite b)
+        , "_id" := val (botId b)
+        , "playerId" := val (botPlayerId b)
+        , "created" := val (created b)
+        , "state" := val (botState b)
+        , "command" := val (command b)
+        ]
 
 instance FromDoc Bot where
-    fromDoc d = Bot (at "x" d) 
-                    (at "y" d) 
+    fromDoc d = Bot (Point (at "x" d) (at "y" d))
                     (at "name" d) 
                     (at "player" d) 
                     (at "sprite" d)
@@ -198,7 +213,8 @@ instance FromDoc Bot where
                     (fromMaybe "" (lookup "playerId" d))
                     (fromMaybe 0 (lookup "kills" d))
                     (fromMaybe (fromSeconds 0) (lookup "created" d))
-
+                    (at "state" d)
+                    (lookup "command" d)
 
 instance FromDoc Point where
     fromDoc p = Point (at "x" p) (at "y" p)
@@ -212,15 +228,10 @@ instance ToDoc Player where
               , "source" := val (source p)
               ]
 
-
--- need to make action and direction an instance of value
-commandToDoc :: BotCommand -> String -> Document
-commandToDoc (BotCommand a d) id = ["_id" := val id, "action" := val a, "direction" := val d]
-
-commandFromDoc :: Document -> (String, BotCommand)
-commandFromDoc doc = (at "_id" doc, BotCommand a d)
-    where a = at "action" doc
-          d = at "direction" doc
+instance Val BotCommand where
+    val (BotCommand a d) = val ["action" := val a, "direciton" := val d]
+    cast' (Doc d) = Just $ BotCommand (at "action" d) (at "direction" d)
+    cast' _ = Nothing
 
 instance Val BotAction where
     val = typeToBSON show
@@ -229,6 +240,10 @@ instance Val BotAction where
 instance Val Direction where
     val = typeToBSON (removeFirstLetter.show)
     cast' = typeFromBSON (readMay.addD)
+
+instance Val BotState where
+    val = typeToBSON show
+    cast' = typeFromBSON readMay
 
 
 
