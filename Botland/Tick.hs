@@ -7,7 +7,7 @@ TODO
 -}
 
 
-module Botland.Game where
+module Botland.Tick where
 
 import Botland.Control
 import Botland.GameState
@@ -28,8 +28,13 @@ import System.CPUTime (getCPUTime)
 
 type IdMap = Map String Bot
 
-runTick :: Game -> Integer -> (Action IO () -> IO (Either Failure ())) -> IO ()
-runTick g delay db = do
+game :: Game
+game = Game 25 20 1000 
+
+runTick :: Game -> (Action IO () -> IO (Either Failure ())) -> IO ()
+runTick g db = do
+
+    let delayms = tick g
 
     startTime <- getCPUTime -- picoseconds
 
@@ -39,11 +44,11 @@ runTick g delay db = do
     endTime <- getCPUTime
     let elapsedps = endTime - startTime :: Integer
         durationµs = round $ ((fromInteger elapsedps) / 1000000) :: Integer
-        waitµs = (delay * 1000000) - durationµs
+        waitµs = (delayms * 1000) - durationµs
 
     threadDelay $ fromIntegral waitµs
 
-    runTick g delay db
+    runTick g db
 
 
 gameTick :: Game -> Action IO ()

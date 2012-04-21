@@ -23,6 +23,9 @@ import Data.Char (intToDigit)
 
 
 -- SETUP ----------------------------------------------------------
+connectMongo :: IO (Pipe) 
+connectMongo = runIOE $ connect (host "127.0.0.1")
+
 ensureIndexes :: Action IO ()
 ensureIndexes = do
     ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)

@@ -58,7 +58,7 @@ data Point = Point { x :: Int, y :: Int }
 -- gives the field and interval
 data Game = Game { width :: Int
                  , height :: Int
-                 , tick :: Int 
+                 , tick :: Integer
                  } deriving (Show, Generic)
 
 -- available actions

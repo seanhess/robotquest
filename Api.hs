@@ -6,7 +6,7 @@ import Botland.Helpers
 import Botland.Types
 import Botland.Control
 import Botland.Middleware
-import Botland.Game
+import Botland.Tick
 
 import Database.MongoDB (runIOE, connect, access, master, host, Pipe, Action)
 
@@ -20,33 +20,12 @@ import Network.Wai.Middleware.Static (staticRoot)
 import Network.HTTP.Types (status200)
 import Web.Scotty
 
-game :: Game
-game = Game 25 20 1000 
-
-cleanupDelay :: Integer
-cleanupDelay = 2 
-
 main :: IO ()
 main = do
 
     pipe <- connectMongo
     let db action = liftIO $ access pipe master "botland" action
     let auth = runAuth pipe "botland"
-    db ensureIndexes
-
-    -- run cleanup every so often
-    let cleanup = do 
-        db $ cleanupInactives cleanupDelay
-        threadDelay ((fromIntegral cleanupDelay)*1000000)
-        cleanup
-
-    let startTick = do
-        runTick game 1 db
-        return ()
-
-    -- continue to accept requests while we run cleanup
-    forkIO $ cleanup
-    forkIO $ startTick
 
     scotty 3026 $ do
 
@@ -157,8 +136,6 @@ main = do
         -- naw, they already know how to do the routes, just use that. You have to write a parser anyway, and you can copy scotty's
         -- post "/pipeline" $ decodeBody $ \cs -> do 
 
-connectMongo :: IO (Pipe) 
-connectMongo = runIOE $ connect (host "127.0.0.1")
 
 
 
