@@ -236,10 +236,10 @@ cleanupInactives delay = do
 
 locations :: Action IO [Bot]
 locations = do
-    c <- find (select [] "bots") {project = ["playerId" =: 0]}
+    c <- find (select [] "bots") {project = ["playerId" =: 0, "command" =: 0]}
     bs <- rest c
     --return bs
-    return $ map fromDoc bs 
+    return $ map fromDoc bs
 
 
 

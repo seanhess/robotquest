@@ -81,23 +81,32 @@
                 })
             }
 
+            var oldMe = null
+
             function tick(bots) {
                 ids = byId(bots)
 
-                if (!ids[botId]) {
+                var me = ids[botId]
+
+                if (!me) {
                     log("Missing from world")
                     return stop()
                 }
 
-                log("Location: " + ids[botId].x + " " + ids[botId].y)
+
+                // didn't move
+                if (oldMe && me.x == oldMe.x && me.y == oldMe.y) {
+                    currentAction = randomAction()
+                    log("New Direction: " + currentAction.direction)
+                }
+
+                log("Location: " + me.x + " " + me.y)
 
                 request("POST", "/players/" + mcpId + "/minions/" + botId +"/command", currentAction, function(err) {
-                    if (err) {
-                        // change directions!
-                        currentAction = randomAction()
-                        log("New Direction: " + currentAction.direction)
-                    }
+
                 })
+
+                oldMe = me
             }
 
             connect()

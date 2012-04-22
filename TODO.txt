@@ -1,4 +1,8 @@
 GAME TIMER
+[ ] Make a monad!
+[ ] Queue up commands. You CAN'T remove old ones
+
+GAME TIMER
 I need a new data type
   lookup by point
   lookup by id
