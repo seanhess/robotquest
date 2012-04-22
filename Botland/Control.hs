@@ -90,7 +90,7 @@ createPlayer p = do
 -- CREATION -------------------------------------------------------
 
 
-createBot :: Game -> String -> Bot -> Action IO (Either Fault Id)
+createBot :: GameInfo -> String -> Bot -> Action IO (Either Fault Id)
 createBot g pid b = do
     id <- randomId
     time <- now
@@ -126,12 +126,12 @@ allBots = do
     docs <- rest c
     return $ map fromDoc docs
 
-loadState :: Action IO GameState
+loadState :: Action IO Game
 loadState = do
     bots <- allBots
     return $ fromBots bots
 
-saveState :: GameState -> Action IO ()
+saveState :: Game -> Action IO ()
 saveState s = do
     let bots = toBots s
     mapM_ updateBot bots 
@@ -156,7 +156,7 @@ removeDeadBots = do
 --    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (show a)]]
 --    return Ok 
 
-performCommand :: BotCommand -> Game -> String -> String -> Action IO ()
+performCommand :: BotCommand -> GameInfo -> String -> String -> Action IO ()
 performCommand c g pid id = do
     updateHeartbeat pid
     modify (select ["_id" =: id] "bots") ["$set" =: ["command" =: c]]
@@ -257,5 +257,5 @@ randomId = do
 intToHex :: Int -> String
 intToHex i = showIntAtBase 16 intToDigit (abs i) "" 
 
-validPosition :: Game -> Point -> Bool
+validPosition :: GameInfo -> Point -> Bool
 validPosition g (Point x y) = 0 <= x && x < (width g) && 0 <= y && y < (height g)

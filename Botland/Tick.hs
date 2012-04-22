@@ -28,10 +28,10 @@ import System.CPUTime (getCPUTime)
 
 type IdMap = Map String Bot
 
-game :: Game
-game = Game 25 20 1000 
+gameInfo :: GameInfo
+gameInfo = GameInfo 25 20 1000 
 
-runTick :: Game -> (Action IO () -> IO (Either Failure ())) -> IO ()
+runTick :: GameInfo -> (Action IO () -> IO (Either Failure ())) -> IO ()
 runTick g db = do
 
     let delayms = tick g
@@ -51,7 +51,7 @@ runTick g db = do
     runTick g db
 
 
-gameTick :: Game -> Action IO ()
+gameTick :: GameInfo -> Action IO ()
 gameTick game = do
 
     removeDeadBots
@@ -63,12 +63,12 @@ gameTick game = do
 
 
 -- these are the things we get from the database, convert and prepare them!
-processActions :: Game -> GameState -> GameState
+processActions :: GameInfo -> Game -> Game
 processActions g gs = 
   let bots = toBots gs
   in foldr (foldField g) gs bots
 
-foldField :: Game -> Bot -> GameState -> GameState
+foldField :: GameInfo -> Bot -> Game -> Game
 foldField g b gs = 
     let p = point b in
     case command b of 
@@ -76,13 +76,13 @@ foldField g b gs =
         Just c -> runAction g b p c gs
 
 -- route the different action functions
-runAction :: Game -> Bot -> Point -> BotCommand -> GameState -> GameState
+runAction :: GameInfo -> Bot -> Point -> BotCommand -> Game -> Game
 runAction g b p (BotCommand Move d) gs = moveAction g b p d gs
 runAction g b p (BotCommand Attack d) gs = attackAction g b p d gs
 runAction _ _ _ _ gs = gs
 
 -- get moving working without a monad, then switch
-moveAction :: Game -> Bot -> Point -> Direction -> GameState -> GameState 
+moveAction :: GameInfo -> Bot -> Point -> Direction -> Game -> Game 
 moveAction g b start d state = 
 
     let dest = destination d start in
@@ -94,7 +94,7 @@ moveAction g b start d state =
         s' = clearPoint start state
     in setBot b' s'
 
-attackAction :: Game -> Bot -> Point -> Direction -> GameState -> GameState
+attackAction :: GameInfo -> Bot -> Point -> Direction -> Game -> Game
 attackAction g b p d s = 
     
     let dest = destination d p in

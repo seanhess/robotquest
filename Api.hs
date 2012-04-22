@@ -42,7 +42,7 @@ main = do
 
         get "/version" $ text "Botland 0.2.0"
 
-        get "/game" $ json game
+        get "/game" $ json gameInfo
 
         -- returns all the bots, obstacles and whathaveyounots
         -- everything except playerId
@@ -64,7 +64,7 @@ main = do
         -- spawn them immediately, don't wait for the tick
         post "/players/:playerId/minions" $ decodeBody $ \b -> do
             pid <- param "playerId"
-            id <- db $ createBot game pid b
+            id <- db $ createBot gameInfo pid b
             sendActionFault "Invalid Starting Location" id
 
         get "/minions/:minionId" $ do
@@ -86,7 +86,7 @@ main = do
         post "/players/:playerId/minions/:minionId/command" $ auth $ decodeBody $ \c -> do
             mid <- param "minionId"
             pid <- param "playerId"
-            res <- db $ performCommand c game pid mid
+            res <- db $ performCommand c gameInfo pid mid
             sendAction "" res
 
         -- delete all bots associated with the player

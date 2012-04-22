@@ -56,7 +56,7 @@ data Point = Point { x :: Int, y :: Int }
            deriving (Show, Ord, Eq)
 
 -- gives the field and interval
-data Game = Game { width :: Int
+data GameInfo = GameInfo { width :: Int
                  , height :: Int
                  , tick :: Integer
                  } deriving (Show, Generic)
@@ -86,8 +86,8 @@ data Ok = Ok deriving (Show)
 
 -- JSON SUPPORT --------------------------------------------------------------
 
-instance ToJSON Game
-instance FromJSON Game
+instance ToJSON GameInfo
+instance FromJSON GameInfo
 
 instance ToJSON Id
 instance FromJSON Id

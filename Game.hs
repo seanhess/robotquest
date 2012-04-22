@@ -27,5 +27,5 @@ main = do
     -- cleanup every once in awhile, not as often as the game tick 
     forkIO $ cleanup
 
-    runTick game db
+    runTick gameInfo db
     return ()
