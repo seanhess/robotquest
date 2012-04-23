@@ -126,16 +126,6 @@ allBots = do
     docs <- rest c
     return $ map fromDoc docs
 
-loadState :: Action IO Game
-loadState = do
-    bots <- allBots
-    return $ fromBots bots
-
-saveState :: Game -> Action IO ()
-saveState s = do
-    let bots = toBots s
-    mapM_ updateBot bots 
-
 updateBot :: Bot -> Action IO ()
 updateBot b = do
     let p = point b
@@ -256,6 +246,3 @@ randomId = do
 
 intToHex :: Int -> String
 intToHex i = showIntAtBase 16 intToDigit (abs i) "" 
-
-validPosition :: GameInfo -> Point -> Bool
-validPosition g (Point x y) = 0 <= x && x < (width g) && 0 <= y && y < (height g)

@@ -15,6 +15,7 @@ import Botland.Types
 
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad.IO.Class (liftIO)
+import Control.Monad.State (execState)
 
 import qualified Data.Map as M
 import Data.Map (Map, insert, delete, lookup, empty)
@@ -52,62 +53,62 @@ runTick g db = do
 
 
 gameTick :: GameInfo -> Action IO ()
-gameTick game = do
-
+gameTick info = do
     removeDeadBots
-    state <- loadState
-    let newState = processActions game state
+    bots <- allBots
+    let state = emptyGame info
+    let newState = execState (processActions bots) state 
     liftIO $ print newState
-    saveState newState
+    mapM_ updateBot $ toBots newState
     clearCommands
 
+processActions :: [Bot] -> GameState ()
+processActions bots = do
+    addBots bots
+    mapM_ runBotCommand bots 
 
--- these are the things we get from the database, convert and prepare them!
-processActions :: GameInfo -> Game -> Game
-processActions g gs = 
-  let bots = toBots gs
-  in foldr (foldField g) gs bots
-
-foldField :: GameInfo -> Bot -> Game -> Game
-foldField g b gs = 
-    let p = point b in
-    case command b of 
-        Nothing -> gs
-        Just c -> runAction g b p c gs
+runBotCommand :: Bot -> GameState ()
+runBotCommand b = case (command b) of
+    Nothing -> return ()
+    Just c -> runAction b (point b) c
 
 -- route the different action functions
-runAction :: GameInfo -> Bot -> Point -> BotCommand -> Game -> Game
-runAction g b p (BotCommand Move d) gs = moveAction g b p d gs
-runAction g b p (BotCommand Attack d) gs = attackAction g b p d gs
-runAction _ _ _ _ gs = gs
+runAction :: Bot -> Point -> BotCommand -> GameState ()
+runAction b p (BotCommand Move d) = moveAction b p d
+runAction b p (BotCommand Attack d) = attackAction b p d
+runAction _ _ _ = return ()
 
 -- get moving working without a monad, then switch
-moveAction :: GameInfo -> Bot -> Point -> Direction -> Game -> Game 
-moveAction g b start d state = 
+moveAction :: Bot -> Point -> Direction -> GameState ()
+moveAction b start d = do
 
-    let dest = destination d start in
+    let dest = destination d start
 
-    if not (validPosition g dest) then state else
-    if isOccupied dest state then state else
+    -- TODO turn these into guard expressions, that just return the original state!
+    -- make your own monad if you have to :)
 
-    let b' = b { point = dest }
-        s' = clearPoint start state
-    in setBot b' s'
+    valid <- onMap dest
+    if not valid then return () else do
 
-attackAction :: GameInfo -> Bot -> Point -> Direction -> Game -> Game
-attackAction g b p d s = 
+    occ <- isOccupied dest
+    if occ then return () else do
+
+    clear start
+    update $ b { point = dest }
+
+attackAction :: Bot -> Point -> Direction -> GameState () 
+attackAction b p d = do
     
-    let dest = destination d p in
+    let dest = destination d p
 
-    case atPoint dest s of
-      Nothing -> s
-      Just victim -> 
-          let s' = setBot (victim { botState = Dead }) s
-              k = (kills b) + 1
-          in setBot (b { kills = k}) s'
+    mv <- atPoint dest
+    case mv of
+      Nothing -> return ()
+      Just victim -> do
+          let k = (kills b) + 1
+          update (victim { botState = Dead })
+          update (b { kills = k})
           
-    -- TODO give kills
-
 {-g b start d f-}
     {-let dest = move d start in-}
     {-case lookup dest f of-}

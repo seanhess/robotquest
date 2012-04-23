@@ -1,4 +1,16 @@
-module Botland.GameState where
+module Botland.GameState 
+( Game
+, GameState
+, emptyGame
+, addBots
+, toBots
+, update
+, isOccupied
+, atPoint
+, clear
+, validPosition
+, onMap
+) where
 
 import Botland.Types
 
@@ -9,35 +21,47 @@ import Data.Maybe (isJust)
 
 import Prelude hiding (lookup)
 
+
 -- GAME STATE ------------------------------------------------
 
 type GameState a = State Game a
 
-data Game = Game { bots :: Map String Bot, points :: Map Point String } deriving (Show)
+data Game = Game { info :: GameInfo, bots :: Map String Bot, points :: Map Point String } deriving (Show)
 
-emptyState :: Game
-emptyState = Game empty empty
+emptyGame :: GameInfo -> Game
+emptyGame i = Game i empty empty
 
-addBots :: [Bot] -> GameState
-addBots bs = do
-    foldr setBot emptyState bs
+addBots :: [Bot] -> GameState ()
+addBots bs = mapM_ update bs
 
 toBots :: Game -> [Bot]
 toBots gs = elems (bots gs)
 
-setBot :: Bot -> GameState ()
-setBot b = do
-    (Game bs ps) <- get
+insertBot :: Bot -> Game -> Game
+insertBot b (Game i bs ps) =
     let id = botId b
         bs' = insert id b bs
         ps' = insert (point b) id ps
-    put $ Game bs' ps'
+    in Game i bs' ps'
 
-isOccupied :: Point -> Game -> Bool
-isOccupied p s = isJust $ lookup p (points s)
+update :: Bot -> GameState ()
+update b = do
+    g <- get
+    put $ insertBot b g
 
-atPoint :: Point -> Game -> Maybe Bot
-atPoint p s = do
+isOccupied :: Point -> GameState Bool
+isOccupied p = do
+    s <- get
+    return $ isJust $ lookup p (points s)
+
+
+atPoint :: Point -> GameState (Maybe Bot)
+atPoint p = do
+    s <- get
+    return $ atPoint' p s
+
+atPoint' :: Point -> Game -> Maybe Bot
+atPoint' p s = do
     let bs = bots s
         ps = points s
 
@@ -45,12 +69,16 @@ atPoint p s = do
     b <- lookup id bs
     return b
 
-clearPoint :: Point -> Game -> Game
-clearPoint p s = 
+onMap :: Point -> GameState Bool
+onMap p = do
+    Game info _ _ <- get
+    return $ validPosition info p
+
+clear :: Point -> GameState ()
+clear p = do
+    s <- get
     let ps = delete p (points s)
-    in s { points = ps }
+    put $ s { points = ps }
 
-
--- TODO Make a freaking monad! It'll be EPIC
-
-
+validPosition :: GameInfo -> Point -> Bool
+validPosition g (Point x y) = 0 <= x && x < (width g) && 0 <= y && y < (height g)
