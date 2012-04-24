@@ -18,17 +18,9 @@ import Data.Conduit.Lazy (lazyConsume)
 import qualified Data.Text.Lazy as T
 
 import Network.HTTP.Types (status404, status500, status400, status401, status200, status403, status501)
-import Network.Wai (requestBody)
 
 import Web.Scotty (ActionM, request, raise, status, text, redirect, rescue, header, json, param)
 import qualified Web.Scotty
-
--- pull out the body as a lazy bytestring (easy for Data.Aeson to consume)
-body :: ActionM (L.ByteString)
-body = do
-    r <- request
-    bss <- liftIO . runResourceT . lazyConsume . requestBody $ r
-    return $ L.fromChunks bss
 
 -- converts a lazy bytestring to strict bytestring
 l2b :: L.ByteString -> B.ByteString

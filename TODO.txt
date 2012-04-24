@@ -1,5 +1,5 @@
 NEXT STEPS
-[ ] Make sure you can deploy it
+[x] Make sure you can deploy it
 [ ] Varnish / Cache Headers
 [ ] Indexes (player name, etc)
 [ ] Tighten up /game/minions
