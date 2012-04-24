@@ -44,7 +44,7 @@ main = do
             header "Content-Type" "text/html"
             file "public/viewer/viewer.html"
 
-        get "/version" $ text "Botland 0.2.0"
+        get "/version" $ text "Botland 0.3.0"
 
         get "/game" $ json gameInfo
 
