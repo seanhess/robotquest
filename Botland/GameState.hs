@@ -3,6 +3,7 @@ module Botland.GameState where
 import Botland.Types
 
 import Control.Monad.State
+import Control.Monad (when, unless)
 
 import Data.Map (Map, insert, delete, lookup, elems, empty)
 import Data.Maybe (isJust)
@@ -69,10 +70,6 @@ validPosition g (Point x y) = 0 <= x && x < (width g) && 0 <= y && y < (height g
 skipIf :: (Game -> Bool) -> GameState () -> GameState ()
 skipIf p k = do
   g <- get
-  when (p g) k
-
-  
-
-
+  unless (p g) k
 
 
