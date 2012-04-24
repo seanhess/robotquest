@@ -1,18 +1,4 @@
-module Botland.GameState 
-( Game
-, GameState
-, emptyGame
-, addBots
-, toBots
-, update
-, isOccupied
-, atPoint
-, clear
-, validPosition
-, onMap
-, ensure
-, ensureNot
-) where
+module Botland.GameState where
 
 import Botland.Types
 
@@ -51,10 +37,8 @@ update b = do
     g <- get
     put $ insertBot b g
 
-isOccupied :: Point -> GameState Bool
-isOccupied p = do
-    s <- get
-    return $ isJust $ lookup p (points s)
+isOccupied :: Point -> Game -> Bool
+isOccupied p g = isJust $ lookup p (points g) 
 
 atPoint :: Point -> GameState (Maybe Bot)
 atPoint p = do
@@ -70,10 +54,8 @@ atPoint' p s = do
     b <- lookup id bs
     return b
 
-onMap :: Point -> GameState Bool
-onMap p = do
-    Game info _ _ <- get
-    return $ validPosition info p
+onMap :: Point -> Game -> Bool
+onMap p (Game info _ _) = validPosition info p
 
 clear :: Point -> GameState ()
 clear p = do
@@ -84,18 +66,11 @@ clear p = do
 validPosition :: GameInfo -> Point -> Bool
 validPosition g (Point x y) = 0 <= x && x < (width g) && 0 <= y && y < (height g)
 
-ensure :: GameState Bool -> GameState () -> GameState ()
-ensure p k = do 
-  t <- p 
-  when t k
+skipIf :: (Game -> Bool) -> GameState () -> GameState ()
+skipIf p k = do
+  g <- get
+  when (p g) k
 
-ensureNot :: GameState Bool -> GameState () -> GameState ()
-ensureNot p k = do 
-  t <- p 
-  unless t k
-
-isOccupied2 :: Point -> Game -> Bool
-isOccupied2 p g = isJust $ lookup p (points g) 
   
 
 

@@ -85,12 +85,8 @@ moveAction b start d = do
 
     let dest = destination d start
 
-    -- TODO turn these into guard expressions, that just return the original state!
-    -- make your own monad if you have to :)
-
-    ensure (onMap dest) $ do
-
-    ensureNot (isOccupied dest) $ do
+    skipIf (not.(onMap dest)) $ do
+    skipIf (isOccupied dest) $ do
 
     clear start
     update $ b { point = dest }
