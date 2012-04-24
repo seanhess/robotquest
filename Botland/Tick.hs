@@ -1,13 +1,8 @@
-{-
-
-Botland Game Timer: gameTick runs once per game tick, updating the world and saving it out
-
-TODO 
-
--}
-
-
 module Botland.Tick where
+
+{-
+Botland Game Timer: gameTick runs once per game tick, updating the world and saving it out
+-}
 
 import Botland.Control
 import Botland.GameState
@@ -32,6 +27,17 @@ type IdMap = Map String Bot
 
 gameInfo :: GameInfo
 gameInfo = GameInfo 25 20 1000 
+
+cleanupDelay :: Integer
+cleanupDelay = 2 
+
+
+cleanup :: (Action IO Botland.Types.Ok -> IO a) -> IO b
+cleanup db = do 
+    putStrLn "CLEANUP"
+    db $ cleanupInactives cleanupDelay
+    threadDelay ((fromIntegral cleanupDelay)*1000000)
+    cleanup db
 
 runTick :: GameInfo -> (Action IO () -> IO (Either Failure ())) -> IO ()
 runTick g db = do

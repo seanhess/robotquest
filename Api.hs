@@ -27,6 +27,10 @@ main = do
     let db action = liftIO $ access pipe master "botland" action
     let auth = runAuth pipe "botland"
 
+    -- recurring tasks
+    forkIO $ cleanup db
+    forkIO $ runTick gameInfo db
+
     scotty 3026 $ do
 
         middleware $ staticRoot "public"

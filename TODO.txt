@@ -1,69 +1,32 @@
-GAME TIMER
-[x] Make a monad!
-[ ] Queue up commands. You CAN'T remove old ones
-[ ] 
-
-GAME TIMER
-I need a new data type
-  lookup by point
-  lookup by id
-  
-  (build multiple indexes)
-
-  this could be represented by two maps
-
-  Start With: [Bot]
-  Conver to: GameState
-  
-  data GameState = GameState { game :: Game, bots :: Map String Bot, points :: Map Point String, commands :: [BotCommand] }
-
-  UPDATE A LOCATION: updates points index (re-insert, delete old one), update x & y in bots
-
-  Keep track of updates instead? (nice for saving and notifying people, but who cares?, really, I'm serializing everything anyway)
-
-  Associate Bots and Commands more closely. They are all shared!
-
-  update: updates the bot index
-  move: moves something to x
-
-  All info about a bot:
-    Bot
-    Location
-    Command
-  
-  It's not hard to ignore a bot that has no command. It's not hard to reset them either
-  It will be easier to map them like this 
-  It's sort of like a big ol' index of stuff
-  {command: {direction: action: }}
-
-  Woot = 
-    henry: bob
-
-
 NEXT STEPS
+[ ] Make sure you can deploy it
+[ ] Varnish / Cache Headers
+[ ] Indexes (player name, etc)
+[ ] Tighten up /game/minions
+[ ] Write AI bots!
+    [ ] Rat
+    [ ] Orc
+    [ ] Troll
+    [ ] Sorcerer (goes after the person with the most kills, or alive the longest, or something like that) (give everyone that information then?)
+[ ] Documentation
+[ ] Image Picker
+[ ] Try playing the game, and publish to friends
+
+ALPHA / FRIENDS RELEASE
+[ ] Queue up commands. You CAN'T remove old ones
+
+REAL RELEASE
+[ ] Real domain 
+[ ] Blog post? (no, internal release first)
+[ ] Gzip?
+
+DONE
 [x] Get the leaderboards to display (and refresh?)
 [x] Click on bot for information
 [x] API: pick your own image
 [x] Leaderboard: top killers
 [x] Leaderboard: link to bot overlay (url based?)
-
-AFTER THAT
-[ ] Game Timer
-[ ] Documentation
-  [ ] Simple page that shows images you can pick
-[ ] Evil Monsters! Bwa ha ha
-
-
-GAME TIMER
-Advantages: automatically limits the number of actions you can take. Can write game logic in haskell, instead of mongo. Maybe easier to keep track of events if I want to do things that way. Just try it and see how it feels
-
-Disadvantages: not concurrent. I have to make sure the game can handle all the processing (with 1s ticks? please! I can handle the world on a 1s tick). 
-    can it be parallized? (not without re-introducing mongo)
-    it can by "room" (ah ha!)
-    I don't think this is a good reason not to do it.
-
-EVENT BASED
-You don't have to sent down events. You just send down invalidated units. everything else is the same as before. (more important with blocks, eh?)
+[x] Game Timer: Make a monad!
 
 IDEAS
 [ ] Have a store. Collect coins, not powerups. BUY powerups. Multiple kinds of powerfuls (Gold, Crystal)
@@ -74,102 +37,4 @@ IDEAS
 [ ] Trading
 [ ] If you die you lose all your gold, so you have an incentive to drop it.
 
-CLEANUP
-[ ] Tighter /game/minions call
-[ ] Gzip / Varnish / Cache-Control header
-[ ] Indexes (player name, etc)
-
-BOTS
-[ ] write a simple monster bot
-
-
-<!-- <meta name="viewport" content="width=device-width, initial-scale=2.0, user-scalable=yes"> -->
-
-<!--
-http://hasgraphics.com/free-sprites/
-
-
-http://protomansprites.webs.com/customsprites.htm - has some small sheets with some cool robots. can't find license. 
-http://marioshi64.deviantart.com/art/MegaMan-IDK-Robot-Sprites-119661029 - mega man sprites.     
-http://sebamkfan.deviantart.com/art/DizCreator-s-Robot-Master-sprites-278946621
-http://nwinmore.deviantart.com/art/RPG-Maker-VX-Sprites-95545909
-
-whole bunch of sprites! only characters. Everything is 32x32
-http://blogoscoped.com/archive/2006-08-08-n51.html
-
-
-http://pousse.rapiere.free.fr/tome/
-Andband tiles
-Silmar - less complete
-
-
-http://gamemaking.indiangames.net/index_files/FreeSpritesforGames.htm - links to everything else
-
-http://www.lostgarden.com/2007/04/free-game-graphics-tyrian-ships-and.html - tyrian - woot - high tech stuff. kind of hard to see - no 2D
-
-http://www.lostgarden.com/2005/03/download-complete-set-of-sweet-8-bit.html - Great theme, not really enough stuff though 
-
-http://www.lostgarden.com/2005/03/game-post-mortem-hard-vacuum.html - good terrain, tanks, etc. 
-
-http://www.widgetworx.com/widgetworx/portfolio/spritelib.html - got some cool stuff, similar.
-
-
-ADVICE
-http://www.anotherearlymorning.com/2008/09/how-to-find-and-use-artwork-for-tile-based-games/
-
-INDEXES
-http://funplosion.com/free-assets.html
-http://gamedev.stackexchange.com/questions/20/where-can-i-find-free-sprites-and-images
-http://opengameart.org/
-
-FROM REAL GAMES
-http://www.videogamesprites.net/
-http://www.bogleech.com/games.html - from real SNES games, probably not legal
-
-
-SMALL SETS
-http://www.over00.com/?p=1941 - some monsters
-http://www.over00.com/?p=1844 - wrong resolution? spaceships :(
-http://www.squidi.net/pixel/char.default.php - some chars and monsters. Non-commercial license
-http://rltiles.sourceforge.net/ - plenty of monsters, limited players + clothes
-http://www.reinerstilesets.de/2d-grafiken/ - iso, blah 
-
-BIG SETS
-http://untamed.wild-refuge.net/rmxpresources.php?characters - many characters!
-
-MONSTERS
-http://opengameart.org/content/more-rpg-enemies
-
-
-
-TODO
-√ 2a. Track kills
-√ 2b. Track time alive
-√ 2c. Kills/ time alive leaderboards
-2d. Display leaderboards somewhere
-2e. Click on bot for information / links
-
-[ ] Choose any image for bot. (URL Based (or should I provide the options?)) - it will have more uniform art if I provide the options. Just provide an index.
-    - make a single sprite sheet
-
-CLEANUP
-don't send down as many fields to the /minions call
-
-MAKE A BOT THAT
-3. randomly spawn monsters, and stars
-
-///// ??? ///////
-try switching to single game tick/loop
-
-LATER
-4. randomly spawn stars. collect stars. stars leaderboard
-
-DONT DO THESE
-4. add blocks, randomly spawn them. 
-5. allow them to pick up blocks
-
-[ ] 
-
-
--->
 
