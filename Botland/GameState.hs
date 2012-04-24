@@ -10,6 +10,8 @@ module Botland.GameState
 , clear
 , validPosition
 , onMap
+, ensure
+, ensureNot
 ) where
 
 import Botland.Types
@@ -54,7 +56,6 @@ isOccupied p = do
     s <- get
     return $ isJust $ lookup p (points s)
 
-
 atPoint :: Point -> GameState (Maybe Bot)
 atPoint p = do
     s <- get
@@ -82,3 +83,21 @@ clear p = do
 
 validPosition :: GameInfo -> Point -> Bool
 validPosition g (Point x y) = 0 <= x && x < (width g) && 0 <= y && y < (height g)
+
+ensure :: GameState Bool -> GameState () -> GameState ()
+ensure p k = do 
+  t <- p 
+  when t k
+
+ensureNot :: GameState Bool -> GameState () -> GameState ()
+ensureNot p k = do 
+  t <- p 
+  unless t k
+
+isOccupied2 :: Point -> Game -> Bool
+isOccupied2 p g = isJust $ lookup p (points g) 
+  
+
+
+
+

@@ -16,6 +16,7 @@ import Botland.Types
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.State (execState)
+import Control.Monad (when, unless)
 
 import qualified Data.Map as M
 import Data.Map (Map, insert, delete, lookup, empty)
@@ -87,11 +88,9 @@ moveAction b start d = do
     -- TODO turn these into guard expressions, that just return the original state!
     -- make your own monad if you have to :)
 
-    valid <- onMap dest
-    if not valid then return () else do
+    ensure (onMap dest) $ do
 
-    occ <- isOccupied dest
-    if occ then return () else do
+    ensureNot (isOccupied dest) $ do
 
     clear start
     update $ b { point = dest }
@@ -106,20 +105,9 @@ attackAction b p d = do
       Nothing -> return ()
       Just victim -> do
           let k = (kills b) + 1
-          update (victim { botState = Dead })
-          update (b { kills = k})
+          update $ victim { botState = Dead }
+          update $ b { kills = k }
           
-{-g b start d f-}
-    {-let dest = move d start in-}
-    {-case lookup dest f of-}
-        {-Nothing -> w-}
-        {-Just target -> delete dest w-}
-
-
-
-removeMisses :: [(Maybe a)] -> [a]
-removeMisses ms = map fromJust $ filter isJust $ ms
-
 -- converts a command document into a (Bot, BotCommand)
 botById :: IdMap -> String -> Maybe Bot
 botById m id = lookup id m 
