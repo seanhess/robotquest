@@ -123,20 +123,22 @@ instance FromJSON BotState where
     parseJSON = typeParseJSON readMay
 
 -- Bot
+-- sometimes kills exists, sometimes it doesn't
+-- 0 means it doesn't matter
 instance ToJSON Bot where
-    toJSON b = object fs 
-        where p = point b
-              id = botId b
-              fs = [ "id" .= id 
-                   , "x" .= x p
-                   , "y" .= y p
-                   , "name" .= name b
-                   , "player" .= player b
-                   , "sprite" .= sprite b 
-                   , "kills" .= kills b
-                   , "created" .= created b
-                   , "state" .= botState b
-                   ]
+  toJSON b = object fs
+    where p = point b
+          id = botId b
+          fs = [ "id" .= id 
+               , "x" .= x p
+               , "y" .= y p
+               , "name" .= name b
+               , "player" .= player b
+               , "sprite" .= sprite b 
+               , "state" .= botState b
+               , "kills" .= kills b
+               , "created" .= created b
+               ]
 
 -- you don't need the other fields from the client. So just make them up with defaults
 instance FromJSON Bot where 

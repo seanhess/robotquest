@@ -36,7 +36,7 @@ describe('botland api', function() {
     describe('game', function() {
 
         it('should give game stats', function(done) {
-            request.get({url:Server + "/game", json:true}, function(err, rs, g) {
+            request.get({url:Server + "/game/info", json:true}, function(err, rs, g) {
                 assert.ifError(err)
                 assert.ok(g)
                 assert.ok(g.width)
@@ -48,7 +48,7 @@ describe('botland api', function() {
         })
 
         it('should return an empty world', function(done) {
-            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 0)
@@ -109,7 +109,7 @@ describe('botland api', function() {
         })
 
         it('should show me in the game', function(done) {
-            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 1, "not showing bot on the map")
@@ -135,7 +135,7 @@ describe('botland api', function() {
 
         it('should update the game', function(done) {
             setTimeout(function() {
-                request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+                request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                     assert.ifError(err)
                     assert.ok(locations)
                     assert.equal(locations.length, 1)
@@ -154,7 +154,7 @@ describe('botland api', function() {
                 assert.equal(rs.statusCode, 200, 'should give 200 status code even though the command is invalid')
 
                 setTimeout(function() {
-                    request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+                    request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                         assert.ifError(err)
                         assert.ok(locations)
                         assert.equal(locations.length, 1)
@@ -184,7 +184,7 @@ describe('botland api', function() {
         })
 
         it('should both appear in the world', function(done) {
-            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 2)
@@ -204,7 +204,7 @@ describe('botland api', function() {
 
         it('bot1 should be dead', function(done) {
             setTimeout(function() {
-                request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+                request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                     assert.ifError(err)
                     assert.ok(locations)
                     assert.equal(locations.length, 2)
@@ -227,7 +227,7 @@ describe('botland api', function() {
 
         it('should remove bot1 after another tick', function(done) {
             setTimeout(function() {
-                request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+                request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                     assert.ifError(err)
                     assert.ok(locations)
                     assert.equal(locations.length, 1, "did not remove dead unit")
@@ -265,7 +265,7 @@ describe('botland api', function() {
         var botId = null
 
         it('should start with only bot2', function(done) {
-            request.get({url: Server + "/game/minions", json:true}, function(err, rs, locations) {
+            request.get({url: Server + "/game/objects", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.equal(locations.length, 1, "Should only have 1 bot to start")
                 done()
@@ -292,7 +292,7 @@ describe('botland api', function() {
         })
 
         it('should be gone', function(done) {
-            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 1)
@@ -311,7 +311,7 @@ describe('botland api', function() {
         })
 
         it('should be empty', function(done) {
-            request.get({url:Server + "/game/minions", json:true}, function(err, rs, locations) {
+            request.get({url:Server + "/game/objects", json:true}, function(err, rs, locations) {
                 assert.ifError(err)
                 assert.ok(locations)
                 assert.equal(locations.length, 0)

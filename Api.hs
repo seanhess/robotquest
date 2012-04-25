@@ -48,15 +48,15 @@ main = do
 
         get "/version" $ text "Botland 0.3.0"
 
-        get "/game" $ do
+        get "/game/info" $ do
             cache minute
             json gameInfo
 
         -- returns all the bots, obstacles and whathaveyounots
         -- everything except playerId
-        get "/game/minions" $ do
+        get "/game/objects" $ do
             cache second
-            res <- db $ locations
+            res <- db $ objects
             sendAction "" res
 
         -- really, just gives you a session id, but pretend that it matters :)

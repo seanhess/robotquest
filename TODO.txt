@@ -2,7 +2,6 @@ NEXT STEPS
 [x] Make sure you can deploy it
 [x] Cache Headers
 [x] Indexes (player name, etc)
-[ ] Tighten up /game/minions
 [ ] Write AI bots!
     [ ] Rat
     [ ] Orc
@@ -21,6 +20,7 @@ REAL RELEASE
 [ ] Blog post? (no, internal release first)
 [ ] Gzip?
 [ ] Spawn limit
+[-] Tighten up /game/objects
 
 DONE
 [x] Get the leaderboards to display (and refresh?)

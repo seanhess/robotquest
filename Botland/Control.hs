@@ -190,11 +190,10 @@ cleanupInactives delay = do
 
 -- THE WORLD -------------------------------------------------------
 
-locations :: Action IO [Bot]
-locations = do
-    c <- find (select [] "bots") {project = ["playerId" =: 0, "command" =: 0]}
+objects :: Action IO [Bot]
+objects = do
+    c <- find (select [] "bots") {project = ["id" =: 1, "x" =: 1, "y" =: 1, "name" =: 1, "sprite" =: 1, "player" =: 1, "state" =: 1, "kills" =: 1, "created" =: 1]}
     bs <- rest c
-    --return bs
     return $ map fromDoc bs
 
 
