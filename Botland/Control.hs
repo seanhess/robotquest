@@ -9,7 +9,7 @@ import Control.Monad.IO.Class (liftIO)
 import Control.Monad (forM_)
 
 import Data.Map (assocs)
-import Data.Maybe (isNothing, fromJust)
+import Data.Maybe (isNothing, fromJust, isJust)
 import Data.DateTime (DateTime, addSeconds, getCurrentTime)
 
 import Database.MongoDB hiding (Field)
@@ -29,11 +29,16 @@ connectMongo = runIOE $ connect (host "127.0.0.1")
 ensureIndexes :: Action IO ()
 ensureIndexes = do
     ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)
+    ensureIndex (Index "bots" ["kills" =: -1] "kills" False False)
+    ensureIndex (Index "bots" ["created" =: 1] "created" False False)
+    ensureIndex (Index "bots" ["playerId" =: 1] "bot_player_id" False False)
+    ensureIndex (Index "players" ["name" =: 1] "player_name" True True)
+    ensureIndex (Index "players" ["heartbeat" =: 1] "player_heartbeat" False False)
 
 botOwner :: String -> String -> Action IO Bool
 botOwner pid botId = do
-    n <- count $ select ["playerId" =: pid, "_id" =: botId] "bots"
-    return (n > 0)
+    m <- findOne (select ["_id" =: botId, "playerId" =: pid] "bots") {project = ["_id" =: 1]}
+    return $ isJust m
 
 
 -- DETAILS --------------------------------------------------------
@@ -141,49 +146,10 @@ removeDeadBots = do
 
 -- ACTIONS --------------------------------------------------------
 
---setAction :: String -> BotAction -> Action IO Ok
---setAction id a = do
---    modify (select ["_id" =: id] "bots") ["$set" =: ["action" =: (show a)]]
---    return Ok 
-
-performCommand :: BotCommand -> GameInfo -> String -> String -> Action IO ()
-performCommand c g pid id = do
+setCommand :: BotCommand -> GameInfo -> String -> String -> Action IO ()
+setCommand c g pid id = do
     updateHeartbeat pid
     modify (select ["_id" =: id] "bots") ["$set" =: ["command" =: c]]
-
-
-{-
-attackAction :: Game -> String -> Direction -> Action IO (Either Fault Ok)
-attackAction g id d = do
-
-    -- I need to GET their current position
-    doc <- findOne (select ["_id" =: id] "bots") {project = ["x" =: 1, "y" =: 1, "_id" =: 0]}
-
-    if (isNothing doc) then
-        return $ Left NotFound
-    else do
-
-    let bp = fromDoc (fromJust doc)
-    let (Point x y) = move d bp
-
-    -- remove anybody there. Die sucka die
-    -- see if anyone is there 
-    targetDoc <- findOne (select ["x" =: x, "y" =: y] "bots") { project = ["_id" =: 1] }
-
-    if (isNothing doc) then
-        return $ Right Ok
-    else do
-
-    let tb = fromDoc (fromJust targetDoc) :: Bot
-
-    -- nuke them!
-    delete (select ["_id" =: botId tb] "bots")
-
-    -- give the bot a kill
-    modify (select ["_id" =: id] "bots") ["$inc" =: ["kills" =: 1]]
-
-    return $ Right Ok
--}
 
 
 -- CLEANUP ---------------------------------------------------------

@@ -13,9 +13,10 @@ import Data.Aeson (decode, ToJSON, FromJSON, encode)
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Data.ByteString as B
-import Data.ByteString.Char8 (ByteString, pack, unpack, append)
+import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Conduit.Lazy (lazyConsume)
 import qualified Data.Text.Lazy as T
+import Data.Text.Lazy (append)
 
 import Network.HTTP.Types (status404, status500, status400, status401, status200, status403, status501)
 
@@ -32,6 +33,22 @@ b2l l = L.fromChunks [l]
 b2t :: B.ByteString -> T.Text
 b2t = T.pack . unpack 
 
+
+-- cache things
+cache :: Integer -> ActionM () 
+cache seconds = header "Cache-Control" ("max-age=" `append` (T.pack $ show seconds) `append` ", must-revalidate")
+
+second :: Integer
+second = 1
+
+minute :: Integer
+minute = 60
+
+hour :: Integer
+hour = 3600
+
+day :: Integer
+day = 84600
 
 
 --class Sendable a where

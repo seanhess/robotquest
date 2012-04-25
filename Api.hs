@@ -37,20 +37,25 @@ main = do
         middleware cors
 
         get "/" $ do
+            cache minute
             header "Content-Type" "text/html"
             file "public/index.html"
 
         get "/viewer" $ do
+            cache minute
             header "Content-Type" "text/html"
             file "public/viewer/viewer.html"
 
         get "/version" $ text "Botland 0.3.0"
 
-        get "/game" $ json gameInfo
+        get "/game" $ do
+            cache minute
+            json gameInfo
 
         -- returns all the bots, obstacles and whathaveyounots
         -- everything except playerId
         get "/game/minions" $ do
+            cache second
             res <- db $ locations
             sendAction "" res
 
@@ -61,6 +66,7 @@ main = do
             sendAction "" id
 
         get "/players/:name" $ do
+            cache minute
             n <- param "name"
             p <- db $ getPlayerByName n
             sendActionMaybe "Could not find player" p
@@ -72,16 +78,19 @@ main = do
             sendActionFault "Invalid Starting Location" id
 
         get "/minions/:minionId" $ do
+            cache second
             id <- param "minionId"
             bot <- db $ botDetails id
             sendActionFault "" bot
 
         -- leaderboards
         get "/top/killers" $ do
+            cache second
             bots <- db $ topKillers
             sendAction "" bots
 
         get "/top/survivors" $ do
+            cache second
             bots <- db $ topSurvivors
             sendAction "" bots
 
@@ -90,7 +99,7 @@ main = do
         post "/players/:playerId/minions/:minionId/command" $ auth $ decodeBody $ \c -> do
             mid <- param "minionId"
             pid <- param "playerId"
-            res <- db $ performCommand c gameInfo pid mid
+            res <- db $ setCommand c gameInfo pid mid
             sendAction "" res
 
         -- delete all bots associated with the player
@@ -103,44 +112,6 @@ main = do
             mid <- param "minionId"
             ok <- db $ cleanupBot mid 
             sendAction "Could not delete minion" ok
-
-        -- TODO: implement planet cute graphics
-            -- then start making up mini games
-            -- random terrain generation (grow)
-            -- spawn some stars. keep track of how many you've collected
-
-        -- TODO: stats! to give it a point. Just list everything
-            -- player connected the longest
-            -- currently connected player
-            -- bots that survived the longest
-            -- resources collected
-
-        -- TODO: resources / blocks (little gold coins?)
-
-        -- TODO: documentation
-        -- TODO: better graphics
-        -- TODO: figure out what the launch site will be like 
-
-        -- TODO: write some more interesting bots 
-
-        -- TODO: varnish, caching. 
-
-        -- AFTER LAUNCH
-        -- TODO: pubnub XXX (requires clients to know all the logic (delete, etc))
-        -- TODO: Add bulk requests? (launch first) (need to figure out new locking mechanism)
-        -- TODO: Encforce movement limit (launch first) 
-
-        -- XXXX: pipelining won't work. The clients don't really do it.
-        -- send an array of requests, and get an array of responses
-        -- request: METHOD URL BODY
-        -- returns: STATUS BODY
-        -- or: create player body
-        --     command playerId botId body
-        --     delete playerId botId body
-        -- naw, they already know how to do the routes, just use that. You have to write a parser anyway, and you can copy scotty's
-        -- post "/pipeline" $ decodeBody $ \cs -> do 
-
-
 
 
 

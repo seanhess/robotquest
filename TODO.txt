@@ -1,7 +1,7 @@
 NEXT STEPS
 [x] Make sure you can deploy it
-[ ] Varnish / Cache Headers
-[ ] Indexes (player name, etc)
+[x] Cache Headers
+[x] Indexes (player name, etc)
 [ ] Tighten up /game/minions
 [ ] Write AI bots!
     [ ] Rat
@@ -14,11 +14,13 @@ NEXT STEPS
 
 ALPHA / FRIENDS RELEASE
 [ ] Queue up commands. You CAN'T remove old ones
+[ ] Varnish (make sure it works)
 
 REAL RELEASE
 [ ] Real domain 
 [ ] Blog post? (no, internal release first)
 [ ] Gzip?
+[ ] Spawn limit
 
 DONE
 [x] Get the leaderboards to display (and refresh?)
