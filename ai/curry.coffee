@@ -4,8 +4,9 @@ exports.curry = curry = (f) ->
 
   call = (args...) ->
 
-    # if we have all the arguments, call the function
-    if f.length == args.length
+    # if we have at least as many arguments as our f supports
+    # then call it
+    if args.length >= f.length
       f args...
 
     # otherwise, return a function with the arguments partially applied

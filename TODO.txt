@@ -12,6 +12,7 @@ NEXT STEPS
 [ ] Try playing the game, and publish to friends
 [ ] Highlight the bot in the game when you click on the leaderboard
 [ ] Change leaderboards to use normal /objects call. It'll save bandwidth, no? (not really)
+[ ] Death animation SPLAT
 
 ALPHA / FRIENDS RELEASE
 [ ] Queue up commands. You CAN'T remove old ones

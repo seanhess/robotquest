@@ -5,14 +5,14 @@ RobotQUEST AI
 # On any error: I want to log the error, then exit and reconnect. (Throw the error)
 
 request = require 'request'
-{clone, map, find, compose, isEqual, bind, extend} = require 'underscore'
+{clone, map, find, compose, isEqual, bind, extend, filter, intersect} = require 'underscore'
 {curry} = require './curry'
 
 HOST = process.env.HOST || "http://localhost:3026"
 AINAME = "AI"
 REPO = "http://github.com/seanhess/botland"
 
-MIN_MONSTERS = 5
+MIN_MONSTERS = 15
 
 start = (host) ->
 
@@ -90,20 +90,31 @@ rat =
   name: -> "rat"
   sprite: -> randomElement ["monster1-0-4", "monster1-1-4", "monster1-2-4", "monster1-3-4"]
   act: (api, info, player, objects, bot) ->
-    direction = randomElement ["Up", "Down", "Left", "Right"]
-    action = randomElement ["Stop", "Stop", "Move"]
-    api.command player, bot, {action, direction}, ->
+    api.command player, bot, wander(), ->
 
 
-# ORC: will attach you if you are next to it. Move randomly
+# ORC: will sometimes attack you if you are next to it for 2 turns 
+# they're a little slow :)
+# 50% chance it will hit you. (Or can you RELY on them being slow?)
 orc =
   name: -> "orc"
   sprite: -> randomElement ["monster1-0-2", "monster1-1-2", "monster1-5-1"]
   act: (api, info, player, objects, bot) ->
-    direction = randomElement ["Up", "Down", "Left", "Right"]
-    action = randomElement ["Stop", "Stop", "Move"]
-    api.command player, bot, {action, direction}, ->
+    targets = filter objects, adjacent(bot)
 
+    targetIds = map targets, id
+    slowTargetIds = intersect bot.oldTargetIds, targetIds
+
+    command = if slowTargetIds.length
+      # attack them!!!
+      slowTarget = find targets, (b) -> b.id is slowTargetIds[0]
+      attack(navigate(bot, slowTarget))
+    else
+      wander()
+
+    bot.oldTargetIds = targetIds
+
+    api.command player, bot, command, ->
 
 
 # TROLL: Will hunt anyone down within X spaces
@@ -112,7 +123,73 @@ orc =
 
 # MAGE: will hunt down the person with the most kills. At the top of the leaderboard :) Booyah!
 
-ais = [rat, orc]
+ais = [orc]
+
+
+
+
+## REUSABLE AI
+
+UP = "Up"
+DOWN = "Down"
+LEFT = "Left"
+RIGHT = "Right"
+
+STOP = "Stop"
+ATTACK = "Attack"
+MOVE = "Move"
+
+directions = [UP, DOWN, LEFT, RIGHT]
+
+# if two objects are adjacent
+# functional programming example! This works against ANY object that has x and y coordinates!
+# I don't have to be over-specific
+adjacent = curry (a, b) ->
+  dirs = directions.map (d) -> dir(b, d)
+  hits = dirs.filter isHit(a)
+  hits.length
+
+# move point in direction
+dir = (point, d) ->
+  switch d
+    when UP then {x: point.x, y: point.y-1}
+    when DOWN then {x: point.x, y: point.y+1}
+    when LEFT then {x: point.x-1, y: point.y}
+    when RIGHT then {x: point.x+1, y: point.y}
+    else point
+
+# gives you a direction from a to b
+# assumes they are adjacent
+navigate = (a, b) ->
+  if a.x is b.x
+    if a.y < b.y then DOWN
+    else if a.y > b.y then UP
+  else if a.y is b.y
+    if a.x < b.x then RIGHT
+    else if a.x > b.x then LEFT
+  else DOWN
+
+pointKey = (p) -> p.x + "," + p.y
+
+mask = curry (fields, obj) ->
+  masked = {}
+  fields.forEach (f) ->
+    masked[f] = obj[f]
+  return masked
+
+isHit = curry (a, b) -> a.x is b.x and a.y is b.y
+
+wander = ->
+  direction = randomElement directions
+  action = randomElement ["Stop", "Stop", "Move"]
+  {action, direction}
+
+
+attack = (d) -> {action: ATTACK, direction: d}
+
+move = (d) -> {action: MOVE, direction: d}
+
+stop = (d) -> {action: STOP, direction: UP}
 
 ## API
 robotQuestApi = (host, onError) ->
