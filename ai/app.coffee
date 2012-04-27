@@ -123,7 +123,7 @@ orc =
 
 # MAGE: will hunt down the person with the most kills. At the top of the leaderboard :) Booyah!
 
-ais = [orc]
+ais = [orc, rat]
 
 
 

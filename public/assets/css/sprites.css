@@ -61,3 +61,8 @@
     background: url(/assets/angbandtk/dg_monster732.gif);
 }
 
+
+.sprite.effects {
+    background: url(/assets/angbandtk/dg_effects32.gif);
+}
+
