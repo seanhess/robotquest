@@ -22,7 +22,7 @@ $(function() {
     })
 
     // first, get the world
-    $.get("/game", function(gameInfo) {
+    $.get("/game/info", function(gameInfo) {
 
         var w = gameInfo.width
         var h = gameInfo.height
@@ -35,7 +35,7 @@ $(function() {
         console.log("GAME INFO", w, h, ms)
 
         function poll() {
-            $.get("/game/minions", function(bots) {
+            $.get("/game/objects", function(bots) {
                 tick(bots)
             })
         }
@@ -89,7 +89,6 @@ $(function() {
         $el.css({'background-position': '-' + xi*32 + 'px -' + yi*32 + 'px'})       
     }
 
-    // require moment.js
     function age(created) {
         var date = new Date(created)
         var ds = Math.floor((Date.now() - date.getTime())/1000)
@@ -163,7 +162,6 @@ $(function() {
     var $headerTemplate = $survivors.find(".header.template").remove().clone()
 
 
-    console.log("HI")
     function loadLeaderboards() {
         $.get('/top/killers', function(bots) {
             $killers.html($headerTemplate.clone())
