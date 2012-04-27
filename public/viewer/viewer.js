@@ -56,9 +56,7 @@ $(function() {
                 $bot.css({left: (bot.x) * PX + padding, top: (bot.y) * PY + padding})
                 // $bot.css({width: PX, height: PY})
 
-
                 if (bot.state === "Dead") {
-                    console.log("DEAD BOT")
                     sprite($bot, "effects-6-8")
                 }
 

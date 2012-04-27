@@ -47,8 +47,6 @@ start = (host) ->
       # player: the player
       # bot: the bot
       # info: the game info
-
-
       act = (objects, bot) ->
         ai = find ais, (a) -> a.name() is bot.name
         ai.act api, info, player, objects, bot
@@ -59,7 +57,7 @@ start = (host) ->
 
         # update all our bots with info from the server
         bots = objects.filter(isAi).map (newBot) ->
-          bot = find bots, compose(eq(newBot.id), id)
+          bot = find bots, (b) -> b.id is newBot.id
           extend(bot ? {}, newBot)
 
         if bots.length < MIN_MONSTERS
@@ -191,6 +189,10 @@ move = (d) -> {action: MOVE, direction: d}
 
 stop = (d) -> {action: STOP, direction: UP}
 
+val = curry (key, obj) -> obj[key]
+eq = curry (a, b) -> a == b
+id = (obj) -> obj.id
+
 ## API
 robotQuestApi = (host, onError) ->
 
@@ -217,11 +219,6 @@ robotQuestApi = (host, onError) ->
     request.post {url: host + "/players/" + player.id + "/minions/" + minion.id + "/command", json: command}, respond cb
 
 
-
-
-val = curry (key, obj) -> obj[key]
-eq = curry (a, b) -> a == b
-id = (obj) -> obj.id
 
 if module == require.main
   start HOST

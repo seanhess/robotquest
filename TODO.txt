@@ -11,6 +11,7 @@ NEXT STEPS
 [ ] Image Picker
 [ ] Try playing the game, and publish to friends
 [ ] Highlight the bot in the game when you click on the leaderboard
+    [ ] don't focus out the board. "SELECT" him, and then you can track him
 [ ] Change leaderboards to use normal /objects call. It'll save bandwidth, no? (not really)
 [ ] Death animation SPLAT
 
