@@ -3,17 +3,19 @@ NEXT STEPS
 [x] Cache Headers
 [x] Indexes (player name, etc)
 [ ] Write AI bots!
-    [ ] Rat
-    [ ] Orc
-    [ ] Troll
-    [ ] Sorcerer (goes after the person with the most kills, or alive the longest, or something like that) (give everyone that information then?)
+    [x] Rat
+    [x] Orc
+    [ ] more!
 [ ] Documentation
 [ ] Image Picker
 [ ] Try playing the game, and publish to friends
 [ ] Highlight the bot in the game when you click on the leaderboard
     [ ] don't focus out the board. "SELECT" him, and then you can track him
-[ ] Change leaderboards to use normal /objects call. It'll save bandwidth, no? (not really)
-[ ] Death animation SPLAT
+[ ] Change leaderboards to use normal /objects call. It'll save bandwidth, no? (not really). It'll be faster
+[x] Death animation SPLAT
+[ ] Death animation (remove white background)
+[ ] Sort actions randomly (there's always a chance you'll get away!). Double KO is much easier. (Bot commands go through!)
+    [ ] No, don't use double KO. Whoever goes first wins. and that's random :) (or based on bot SPEED) (ooh!)
 
 ALPHA / FRIENDS RELEASE
 [ ] Queue up commands. You CAN'T remove old ones

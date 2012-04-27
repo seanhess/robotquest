@@ -12,7 +12,7 @@ HOST = process.env.HOST || "http://localhost:3026"
 AINAME = "AI"
 REPO = "http://github.com/seanhess/botland"
 
-MIN_MONSTERS = 15
+MONSTERS = process.env.MONSTERS || 20
 
 start = (host) ->
 
@@ -24,6 +24,7 @@ start = (host) ->
 
   # standard error handling 
   # should cause everything to exit
+  # OS will respawn it
   onError = (err) ->
     throw err
 
@@ -60,7 +61,7 @@ start = (host) ->
           bot = find bots, (b) -> b.id is newBot.id
           extend(bot ? {}, newBot)
 
-        if bots.length < MIN_MONSTERS
+        if bots.length < MONSTERS
           x = random info.width
           y = random info.height
           type = randomElement ais
@@ -92,8 +93,7 @@ rat =
 
 
 # ORC: will sometimes attack you if you are next to it for 2 turns 
-# they're a little slow :)
-# 50% chance it will hit you. (Or can you RELY on them being slow?)
+# they are slow, they take an extra turn to hit you, only if you are still next to them
 orc =
   name: -> "orc"
   sprite: -> randomElement ["monster1-0-2", "monster1-1-2", "monster1-5-1"]
@@ -115,13 +115,38 @@ orc =
     api.command player, bot, command, ->
 
 
-# TROLL: Will hunt anyone down within X spaces
+# BLARG: Wanders, but attacks perfectly if something comes near
+blarg =
+  name: -> "blarg"
+  sprite: -> randomElement [
+    "monster2-2-6", "monster2-3-6", "monster2-4-6", "monster2-5-6"
+    "monster2-0-7", "monster2-1-7", "monster2-2-7", "monster2-3-7", "monster2-4-7", "monster2-5-7",
+    "monster2-0-8", "monster2-1-8", "monster2-2-8", "monster2-3-8", "monster2-4-8", "monster2-5-8"
+  ]
+  act: (api, info, player, objects, bot) ->
+    targets = filter objects, adjacent(bot)
+
+    command = if targets.length > 0
+      attack(navigate(bot, targets[0]))
+    else wander()
+
+    api.command player, bot, command, ->
 
 
+# GOOBER: Will hunt anything down within X spaces, and attack mercilessly
+
+
+# Will hunt anything down, and will ignore AI bots
+
+# SLUDGE: umm... 
 
 # MAGE: will hunt down the person with the most kills. At the top of the leaderboard :) Booyah!
+  # once it acquires a target it will NEVER give up!
+  # you must destroy it!
 
-ais = [orc, rat]
+# DRAGON: never moves. Attacks anything near it immediately. 
+
+ais = [orc, rat, blarg]
 
 
 
