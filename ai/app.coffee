@@ -5,7 +5,7 @@ RobotQUEST AI
 # On any error: I want to log the error, then exit and reconnect. (Throw the error)
 
 request = require 'request'
-{clone, map, find, compose, isEqual, bind, extend, filter, intersect} = require 'underscore'
+{clone, map, find, compose, isEqual, bind, extend, filter, intersect, sortBy} = require 'underscore'
 {curry} = require './curry'
 
 HOST = process.env.HOST || "http://localhost:3026"
@@ -25,8 +25,7 @@ start = (host) ->
   # standard error handling 
   # should cause everything to exit
   # OS will respawn it
-  onError = (err) ->
-    throw err
+  onError = (err) -> console.log "ERROR", err.message
 
   api = robotQuestApi host, onError
 
@@ -59,7 +58,7 @@ start = (host) ->
         # update all our bots with info from the server
         bots = objects.filter(isAi).map (newBot) ->
           bot = find bots, (b) -> b.id is newBot.id
-          extend(bot ? {}, newBot)
+          extend bot ? {}, newBot
 
         if bots.length < MONSTERS
           x = random info.width
@@ -133,10 +132,48 @@ blarg =
     api.command player, bot, command, ->
 
 
-# GOOBER: Will hunt anything down within X spaces, and attack mercilessly
+# GOOBER: Picks the nearest target within 3 spaces or so, then attacks
+# TODO fix oscillation by allowing a NONE direction, in addition to a stop action
+demon =
+  name: -> "demon"
+  sprite: -> randomElement ["monster1-0-5", "monster1-1-5", "monster1-2-5", "monster1-3-5", "monster1-4-5", "monster1-5-5"]
+  act: (api, info, player, objects, bot) ->
 
+    ds = map objects, (b) ->
+      bot: b
+      distance: distance(bot, b)
 
-# Will hunt anything down, and will ignore AI bots
+    # this will also prevent you from picking yourself
+    ds = ds.filter (obj) -> 0 < obj.distance < 3
+
+    ds = sortBy ds, (obj) -> obj.distance
+
+    target = ds[0]
+
+    command = if target?
+      dir = navigate bot, target.bot
+      if target.distance is 1 then attack dir
+      else move dir
+    else wander()
+
+    api.command player, bot, command, ->
+
+sorcerer =
+  name: -> "sorcerer"
+  sprite: -> "monster1-4-1"
+  act: (api, info, player, objects, bot) ->
+
+    leaders = sortBy objects, (b) -> b.kills
+
+    target = leaders[0]
+
+    command = if target?
+      dir = navigate bot, target
+      if adjacent bot, target then attack dir
+      else move dir
+    else wander()
+
+    api.command player, bot, command, ->
 
 # SLUDGE: umm... 
 
@@ -146,10 +183,9 @@ blarg =
 
 # DRAGON: never moves. Attacks anything near it immediately. 
 
-ais = [orc, rat, blarg]
-
-
-
+ais = [rat, rat, rat, rat, orc, orc, blarg, blarg, demon, sorcerer]
+#ais = [orc, demon, sorcerer]
+#ais = [sorcerer]
 
 ## REUSABLE AI
 
@@ -186,13 +222,15 @@ dir = (point, d) ->
 navigate = (a, b) ->
   if a.x is b.x
     if a.y < b.y then DOWN
-    else if a.y > b.y then UP
-  else if a.y is b.y
+    else UP
+  else
     if a.x < b.x then RIGHT
-    else if a.x > b.x then LEFT
-  else DOWN
+    else LEFT
+
 
 pointKey = (p) -> p.x + "," + p.y
+
+distance = curry (a, b) -> Math.abs(b.x - a.x) + Math.abs(b.y - a.y)
 
 mask = curry (fields, obj) ->
   masked = {}
@@ -208,15 +246,16 @@ wander = ->
   {action, direction}
 
 
-attack = (d) -> {action: ATTACK, direction: d}
+attack = (direction) -> {action: ATTACK, direction}
 
-move = (d) -> {action: MOVE, direction: d}
+move = (direction) -> {action: MOVE, direction}
 
 stop = (d) -> {action: STOP, direction: UP}
 
 val = curry (key, obj) -> obj[key]
 eq = curry (a, b) -> a == b
 id = (obj) -> obj.id
+
 
 ## API
 robotQuestApi = (host, onError) ->
@@ -241,6 +280,7 @@ robotQuestApi = (host, onError) ->
     request.post {url: host + "/players/" + player.id + "/minions", json: minion}, respond(cb, false)
 
   command: (player, minion, command, cb) ->
+    #console.log "COMMAND", minion.id, command
     request.post {url: host + "/players/" + player.id + "/minions/" + minion.id + "/command", json: command}, respond cb
 
 
@@ -248,4 +288,5 @@ robotQuestApi = (host, onError) ->
 if module == require.main
   start HOST
   
+## When you command something that doesn't exist any more you get a not authorized
 
