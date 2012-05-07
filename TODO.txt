@@ -3,30 +3,25 @@ NEXT STEPS
 [x] Cache Headers
 [x] Indexes (player name, etc)
 [x] Write AI bots!
-    [x] Rat
-    [x] Orc
-    [x] more!
 [x] Documentation
-    [x] Small paragraph on the main page: RobotQuest is blah blah blah. Read more!
-    [x] Rules
-    [x] Goal
-[ ] Make the game work like the docs (id strings)
-[ ] Image Picker
-[ ] Try playing the game, and publish to friends
-[ ] Highlight the bot in the game when you click on the leaderboard
-    [ ] don't focus out the board. "SELECT" him, and then you can track him
-[ ] Change leaderboards to use normal /objects call. It'll save bandwidth, no? (not really). It'll update more frequently, the browser doesn't have THAT much to do
-[x] Death animation SPLAT
+[x] Make the game work like the docs (id strings)
 [ ] Death animation (remove white background)
+[ ] Highlight the bot in the game when you click on the leaderboard. Don't defocus the board. SELECT the bot and track.
+[ ] Image Picker
 [ ] Sort actions randomly (there's always a chance you'll get away!). Double KO is much easier. (Bot commands go through!)
-    [ ] No, don't use double KO. Whoever goes first wins. and that's random :) (or based on bot SPEED) (ooh!)
-[ ] Change leaderboards to be permanant with rollover (minute, hour, day, month, year, etc) (top 5 in each?)
+[x] Death animation SPLAT
 [ ] Limit survivors list to 10
 [ ] Stats sheet always says 0 kills
 [ ] Different "halos" depending on alignment
 [ ] Wrong monster when you click on rats (from the line above??)
 
-ALPHA / FRIENDS RELEASE
+MAYBE
+[ ] Change leaderboards to use normal /objects call. It'll save bandwidth, no? (not really). It'll update more frequently, the browser doesn't have THAT much to do
+
+FRIENDS RELEASE
+
+ALPHA RELEASE
+[ ] Change leaderboards to be permanant with rollover (minute, hour, day, month, year, etc) (top 5 in each?)
 [ ] Queue up commands. You CAN'T remove old ones
 [ ] Varnish (make sure it works)
 
