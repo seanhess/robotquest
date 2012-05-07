@@ -46,6 +46,11 @@ main = do
             header "Content-Type" "text/html"
             file "public/viewer/viewer.html"
 
+        get "/docs" $ do
+            cache minute
+            header "Content-Type" "text/html"
+            file "public/docs.html"
+
         get "/version" $ text "Botland 0.3.0"
 
         get "/game/info" $ do

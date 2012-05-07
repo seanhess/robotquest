@@ -1,4 +1,5 @@
-header {
+
+header.sidebar {
     font-family: knightsquest;
     color: #FFF;
     position: fixed;
@@ -8,20 +9,6 @@ header {
     background: url(/assets/headerbg2.png);
     height: 100%;
     padding: 5px;
-}
-
-header #logo {
-    display: block;
-    float: left;
-    width: 64px;
-    height: 64px;
-}
-
-header .title {
-    font-size: 32px;
-    text-transform: uppercase;
-    margin-top: -3px;
-    margin-left: 69px;
 }
 
 header .links {
@@ -36,14 +23,6 @@ header .links a {
     padding: 5px;
 }
 
-header .robot {
-    font-family: robothead;
-}
-
-header .quest {
-    font-family: knightsquest;
-    font-size: 26px;
-}
 
 
 #botInfo {

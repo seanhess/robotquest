@@ -4,6 +4,9 @@
     margin: 0px;
 }
 
+body {
+}
+
 @font-face {
     font-family: robot;
     src: url('/assets/robot.ttf')  format('truetype');
@@ -18,3 +21,40 @@
     font-family: knightsquest;
     src: url(/assets/knightsquest.ttf) format('truetype');
 }
+
+
+header {
+    background: url(/assets/headerbg2.png);
+    color: white;
+    padding: 5px;
+}
+
+header a.logo {
+    color: white;
+    text-decoration: none;
+}
+
+header #logo {
+    display: block;
+    float: left;
+    width: 64px;
+    height: 64px;
+
+}
+
+header .title {
+    font-size: 32px;
+    text-transform: uppercase;
+    margin-top: -3px;
+    margin-left: 69px;
+}
+
+.robot {
+    font-family: robothead;
+}
+
+.quest {
+    font-family: knightsquest;
+    font-size: 26px;
+}
+

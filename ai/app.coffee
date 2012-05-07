@@ -6,13 +6,13 @@ RobotQUEST AI
 
 request = require 'request'
 {clone, map, find, compose, isEqual, bind, extend, filter, intersect, sortBy} = require 'underscore'
-{curry} = require './curry'
+{curry} = require 'fjs'
 
 HOST = process.env.HOST || "http://localhost:3026"
 AINAME = "AI"
 REPO = "http://github.com/seanhess/botland"
 
-MONSTERS = process.env.MONSTERS || 20
+MONSTERS = process.env.MONSTERS || 50
 
 start = (host) ->
 
