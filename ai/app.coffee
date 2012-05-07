@@ -32,8 +32,8 @@ start = (host) ->
   ## START 
   api.gameInfo (info) ->
 
-    api.createPlayer player, (data) ->
-      player.id = data.id
+    api.createPlayer player, (id) ->
+      player.id = id
 
       poll = ->
         api.objects (objects) ->
