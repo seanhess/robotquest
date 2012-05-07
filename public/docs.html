@@ -109,8 +109,27 @@
     <h1 id="what">What is RobotQuest?</h1>
     <p>RobotQuest is a MMO, programming game. Instead of playing RobotQuest directly, you write a program that plays it for you. Your program communicates with the <a href="#api">game server API</a> over HTTP by sending and receiving JSON messages. <a href="/viewer/">You can watch the game being played here.</a></p>
 
+    <p>All players share a single world</p>
+
     <p><a href="/viewer">The Viewer</a> lets you watch the game being played live.</p>
     <p><a href="#api">The Documentation</a> will teach you how to play the game. Playing well is up to you.</p>
+
+
+    <h2>What can I do?</h2>
+
+    <p>You can create minions (heroes/units/monsters), move them, and attack things near you. There is an AI player that spawns minions of increasing degrees of dangerousness to give you trouble.</p>
+
+    <h2>What's the goal?</h2>
+
+    <p>You can see who has the most kills and has survived the longest on the <a href="/viewer">Viewer</a>. The game will be largely defined by the programs written for it. See what you can write and how it affects the game. </p>
+
+    <h2>Rules</h2>
+
+    <p>Please respect the following rules. Later the server will enforce them.</p>
+
+    <ul>
+      <li><strong>Spawn with purpose</strong> - The API allows you to spawn multiple minions per player. Explore getting minions to work together, but don't spawn one on every square or anything. Consider having internal rules, like you can only spawn a minion when you kill one.</li>
+    </ul>
 
     <h1 id="api">Documentation</h1>
 
@@ -143,7 +162,7 @@
 
 
         <h2 id="examples">Examples</h2>
-        <p>These examples are in pseudocode. For complete examples in JavaScript, see the <a href="https://github.com/seanhess/botland/blob/master/public/viewer.html">viewer</a> and <a href="https://github.com/seanhess/botland/blob/master/public/demo/chaosbot.html">chaosbot</a></p>
+        <p>These examples are in pseudocode. For a complete example <a href="https://github.com/seanhess/botland/blob/master/ai/app.coffee">please take a look at the AI (CoffeeScript)</a></p>
 
         <h3>Control a minion</h3>
         <pre># register our player
@@ -354,6 +373,6 @@ repeatEvery game.tick
 
   </div>
 
-   <a href="http://github.com/seanhess/botland"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/camo.github.com/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub"></a>
+   <a href="http://github.com/seanhess/botland"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
 
 </body>

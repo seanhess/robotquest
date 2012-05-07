@@ -7,6 +7,9 @@ NEXT STEPS
     [x] Orc
     [x] more!
 [ ] Documentation
+    [ ] Small paragraph on the main page: RobotQuest is blah blah blah. Read more!
+    [x] Rules
+    [x] Goal
 [ ] Image Picker
 [ ] Try playing the game, and publish to friends
 [ ] Highlight the bot in the game when you click on the leaderboard
