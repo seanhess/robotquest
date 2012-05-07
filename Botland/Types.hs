@@ -89,8 +89,8 @@ data Ok = Ok deriving (Show)
 instance ToJSON GameInfo
 instance FromJSON GameInfo
 
-instance ToJSON Id
-instance FromJSON Id
+instance ToJSON Id where
+    toJSON (Id id) = A.String $ T.pack id
 
 instance ToJSON Ok where
     toJSON _ = object ["ok" .= True]
