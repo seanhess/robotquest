@@ -12,7 +12,7 @@ HOST = process.env.HOST || "http://localhost:3026"
 AINAME = "AI"
 REPO = "http://github.com/seanhess/botland"
 
-MONSTERS = process.env.MONSTERS || 50
+MONSTERS = process.env.MONSTERS || 10
 
 start = (host) ->
 

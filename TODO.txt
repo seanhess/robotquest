@@ -6,13 +6,13 @@ NEXT STEPS
 [x] Documentation
 [x] Make the game work like the docs (id strings)
 [x] Death animation (remove white background)
+[ ] Different "halos" depending on alignment
 [ ] Highlight the bot in the game when you click on the leaderboard. Don't defocus the board. SELECT the bot and track.
 [ ] Image Picker
-[ ] Sort actions randomly (there's always a chance you'll get away!). Double KO is much easier. (Bot commands go through!)
+[x] Sort actions randomly (there's always a chance you'll get away!). Double KO is much easier. (Bot commands go through!)
 [x] Death animation SPLAT
 [ ] Limit survivors list to 10
 [ ] Stats sheet always says 0 kills
-[ ] Different "halos" depending on alignment
 [ ] Wrong monster when you click on rats (from the line above??)
 
 MAYBE

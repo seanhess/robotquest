@@ -67,7 +67,7 @@ $(function() {
         }
 
         function botView(bot) {
-            var $bot = $("<a href='/bots/"+bot.id+"' class='bot sprite' id='"+bot.id+"'></a>")
+            var $bot = $("<a href='/bots/"+bot.id+"' class='bot sprite "+bot.player+"' id='"+bot.id+"'></a>")
             $bot.data(bot)
             sprite($bot, bot.sprite)
             return $bot
