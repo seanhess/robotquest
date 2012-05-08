@@ -68,13 +68,13 @@ botDetails id = do
 
 topKillers :: Action IO [Bot]
 topKillers = do
-    c <- find (select ["kills" =: ["$gt" =: 0]] "bots") {sort = ["kills" =: -1], limit = 20}
+    c <- find (select ["kills" =: ["$gt" =: 0]] "bots") {sort = ["kills" =: -1], limit = 10}
     ds <- rest c
     return $ map fromDoc ds
 
 topSurvivors :: Action IO [Bot]
 topSurvivors = do
-    c <- find (select [] "bots") {sort = ["created" =: 1], limit = 20}
+    c <- find (select [] "bots") {sort = ["created" =: 1], limit = 10}
     ds <- rest c
     return $ map fromDoc ds
 

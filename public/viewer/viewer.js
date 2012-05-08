@@ -46,6 +46,7 @@ $(function() {
 
             bots.forEach(function(bot) {
                 var $bot = $("#" + bot.id)
+                $bot.data(bot)
 
                 if (!$bot.length) {
                     console.log("NEW BOT", bot.id, bot.name, bot.x, bot.y, bot.sprite)
