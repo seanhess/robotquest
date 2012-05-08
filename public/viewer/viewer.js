@@ -115,15 +115,17 @@ $(function() {
             var botId = matchBot[1]
             var $bot = $("#" + botId)
             var bot = $bot.data()
-            showBot(bot)
+            showBot(bot, $bot)
         }
     })
 
     // BOT INFORMATION /////////////////////////////////////
     var $botInfo = $("#botInfo")
+    var $selectedBot = null 
 
-    function showBot(bot) {
-        $botInfo.show()
+    function showBot(bot, $bot) {
+
+        $botInfo.removeClass("hidden")
         $botInfo.find(".name").text(bot.name)
         $botInfo.find(".age").text(age(bot.created))
         $botInfo.find(".kills").text(bot.kills)
@@ -136,12 +138,15 @@ $(function() {
             $botInfo.find(".source").attr('href', player.source)
         })
 
-        // TODO get player information, add it hereszzz
-        // TODO change bot: player (drop source)
+        if ($selectedBot) $selectedBot.removeClass('selected')
+        $selectedBot = $bot
+        $selectedBot.addClass('selected')
     }
 
     function hideBot() {
-        $botInfo.hide()
+        $botInfo.addClass('hidden')
+        $selectedBot.removeClass('selected')
+        $selectedBot = null
     }
 
     $viewer.on("click", ".bot", function(event) {
@@ -149,6 +154,10 @@ $(function() {
         //showBot($(this).data())
         window.location.hash = "/bots/" + bot.id
         return false
+    })
+
+    $window.on("click", function(event) {
+        window.location.hash = ""
     })
 
     // only outside clicks

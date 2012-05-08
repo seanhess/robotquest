@@ -27,19 +27,20 @@ header .links a {
 
 #botInfo {
     position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0px;
+    bottom: 0px;
     left: 0px;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: none;
+
+    transition: bottom linear 300ms;
+    -webkit-transition: bottom linear 300ms;
+}
+
+#botInfo.hidden {
+    bottom: -200px;
 }
 
 #botInfo .inside {
     background-color: #FFF;
     width: 200px;
-    margin-top: 100px;
-    margin: 100px auto;
     padding: 10px;
 }
 
@@ -87,7 +88,7 @@ body {
     box-shadow: inset 0px 0px 10px 10px rgba(0, 0, 0, 0.15);
 }
 
-.bot:hover {
+.bot:hover, .bot.selected {
     box-shadow: inset 0px 0px 5px 5px #FCF766;
 }
 
