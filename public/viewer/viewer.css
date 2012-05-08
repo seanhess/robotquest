@@ -78,13 +78,13 @@ body {
 
     border-radius: 40px;
 
-    /* The white halo of good! */
-    box-shadow: inset 0px 0px 10px 10px rgba(255, 255, 255, 0.1);
+    /* The green halo of good! */
+    box-shadow: inset 0px 0px 10px 10px rgba(0, 255, 0, 0.10);
 }
 
-.bot.AI {
+.bot.monster2 {
     /* The black halo of evil */
-    box-shadow: inset 0px 0px 10px 10px rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0px 0px 10px 10px rgba(0, 0, 0, 0.15);
 }
 
 .bot:hover {
