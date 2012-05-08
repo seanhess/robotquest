@@ -26,7 +26,7 @@ import System.CPUTime (getCPUTime)
 type IdMap = Map String Bot
 
 gameInfo :: GameInfo
-gameInfo = GameInfo 25 20 1000 
+gameInfo = GameInfo 25 20 1000
 
 cleanupDelay :: Integer
 cleanupDelay = 2 
@@ -62,7 +62,7 @@ runTick g db = do
 gameTick :: GameInfo -> Action IO ()
 gameTick info = do
     removeDeadBots
-    bots <- allBots
+    bots <- botsBySpeed
     let state = emptyGame info
     let newState = execState (processActions bots) state 
     liftIO $ print newState

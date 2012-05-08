@@ -28,11 +28,24 @@ connectMongo = runIOE $ connect (host "127.0.0.1")
 
 ensureIndexes :: Action IO ()
 ensureIndexes = do
-    ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)
+
+    -- don't need this right now, I don't ever query by location
+    -- ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)
+
+    -- for leaderboards
     ensureIndex (Index "bots" ["kills" =: -1] "kills" False False)
     ensureIndex (Index "bots" ["created" =: 1] "created" False False)
+
+    -- for ownership
     ensureIndex (Index "bots" ["playerId" =: 1] "bot_player_id" False False)
+
+    -- for commands
+    ensureIndex (Index "bots" ["speed" =: -1] "bot_speed" False False)
+
+    -- to look up a player
     ensureIndex (Index "players" ["name" =: 1] "player_name" True True)
+
+    -- for cleanup
     ensureIndex (Index "players" ["heartbeat" =: 1] "player_heartbeat" False False)
 
 botOwner :: String -> String -> Action IO Bool
@@ -125,9 +138,9 @@ createBot g pid b = do
 
 -- GAME STATE -----------------------------------------------------
 
-allBots :: Action IO [Bot]
-allBots = do
-    c <- find (select [] "bots")
+botsBySpeed :: Action IO [Bot]
+botsBySpeed = do
+    c <- find (select [] "bots") {sort = ["speed" =: -1]}
     docs <- rest c
     return $ map fromDoc docs
 
@@ -149,7 +162,12 @@ removeDeadBots = do
 setCommand :: BotCommand -> GameInfo -> String -> String -> Action IO ()
 setCommand c g pid id = do
     updateHeartbeat pid
-    modify (select ["_id" =: id] "bots") ["$set" =: ["command" =: c]]
+
+    -- later, speed will be set via items. For now, let's set it randomly so bots
+    -- at the top don't have an advantage
+    s <- randomSpeed
+
+    modify (select ["_id" =: id] "bots") ["$set" =: ["command" =: c, "speed" =: s]]
 
 
 -- CLEANUP ---------------------------------------------------------
@@ -208,6 +226,11 @@ randomId :: Action IO String
 randomId = do
     i <- liftIO $ randomIO
     return $ intToHex i
+
+randomSpeed :: Action IO Int
+randomSpeed = do
+    i <- liftIO $ randomIO
+    return i
 
 intToHex :: Int -> String
 intToHex i = showIntAtBase 16 intToDigit (abs i) "" 
