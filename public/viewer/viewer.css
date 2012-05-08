@@ -82,7 +82,7 @@ body {
     box-shadow: inset 0px 0px 10px 10px rgba(0, 255, 0, 0.10);
 }
 
-.bot.monster2 {
+.bot.AI {
     /* The black halo of evil */
     box-shadow: inset 0px 0px 10px 10px rgba(0, 0, 0, 0.15);
 }
