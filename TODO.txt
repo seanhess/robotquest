@@ -11,14 +11,17 @@ NEXT STEPS
 [x] Sort actions randomly (there's always a chance you'll get away!). Double KO is much easier. (Bot commands go through!)
 [x] Death animation SPLAT
 [x] Limit survivors list to 10
-[ ] Stats sheet always says 0 kills
-[ ] Wrong monster when you click on rats (from the line above??)
-[ ] Image Picker
+[x] Stats sheet always says 0 kills
+[x] Wrong monster when you click on rats (from the line above??)
 
 MAYBE
 [ ] Change leaderboards to use normal /objects call. It'll save bandwidth, no? (not really). It'll update more frequently, the browser doesn't have THAT much to do
 
 FRIENDS RELEASE
+[ ] Talk about long-term plans
+[ ] Image Picker (or split out the images?) (on documentation)
+[ ] Put it up on a server
+[ ] Write an email
 
 ALPHA RELEASE
 [ ] Change leaderboards to be permanant with rollover (minute, hour, day, month, year, etc) (top 5 in each?)
@@ -31,6 +34,14 @@ REAL RELEASE
 [ ] Gzip?
 [ ] Spawn limit
 [-] Tighten up /game/objects
+
+COOL NEW FEATURES
+[ ] Real sign up (limit players!)
+[ ] Spawning as a resource
+[ ] Gold
+[ ] Blocks
+[ ] Store / Powerups
+[ ] Trading
 
 DONE
 [x] Get the leaderboards to display (and refresh?)
@@ -50,44 +61,3 @@ IDEAS
 [ ] If you die you lose all your gold, so you have an incentive to drop it.
 
 
-HOW TO WRITE MY AI BOTS
-In node?
-In haskell? (might as well. Should be fun, eh?)
-    -- could I use the same objects?
-    -- not really. I need a different ToJSON and FromJSON implementation
-    -- well, I could map them to another object. Use a BotRequest and BotResponse object. Then I could just genericize them
-    -- BotDocument (does it have a generic serializer)? Writing converters can't be any harder than writing parsers, etc
-        -- it would be FASTER though
-
-    HTTP request library would have to be good, but I could get it nice pretty quickly. 
-    Might be kind of hard to do
-
-    Would be less useful as a teaching tool
-    Could do it faster in coffeescript
-
-AI BOTS IN NATIVE HASKELL
-    
-What if the AI bots were implemented on the server?
-    Would be much more performant
-    Easier to deploy
-    Could use my existing monads, etc
-    Less useful as a teaching tool
-    
-    I'm going to need to implement some server-side logic anyway
-  
-    I could cheat (allow more spawns, etc)
-    
-    Might be harder in some respects: I wouldn't automatically have everything in place. 
-
-    I would like to TRY to write it in haskell. no? why not?
-
-    Try implementing them on the server?
-
-Implement them normally. It's cool. 
-    Use coffeescript
-    Make it AWESOME
-    
-    • use a single controller
-    • keep track of your guys
-    • have it all in an app
-    

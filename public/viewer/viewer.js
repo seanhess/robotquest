@@ -89,6 +89,7 @@ $(function() {
         var xi = parseInt(parts[1], 10)
         var yi = parseInt(parts[2], 10)
 
+        // need to remove the OLD class as well!
         $el.addClass(sheet)
         $el.css({'background-position': '-' + xi*32 + 'px -' + yi*32 + 'px'})       
     }
@@ -131,6 +132,9 @@ $(function() {
         $botInfo.find(".age").text(age(bot.created))
         $botInfo.find(".kills").text(bot.kills)
         $botInfo.find(".player").text(bot.player)
+
+        var $sprite = $botInfo.find(".sprite")
+        $sprite.attr("class", "sprite")
 
         sprite($botInfo.find(".sprite"), bot.sprite)
 

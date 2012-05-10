@@ -5,96 +5,7 @@
     <script src="/assets/js/jquery.min.js"></script>
 
     <link rel="stylesheet" href="/assets/css/lib.css"/>
-    <link rel="stylesheet" href="/docs.css"/>
-
-    <style>
-
-
-    .main {
-        padding: 20px;
-        font-size: 14px;
-        font-family: "Helvetica";
-        max-width: 960px;
-    }
-
-    ul {
-
-    }
-
-    ul li {
-        margin-left: 20px;
-    }
-
-    h1, h2, h3, h4, h5 {
-        margin-top: 20px;
-        margin-bottom: 5px;
-    }
-
-    h1, h2 {
-        margin-top: 30px;
-        font-family: robothead;
-    }
-
-    h1 {
-        font-size: 60px;
-    }
-
-    h2 {
-        font-size: 50px;
-    }
-
-    p, table {
-        margin-top: 1em;
-        margin-bottom: 1em;
-    }
-
-    pre, code, table.methods td, table.fields td {
-        font-family: "Courier";
-        background-color: #EEE;
-        padding: 2px;
-    }
-
-    pre, code, table.methods td, table.fields td {
-        font-size: 12px;
-    }
-
-    pre {
-        background-color: #EEE;
-        padding: 5px;
-        line-height: 1.4em;
-    }
-
-    table.methods td pre {
-        border: none;
-    }
-
-    .toc {
-    }
-
-    .toc > a {
-        display: block;
-        margin-top: 5px;
-        margin-bottom: 2px;
-        font-weight: bold;
-    }
-
-    .toc ul.routes {
-        font-family: "Courier";
-    }
-
-    .route h3 {
-        font-family: "Courier";
-    }
-
-    .route div {
-        margin-bottom: 5px;
-    } 
-
-    .route pre span {
-        font-weight: bold;
-    }
-
-    </style>
+    <link rel="stylesheet" href="/docs/docs.css"/>
 </head>
 <body>
 
@@ -107,28 +18,39 @@
   <div class="main">
 
     <h1 id="what">What is RobotQuest?</h1>
-    <p>RobotQuest is a MMO, programming game. Instead of playing RobotQuest directly, you write a program that plays it for you. Your program communicates with the <a href="#api">game server API</a> over HTTP by sending and receiving JSON messages. <a href="/viewer/">You can watch the game being played here.</a></p>
+    <p>RobotQuest is a MMO, programming game. Instead of playing RobotQuest directly, you write a program that plays it for you. Your program communicates with the <a href="#api">game server API</a> over HTTP by sending and receiving JSON messages. </p>
 
     <p>All players share a single world</p>
 
     <p><a href="/viewer">The Viewer</a> lets you watch the game being played live.</p>
-    <p><a href="#api">The Documentation</a> will teach you how to play the game. Playing well is up to you.</p>
+    <p><a href="#api">The Documentation</a> will teach you how to connect to the game and control your minions.</p>
 
 
     <h2>What can I do?</h2>
 
-    <p>You can create minions (heroes/units/monsters), move them, and attack things near you. There is an AI player that spawns minions of increasing degrees of danger to give you trouble.</p>
+    <p>You can create minions (heroes or monsters), move them, and attack things near you. There is an AI player that spawns minions of increasing degrees of danger to give you trouble.</p>
 
     <h2>What's the goal?</h2>
 
-    <p>You can see who has the most kills and has survived the longest on the <a href="/viewer">Viewer</a>. The game will be largely defined by the programs written for it. See what you can write and how it affects the game. </p>
+    <p>You can see who has the most kills and has survived the longest on the <a href="/viewer">Viewer</a>. Other than that it's up to the players. The game will change signifiantly depending on the programs written for it and as new features are added.</p>
 
     <h2>Rules</h2>
 
-    <p>Please respect the following rules. Later the server will enforce them.</p>
+    <p>Please respect the following rules. The server will eventually enforce them. </p>
 
+    <p><strong>Spawn with purpose</strong> - The API allows you to spawn multiple minions per player. Explore getting minions to work together, but don't spawn one on every square or anything. Consider having internal rules, like you can only spawn a minion when you kill one.</p>
+      <p><strong>Single player per program</strong> - You can try many different approaches to the game, but idea is that you write a program, which is a player. If you want to try a different approach, feel free to turn your old program off and use the same player name, or use a different player name, but don't spam player accounts</p>
+    </ul>
+
+    <h2>Feature Ideas</h2>
     <ul>
-      <li><strong>Spawn with purpose</strong> - The API allows you to spawn multiple minions per player. Explore getting minions to work together, but don't spawn one on every square or anything. Consider having internal rules, like you can only spawn a minion when you kill one.</li>
+      <li>Blocks - Place walls down on the map that block movement
+      <li>Gold -  Collect gold
+      <li>Store - Spend gold to buy items (upgrades)
+      <li>Trading - Swap gold or items with other minions
+      <li>Big World - Infinite or much larger world. Safe zones?
+      <li>Limit Player Creation - right now it's completely open
+      <li>Limit Spawning - make it a resource of some kind
     </ul>
 
     <h1 id="api">Documentation</h1>
@@ -226,37 +148,52 @@ repeatEvery game.tick
   name: "sean",
   source: "http://github.com/seanhess/botland"
 }</pre>
+      <p><code>name</code> - A unique player name for your program.</p>
       <p><code>source</code> - Bot homepage. Source code preferred.</p>
   </div>
 
   <div class="object">
     <h3 id="Minion">Minion</h3>
-      <pre>{
-  state: "Active",
+      <pre>// To Server
+{
   name: "rat",
+  sprite: "monster1-1-4",
+  x: 10,
+  y: 10
+}
+  
+// From Server
+{
+  name: "rat",
+  sprite: "monster1-1-4",
+  x: 10
+  y: 10,
+
+  // generated fields
+  state: "Active",
   kills: 0,
   created: "2012-05-03T12:06:48.666Z",
   player: "AI",
   id: "6dc21b03a79fa15d",
-  sprite: "monster1-1-4",
-  y: 18,
-  x: 10
-}</pre>
-      <p><code>state</code> - Active or Dead</p>
-      <p><code>name</code> - Player-specified name</p>
-      <p><code>player</code> - Player name</p>
+}
+
+</pre>
+      <p><code>name</code> - The name chosen for the minion by its player.</p>
       <p><code>sprite</code> - Player-chosen sprite id</p>
       <p><code>x, y</code> - Position in squares</p>
+      <p><code>state</code> - Active or Dead</p>
+      <p><code>player</code> - Name of the controlling <a href="#Player">Player</a></p>
   </div>
 
   <div class="object">
     <h3 id="Command">Command</h3>
+    <p>Careful, I'm case sensitive!</p>
     <pre>{
   action: "Move",
   direction: "Left"
 }</pre>
-      <p><code>action</code> - Move or Attack</p>
-      <p><code>direction</code> - Left, Right, Up, or Down</p>
+      <p><code>action</code> - "Move", "Attack"</p>
+      <p><code>direction</code> - "Left", "Right", "Up", or "Down"</p>
   </div>
 
 
@@ -264,6 +201,8 @@ repeatEvery game.tick
 
 
   <h2 id="routes">Routes</h2>
+
+  <p>Each route lists the url, the body it expects (if any), and what it returns. </p>
 
   <div class="route">
     <h3 id="game_info">GET /game/info</h3>
@@ -284,7 +223,7 @@ repeatEvery game.tick
   <div class="route">
     <h3 id="new_player">POST /players</h3>
 
-    <p>Register your player. Note that the id returned from this is <em>secret</em>. You use it to <a href="#new_minion">spawn</a> and <a href="#command">command</a> your bot.</p>
+    <p>Register your player. Note that the id returned from this is <em>secret</em>. You use it to <a href="#new_minion">spawn</a> and <a href="#command">command</a> your minions.</p>
 
     <div>
       <pre><span>body</span> <a href="#Player">Player</a></pre>
@@ -315,7 +254,7 @@ repeatEvery game.tick
     <p>Spawn a minion on the map</p>
 
     <div>
-      <pre><span>body</span> <a href="#Minion">Minion</a></pre>
+      <pre><span>body</span> <a href="#Minion">Minion</a> - only send {name, sprite, x, y}</pre>
     </div>
 
     <div>
@@ -339,7 +278,7 @@ repeatEvery game.tick
   <div class="route">
     <h3 id="command">POST /players/:playerId/minions/:minionId/commands</h3>
 
-    <p>Issue a command to one of your minions.</p>
+    <p>Issue a command to one of your minions. The command will be executed at the next game tick. If you issue more than one command per tick it will replace your previous command.</p>
 
     <div>
       <pre><span>body</span> <a href="#Command">Command</a></pre>

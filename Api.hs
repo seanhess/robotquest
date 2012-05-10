@@ -37,9 +37,7 @@ main = do
         middleware cors
 
         get "/" $ do
-            cache minute
-            header "Content-Type" "text/html"
-            file "public/index.html"
+            redirect "/viewer/"
 
         get "/viewer" $ do
             cache minute
@@ -49,7 +47,7 @@ main = do
         get "/docs" $ do
             cache minute
             header "Content-Type" "text/html"
-            file "public/docs.html"
+            file "public/docs/docs.html"
 
         get "/version" $ text "Botland 0.3.0"
 
