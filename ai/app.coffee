@@ -12,7 +12,7 @@ HOST = process.env.HOST || "http://localhost:3026"
 AINAME = "AI"
 REPO = "http://github.com/seanhess/botland"
 
-MONSTERS = process.env.MONSTERS || 10
+MONSTERS = process.env.MONSTERS || 7
 
 start = (host) ->
 
@@ -60,7 +60,8 @@ start = (host) ->
           bot = find bots, (b) -> b.id is newBot.id
           extend bot ? {}, newBot
 
-        if bots.length < MONSTERS
+        # if there are fewer than MONSTERS objects, then make some AI!
+        if objects.length < MONSTERS
           x = random info.width
           y = random info.height
           type = randomElement ais

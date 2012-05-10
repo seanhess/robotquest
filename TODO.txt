@@ -14,13 +14,18 @@ NEXT STEPS
 [x] Stats sheet always says 0 kills
 [x] Wrong monster when you click on rats (from the line above??)
 
-
 FRIENDS RELEASE
 [x] Talk about long-term plans
 [x] Image Picker (or split out the images?) (on documentation)
-[ ] Change leaderboards to use normal /objects call. It'll be simpler. 
+[-] Change leaderboards to use normal /objects call. It'll be simpler. 
 [ ] Put it up on a server
-[ ] Write an email
+[ ] Friends: (Scott, i.TV, Dude, Ryan)
+[ ] Write an email (utahjs, uflash, cocoaheads, provo-html5)
+
+MAYBE
+[ ] Fix Sorcerer AI
+[x] AI - depends on how many people are in the room total, not ITS total
+[ ] AI - only one sorcerer EVER. (not just less common)
 
 ALPHA RELEASE
 [ ] Change leaderboards to be permanant with rollover (minute, hour, day, month, year, etc) (top 5 in each?)
