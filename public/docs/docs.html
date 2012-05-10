@@ -79,6 +79,7 @@
         <li><a href="#delete_player">DELETE /players/:playerId</a>
         <li><a href="#delete_minion">DELETE /players/:playerId/minions/:minionId</a>
       </ul>
+      <a href="#sprites">Sprites</a>
     </div>
 
 
@@ -179,7 +180,7 @@ repeatEvery game.tick
 
 </pre>
       <p><code>name</code> - The name chosen for the minion by its player.</p>
-      <p><code>sprite</code> - Player-chosen sprite id</p>
+      <p><code>sprite</code> - Player-chosen <a href="#sprites">sprite</a></p>
       <p><code>x, y</code> - Position in squares</p>
       <p><code>state</code> - Active or Dead</p>
       <p><code>player</code> - Name of the controlling <a href="#Player">Player</a></p>
@@ -310,7 +311,67 @@ repeatEvery game.tick
     </div>
   </div>
 
-  </div>
+  <h2 id="sprites">Sprites</h2>
+
+  <p>I am using the extraordinarily complete, free, <a href="/">angbandtk dungeon tileset</a>. When creating a minion, you can choose the sprite that represents it. The format is:</p>
+  <pre>sheet-x-y</pre>
+  <p>where <code>sheet</code> is the name of one of the following sheets, and <code>x</code> and <code>y</code> are the 0-indexed offset from the top left. For example, the dark blue ghost is <code>undead-0-0</code>, while the phoenix is <code>uniques-8-5</code></p>
+  <table>
+    <div class="spritesheet">
+      <h5>classm</h5>
+      <img src="/assets/angbandtk/dg_classm32.gif">
+    </div>
+    <div class="spritesheet">
+      <h5>humans</h5>
+      <img src="/assets/angbandtk/dg_humans32.gif">
+    </div>
+    <div class="spritesheet">
+      <h5>undead</h5>
+      <img src="/assets/angbandtk/dg_undead32.gif">
+    </div>
+    <div class="spritesheet clear">
+      <h5>uniques</h5>
+      <img src="/assets/angbandtk/dg_uniques32.gif">
+    </div>
+    <div class="spritesheet">
+      <h5>monster5</h5>
+      <img src="/assets/angbandtk/dg_monster532.gif">
+    </div>
+    <div class="spritesheet clear">
+      <h5>monster1</h5>
+      <img src="/assets/angbandtk/dg_monster132.gif">
+    </div>
+    <div class="spritesheet">
+      <h5>monster2</h5>
+      <img src="/assets/angbandtk/dg_monster232.gif">
+    </div>
+    <div class="spritesheet">
+      <h5>monster3</h5>
+      <img src="/assets/angbandtk/dg_monster332.gif">
+    </div>
+    <div class="spritesheet clear">
+      <h5>monster4</h5>
+      <img src="/assets/angbandtk/dg_monster432.gif">
+    </div>
+    <div class="spritesheet">
+      <h5>monster6</h5>
+      <img src="/assets/angbandtk/dg_monster632.gif">
+    </div>
+    <div class="spritesheet">
+      <h5>monster7</h5>
+      <img src="/assets/angbandtk/dg_monster732.gif">
+    </div>
+    <div class="spritesheet">
+      <h5>people</h5>
+      <img src="/assets/angbandtk/dg_people32.gif">
+    </div>
+  </table>
+
+
+
+
+
+</div> <!-- main -->
 
    <a href="http://github.com/seanhess/botland"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
 

@@ -82,3 +82,13 @@ table.methods td pre {
 .route pre span {
     font-weight: bold;
 }
+
+
+.spritesheet {
+    float: left;
+    margin: 10px;
+}
+
+.clear {
+    clear: both;
+}
