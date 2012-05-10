@@ -36,6 +36,7 @@ header .links a {
 
     transition: bottom linear 300ms;
     -webkit-transition: bottom linear 300ms;
+    -moz-transition: bottom linear 300ms;
 }
 
 #botInfo.hidden {
@@ -80,6 +81,7 @@ body {
 
     transition: all linear 300ms;
     -webkit-transition: all linear 300ms;
+    -moz-transition: all linear 300ms;
 
     border-radius: 40px;
 

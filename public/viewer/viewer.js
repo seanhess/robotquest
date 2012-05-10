@@ -178,7 +178,6 @@ $(function() {
     var $rowTemplate = $survivors.find(".row.template").remove().clone()
     var $headerTemplate = $survivors.find(".header.template").remove().clone()
 
-
     function loadLeaderboards() {
         $.get('/top/killers', function(bots) {
             $killers.html($headerTemplate.clone())
@@ -206,5 +205,5 @@ $(function() {
     }
 
     loadLeaderboards()
-    var slowInterval = setInterval(loadLeaderboards, 10*1000)
+    var slowInterval = setInterval(loadLeaderboards, 3*1000)
 })
