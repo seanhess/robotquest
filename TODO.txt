@@ -14,12 +14,11 @@ NEXT STEPS
 [x] Stats sheet always says 0 kills
 [x] Wrong monster when you click on rats (from the line above??)
 
-MAYBE
-[ ] Change leaderboards to use normal /objects call. It'll save bandwidth, no? (not really). It'll update more frequently, the browser doesn't have THAT much to do
 
 FRIENDS RELEASE
-[ ] Talk about long-term plans
-[ ] Image Picker (or split out the images?) (on documentation)
+[x] Talk about long-term plans
+[x] Image Picker (or split out the images?) (on documentation)
+[ ] Change leaderboards to use normal /objects call. It'll be simpler. 
 [ ] Put it up on a server
 [ ] Write an email
 

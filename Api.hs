@@ -86,7 +86,7 @@ main = do
             bot <- db $ botDetails id
             sendActionFault "" bot
 
-        -- leaderboards
+        -- LEADERBOARDS (undocumented, the viewer can just use the normal objects call)
         get "/top/killers" $ do
             cache second
             bots <- db $ topKillers

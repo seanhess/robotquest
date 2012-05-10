@@ -11,6 +11,10 @@ header.sidebar {
     padding: 5px;
 }
 
+header.sidebar h2, header.sidebar th {
+    font-weight: normal;
+}
+
 header .links {
     clear:both;
     margin-top: 10px;
