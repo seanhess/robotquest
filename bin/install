@@ -2,12 +2,10 @@
 
 
 echo "CABAL UPDATE"
-cabal update 
+/root/.cabal/bin/cabal-dev update
+
 echo "CABAL INSTALL"
-pwd
-cabal install cabal-dev
-which cabal-dev
-cabal-dev install
+/root/.cabal/bin/cabal-dev install
 
 echo "Should be installed to cabal-dev/bin/botland"
 ls cabal-dev/bin/botland
