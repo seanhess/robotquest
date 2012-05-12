@@ -24,4 +24,4 @@ make install
 
 
 # install cabal-dev
-cabal install cabal-dev
+cabal install cabal-dev --prefix=/usr
