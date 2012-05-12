@@ -281,7 +281,7 @@ robotQuestApi = (host, onError) ->
 
   command: (player, minion, command, cb) ->
     #console.log "COMMAND", minion.id, command
-    request.post {url: host + "/players/" + player.id + "/minions/" + minion.id + "/command", json: command}, respond cb
+    request.post {url: host + "/players/" + player.id + "/minions/" + minion.id + "/commands", json: command}, respond cb
 
 
 

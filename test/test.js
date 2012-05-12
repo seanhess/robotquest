@@ -126,7 +126,7 @@ describe('botland api', function() {
     describe('movement', function() {
 
         it('should let me move', function(done) {
-            var url = Server + "/players/" + playerId + "/minions/" + minionId + "/command"
+            var url = Server + "/players/" + playerId + "/minions/" + minionId + "/commands"
             request.post({url: url, json:{action:"Move", direction:"Right"}}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, data)
@@ -150,7 +150,7 @@ describe('botland api', function() {
         })
 
         it("should not let me move out-of-bounds", function(done) {
-            request.post({url: Server + "/players/" + playerId + "/minions/" + minionId + "/command", json:{action:"Move", direction:"Up"}}, function(err, rs, data) {
+            request.post({url: Server + "/players/" + playerId + "/minions/" + minionId + "/commands", json:{action:"Move", direction:"Up"}}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200, 'should give 200 status code even though the command is invalid')
 
@@ -196,7 +196,7 @@ describe('botland api', function() {
         })
 
         it('should attack bot1', function(done) {
-            request.post({url: Server + "/players/" + playerId + "/minions/" + bot2Id + "/command", json:{action:"Attack", direction:"Right"}}, function(err, rs, data) {
+            request.post({url: Server + "/players/" + playerId + "/minions/" + bot2Id + "/commands", json:{action:"Attack", direction:"Right"}}, function(err, rs, data) {
                 assert.ifError(err)
                 assert.equal(rs.statusCode, 200)
                 done()

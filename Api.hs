@@ -98,7 +98,7 @@ main = do
 
 
         -- sets the bot's action
-        post "/players/:playerId/minions/:minionId/command" $ auth $ decodeBody $ \c -> do
+        post "/players/:playerId/minions/:minionId/commands" $ auth $ decodeBody $ \c -> do
             mid <- param "minionId"
             pid <- param "playerId"
             res <- db $ setCommand c gameInfo pid mid

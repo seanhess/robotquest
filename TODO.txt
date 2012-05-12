@@ -3,6 +3,8 @@ CLEANUP
 [ ] /commands
 [ ] Readme
 [ ] AI crashed :( not sure why (need to add logs, and auto-restart)
+    [ ] when he spawns a bunch of guys, then all the AI, it never comes back
+    [ ] Probably happens when 0 things are on the field, the AI can't restart
 
 NEXT STEPS
 [x] Make sure you can deploy it
