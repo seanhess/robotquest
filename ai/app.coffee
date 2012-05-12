@@ -5,14 +5,14 @@ RobotQUEST AI
 # On any error: I want to log the error, then exit and reconnect. (Throw the error)
 
 request = require 'request'
-{clone, map, find, compose, isEqual, bind, extend, filter, intersect, sortBy} = require 'underscore'
+{clone, map, find, compose, isEqual, bind, extend, filter, intersect, sortBy, last} = require 'underscore'
 {curry} = require 'fjs'
 
 HOST = process.env.HOST || "http://localhost:3026"
 AINAME = "AI"
 REPO = "http://github.com/seanhess/botland"
 
-MONSTERS = process.env.MONSTERS || 7
+MONSTERS = process.env.MONSTERS || 12
 
 start = (host) ->
 
@@ -165,10 +165,9 @@ sorcerer =
   act: (api, info, player, objects, bot) ->
 
     leaders = sortBy objects, (b) -> b.kills
+    target = last leaders
 
-    target = leaders[0]
-
-    command = if target?
+    command = if target? and target.id != bot.id
       dir = navigate bot, target
       if adjacent bot, target then attack dir
       else move dir
