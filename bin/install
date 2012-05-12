@@ -4,7 +4,9 @@
 echo "CABAL UPDATE"
 cabal update 
 echo "CABAL INSTALL"
+pwd
 cabal install cabal-dev
+which cabal-dev
 cabal-dev install
 
 echo "Should be installed to cabal-dev/bin/botland"
