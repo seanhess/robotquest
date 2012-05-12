@@ -1,8 +1,10 @@
 #!/bin/bash
 
+
 echo "CABAL UPDATE"
-cabal-dev update 
+cabal update 
 echo "CABAL INSTALL"
+cabal install cabal-dev
 cabal-dev install
 
 echo "Should be installed to cabal-dev/bin/botland"
