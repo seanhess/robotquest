@@ -1,3 +1,9 @@
+CLEANUP
+[x] Fix sorcerers
+[ ] /commands
+[ ] Readme
+[ ] AI crashed :( not sure why (need to add logs, and auto-restart)
+
 NEXT STEPS
 [x] Make sure you can deploy it
 [x] Cache Headers
