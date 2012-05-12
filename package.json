@@ -10,7 +10,7 @@
   "scripts": {
     "install":"bin/install",
     "test": "node_modules/.bin/mocha *.js",
-    "start":"./Api"
+    "start":"cabal-dev/bin/botland"
   },
   "engines": {
     "node": "0.6.x"

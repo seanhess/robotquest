@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo "CABAL UPDATE"
-cabal update 
+cabal-dev update 
 echo "CABAL INSTALL"
-cabal install --only-dependencies
+cabal-dev install
 
-echo "COMPILING"
-ghc --make Api.hs
+echo "Should be installed to cabal-dev/bin/botland"
+ls cabal-dev/bin/botland
