@@ -10,3 +10,4 @@ node_modules
 *.log
 public/assets/cute
 ggg/_main.js
+cabal-dev

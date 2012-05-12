@@ -11,8 +11,8 @@ Build-type:          Simple
 
 Cabal-version:       >=1.2
 
-Library
-  Exposed-modules:    Botland
+Executable botland
+  Main-is:            Api.hs
   Build-depends:      base                      >= 4        && < 5
                     , scotty                    >= 0.4      && < 0.5
                     , mongoDB                   >= 1.2
@@ -28,5 +28,6 @@ Library
                     , system-uuid         
                     , datetime           
                     , either-unwrap     
+                    , transformers, containers, ghc-prim, compact-string-fix, bson, random, http-types, conduit, resourcet
 
 

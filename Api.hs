@@ -17,7 +17,6 @@ import Data.Text.Lazy (Text, pack)
 
 import Network.Wai.Middleware.Headers (cors)
 import Network.Wai.Middleware.Static (staticRoot)
-import Network.HTTP.Types (status200)
 import Web.Scotty
 
 main :: IO ()
