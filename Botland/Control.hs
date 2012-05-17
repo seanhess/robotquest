@@ -115,7 +115,7 @@ createBot g pid b = do
     mp <- getPlayerById pid
 
     if (isNothing mp) then
-        return $ Left NotFound
+        return $ Left $ Fault "Player Not Found"
     else do
 
     let p = fromJust mp

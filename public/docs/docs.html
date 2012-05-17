@@ -83,7 +83,9 @@
       <a href="#sprites">Sprites</a>
     </div>
 
-
+    <h2>Notes</h2>
+    <p>All types sent and received from the server are in JSON. Don't forget to set "Content-Type: application/json" and Content-Length (good libraries will do this for you)</p>
+    <p>This includes the <a href="#Id">Id</a> type, which is just a JSON string. Run everything through your JSON parser and all will be well</p>
 
         <h2 id="examples">Examples</h2>
         <p>These examples are in pseudocode. For a complete example <a href="https://github.com/seanhess/botland/blob/master/ai/app.coffee">please take a look at the AI (CoffeeScript)</a></p>
@@ -131,6 +133,7 @@ repeatEvery game.tick
   <div class="object">
     <h3 id="Id">Id</h3>
     <pre>"6dc21b03a79fa15d"</pre>
+    <p>Note that this will include quotes when it comes down. This is valid JSON. Just run it through your normal JSON decoder and it will come out a string</p> 
   </div>
 
   <div class="object">
@@ -183,7 +186,7 @@ repeatEvery game.tick
       <p><code>name</code> - The name chosen for the minion by its player.</p>
       <p><code>sprite</code> - Player-chosen <a href="#sprites">sprite</a></p>
       <p><code>x, y</code> - Position in squares</p>
-      <p><code>state</code> - Active or Dead</p>
+      <p><code>state</code> - Active or Dead. If a minion dies, the server will send down Dead once, then the minion will no longer appear in the result of <a href="#game_objects">/game/objects</a></p>
       <p><code>player</code> - Name of the controlling <a href="#Player">Player</a></p>
   </div>
 
@@ -204,7 +207,7 @@ repeatEvery game.tick
 
   <h2 id="routes">Routes</h2>
 
-  <p>Each route lists the url, the body it expects (if any), and what it returns. </p>
+  <p>Each route lists the url, the body it expects (if any), and what it returns. All types are JSON</p>
 
   <div class="route">
     <h3 id="game_info">GET /game/info</h3>
@@ -215,7 +218,7 @@ repeatEvery game.tick
 
   <div class="route">
     <h3 id="game_objects">GET /game/objects</h3>
-    <p>Call this every <code>tick</code> to know where things are in the game</p>
+    <p>Call this every <code>tick</code> to know where things are in the game. If a minion dies, it will come back one last time with <code>state: "Dead"</code>, after which it will stop appearing in this call.</p>
     <div>
       <pre><span>returns</span> [<a href="#Minion">Minion</a>]</pre>
     </div>

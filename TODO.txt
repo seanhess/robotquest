@@ -1,10 +1,32 @@
 CLEANUP
 [x] Fix sorcerers
-[ ] /commands
-[ ] Readme
+[x] /commands
+[x] Readme
+[x] Tell people they need to add Content-Type header or they'll get an error
+[x] They need double quotes. Say anything?
+[x] Docs: it will come back with "dead" before removing you
+[x] Make it more clear that the ID returned is json. you need to json decode it
+[x] "Not Found" error on spawn minon. Probably player not found, but should be more specific
 [ ] AI crashed :( not sure why (need to add logs, and auto-restart)
+    [ ] Add logs!
     [ ] when he spawns a bunch of guys, then all the AI, it never comes back
     [ ] Probably happens when 0 things are on the field, the AI can't restart
+[ ] Cleanup: Do I really want to remove the player?
+    [ ] Maybe get rid of it. The AI will remove stuff
+    [ ] add a cleanup bot
+[ ] Make it easier for bots to reconnect if the server is down. Don't remove their players!
+[ ] If someone is dead, their position should register as clear, not taken (allowing spawns)
+[ ] Stop player deletion (or at least slow it down)
+
+[ ] real signups? I don't have to have real signups. Just ask for people to sign up, and generate a player for them by hand, until you make it realz
+
+IDEAS
+[ ] Limit spawning: you can only spawn next to you, for gold. (first spawn is free though)
+[ ] Are items ALWAYS expendable? Attack speed, it gets used up?
+[ ] Armor = Expendable health 
+[ ] Item: teleporters and invisibility cloaks
+[ ] Item: teleport squares (portals) 
+[ ] A chat / who's on thing. Show the most recent people
 
 NEXT STEPS
 [x] Make sure you can deploy it
