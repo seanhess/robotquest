@@ -54,6 +54,9 @@ runTick g db = do
         durationµs = round $ ((fromInteger elapsedps) / 1000000) :: Integer
         waitµs = (delayms * 1000) - durationµs
 
+    -- see if it is slow
+    liftIO $ putStrLn ("GameTick: " ++ (show durationµs) ++ "µs")
+
     threadDelay $ fromIntegral waitµs
 
     runTick g db

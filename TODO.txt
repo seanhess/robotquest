@@ -18,10 +18,10 @@ CLEANUP
 [ ] If someone is dead, their position should register as clear, not taken (allowing spawns)
 [ ] Stop player deletion (or at least slow it down)
 
+[ ] Add a timer to the game tick to see how slow it is?
+
 [ ] real signups? I don't have to have real signups. Just ask for people to sign up, and generate a player for them by hand, until you make it realz
     -- then I don't have to worry about them reconnecting, etc. I just give them a player name and ID
-
-[ ]
 
 IDEAS
 [ ] Limit spawning: you can only spawn next to you, for gold. (first spawn is free though)
