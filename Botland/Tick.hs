@@ -34,7 +34,7 @@ cleanupDelay = 2
 
 cleanup :: (Action IO Botland.Types.Ok -> IO a) -> IO b
 cleanup db = do 
-    putStrLn "CLEANUP"
+    {- putStrLn "CLEANUP"-}
     db $ cleanupInactives cleanupDelay
     threadDelay ((fromIntegral cleanupDelay)*1000000)
     cleanup db
@@ -65,7 +65,7 @@ gameTick info = do
     bots <- botsBySpeed
     let state = emptyGame info
     let newState = execState (processActions bots) state 
-    liftIO $ print newState
+    {- liftIO $ print newState-}
     mapM_ updateBot $ toBots newState
     clearCommands
 

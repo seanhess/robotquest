@@ -64,7 +64,6 @@ start = (host) ->
         if bots.length < MONSTERS
           x = random info.width
           y = random info.height
-          woot = henry.bob
           type = randomElement ais
           spawn(x, y, type.sprite(), type.name())
 
