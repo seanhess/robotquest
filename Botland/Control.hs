@@ -124,13 +124,13 @@ isPlayerNameActive name = do
 
 -- CREATION -------------------------------------------------------
 
-
 createBot :: GameInfo -> String -> Bot -> Action IO (Either Fault Id)
 createBot g pid b = do
     id <- randomId
     time <- now
-    mp <- getPlayerById pid
 
+    -- get player information
+    mp <- getPlayerById pid
     if (isNothing mp) then
         return $ Left $ Fault "Player Not Found"
     else do
@@ -140,17 +140,26 @@ createBot g pid b = do
 
     let ub = b { botId = id, botPlayerId = pid, player = pn, created = time }
 
+    -- check is valid position
     let v = validPosition g (point b)
-
     if (not v) then 
         return $ Left InvalidPosition 
     else do
 
-    -- this insert will fail if the location is occupied
+    -- check is occupied
+    occupied <- locationOccupied (point ub)
+    if (occupied) then
+        return $ Left InvalidPosition
+    else do
+
     insert_ "bots" (toDoc ub)
 
     return $ Right $ Id id 
 
+locationOccupied :: Point -> Action IO Bool
+locationOccupied p = do
+    c <- count (select ["x" =: (x p), "y" =: (y p), "state" =: Active] "bots")
+    return (c > 0)
 
 
 -- GAME STATE -----------------------------------------------------

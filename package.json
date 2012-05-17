@@ -9,7 +9,7 @@
   },
   "scripts": {
     "install":"bin/install",
-    "test": "node_modules/.bin/mocha *.js",
+    "test": "node_modules/.bin/mocha test/*.js -R spec -b",
     "start":"cabal-dev/bin/botland"
   },
   "engines": {
