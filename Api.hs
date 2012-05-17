@@ -19,9 +19,14 @@ import Network.Wai.Middleware.Headers (cors)
 import Network.Wai.Middleware.Static (staticRoot)
 import Web.Scotty
 
+import System.IO
+
+
 main :: IO ()
 main = do
 
+    -- without this you don't see any log output
+    hSetBuffering stdout NoBuffering
     putStrLn "Starting BOTLAND"
 
     pipe <- connectMongo
