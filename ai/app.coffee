@@ -64,6 +64,7 @@ start = (host) ->
         if bots.length < MONSTERS
           x = random info.width
           y = random info.height
+          woot = henry.bob
           type = randomElement ais
           spawn(x, y, type.sprite(), type.name())
 
@@ -287,6 +288,7 @@ robotQuestApi = (host, onError) ->
 
 if module == require.main
   start HOST
+  console.log "STARTED AI. HOST=#{HOST}"
   
 ## When you command something that doesn't exist any more you get a not authorized
 
