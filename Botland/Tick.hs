@@ -28,13 +28,12 @@ type IdMap = Map String Bot
 gameInfo :: GameInfo
 gameInfo = GameInfo 25 20 1000
 
+-- long enough that it doesn't happen by accident
 cleanupDelay :: Integer
-cleanupDelay = 2 
-
+cleanupDelay = 5
 
 cleanup :: (Action IO Botland.Types.Ok -> IO a) -> IO b
 cleanup db = do 
-    {- putStrLn "CLEANUP"-}
     db $ cleanupInactives cleanupDelay
     threadDelay ((fromIntegral cleanupDelay)*1000000)
     cleanup db
@@ -54,8 +53,8 @@ runTick g db = do
         durationµs = round $ ((fromInteger elapsedps) / 1000000) :: Integer
         waitµs = (delayms * 1000) - durationµs
 
-    -- see if it is slow
-    liftIO $ putStrLn ("GameTick: " ++ (show durationµs) ++ "µs")
+    -- If you get worried that the game tick is going slow, uncomment this
+    -- liftIO $ putStrLn ("GameTick: " ++ (show durationµs) ++ "µs")
 
     threadDelay $ fromIntegral waitµs
 

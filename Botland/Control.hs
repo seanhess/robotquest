@@ -42,7 +42,7 @@ ensureIndexes = do
     -- for commands
     ensureIndex (Index "bots" ["speed" =: -1] "bot_speed" False False)
 
-    -- to look up a player
+    -- to look up a player. Unique index. Can't have two players with the same name
     ensureIndex (Index "players" ["name" =: 1] "player_name" True True)
 
     -- for cleanup
@@ -96,14 +96,31 @@ getPlayer s = do
         Just d -> return $ Just $ fromDoc d
     
 -- we provide a random id. It is your secret id from now on, and you use it to control your bots
-createPlayer :: Player -> Action IO Id
+createPlayer :: Player -> Action IO (Either Fault Id)
 createPlayer p = do
+
+    let name = (playerName p)
+
+    active <- isPlayerNameActive name
+
+    if (active) then
+      return $ Left $ Fault "Player name already exists and is still active"
+    else do
+
+    -- remove any player of that name (if they're still there, they are inactive)
+    deletePlayerByName name 
+
+    -- now, register the new player with a brand new id
     id <- randomId
     let p' = p { playerId = id }
     save "players" (toDoc p')
     updateHeartbeat id
-    return $ Id id
+    return $ Right $ Id id
 
+isPlayerNameActive :: String -> Action IO Bool
+isPlayerNameActive name = do
+    c <- count (select ["name" =: name, "active" =: True] "players")
+    return (c > 0)
 
 -- CREATION -------------------------------------------------------
 
@@ -173,17 +190,26 @@ setCommand c g pid id = do
 -- CLEANUP ---------------------------------------------------------
 
 -- save when the player last completed an action
+-- mark them as active
 updateHeartbeat :: String -> Action IO ()
 updateHeartbeat pid = do
     time <- now
-    modify (select ["_id" =: pid] "players") ["$set" =: ["heartbeat" =: time]]
+    modify (select ["_id" =: pid] "players") ["$set" =: ["heartbeat" =: time, "active" =: True]]
 
 cleanupPlayer :: String -> Action IO Ok
 cleanupPlayer id = do
     liftIO $ putStrLn ("Cleaning Up " ++ id)
     delete (select ["playerId" =: id] "bots")
-    delete (select ["_id" =: id] "players")
+    
+    -- Marks the player as inactive, so someone can create over it if they want
+    modify (select ["_id" =: id] "players") ["$set" =: ["active" =: False]]
+
     return Ok
+
+-- deletes a player by name so you can re-register the name
+deletePlayerByName :: String -> Action IO ()
+deletePlayerByName name = do
+    delete (select ["name" =: name] "players")
 
 cleanupBot :: String -> Action IO Ok
 cleanupBot botId = do
@@ -194,15 +220,18 @@ cleanupInactives :: Integer -> Action IO Ok
 cleanupInactives delay = do
 
     time <- now
-    let tenSecondsAgo = addSeconds (-delay) time
+    let cutoffTime = addSeconds (-delay) time
 
-    c <- find (select ["heartbeat" =: ["$lt" =: tenSecondsAgo]] "players")
+    -- query for inactive players
+    c <- find (select ["heartbeat" =: ["$lt" =: cutoffTime], "active" =: True] "players")
     docs <- rest c
 
     let ids = map playerId $ map fromDoc docs
 
     mapM_ cleanupPlayer ids 
     return Ok
+
+    
 
 
 

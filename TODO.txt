@@ -7,10 +7,8 @@ CLEANUP
 [x] Docs: it will come back with "dead" before removing you
 [x] Make it more clear that the ID returned is json. you need to json decode it
 [x] "Not Found" error on spawn minon. Probably player not found, but should be more specific
-[ ] AI crashed :( not sure why (need to add logs, and auto-restart)
-    [ ] Add logs!
-    [ ] when he spawns a bunch of guys, then all the AI, it never comes back
-    [ ] Probably happens when 0 things are on the field, the AI can't restart
+[x] Logs!
+[ ] AI crashed (wait for error then read logs)
 [ ] Cleanup: Do I really want to remove the player?
     [ ] Maybe get rid of it. The AI will remove stuff
     [ ] add a cleanup bot
@@ -23,6 +21,28 @@ CLEANUP
 [ ] real signups? I don't have to have real signups. Just ask for people to sign up, and generate a player for them by hand, until you make it realz
     -- then I don't have to worry about them reconnecting, etc. I just give them a player name and ID
 
+[ ] Better Cleanup: Go through the db looking for "inactive" players (defined by 0 bots for X seconds)
+    [ ] Reset player age on spawn?
+    [ ] I don't really want to pull down ALL the players, right?
+    [ ] I want any players that don't have any bots
+    [ ] Not THAT hard
+
+When a player connects with a given name
+  - usually because it is restarting
+
+When the name already exists
+  - can't let them have the same name. The names are unique! player/:name (for seeing the source, etc)
+
+
+OPTIONS
+  1. track whether a player is active. If inactive, allow the name to be registered
+     --- does he have any active bots on the board?
+     --- just use cleanupInactives then
+
+  2. give people a secret player id (token) by hand or form. They must use this when connecting
+     !!! No good! Because then people couldn't publish their source!
+     --- the way you have it now is better
+
 IDEAS
 [ ] Limit spawning: you can only spawn next to you, for gold. (first spawn is free though)
 [ ] Are items ALWAYS expendable? Attack speed, it gets used up?
@@ -30,6 +50,18 @@ IDEAS
 [ ] Item: teleporters and invisibility cloaks
 [ ] Item: teleport squares (portals) 
 [ ] A chat / who's on thing. Show the most recent people
+
+REAL SIGNUP DESIGN
+[ ] Form: pick a player name, give your email
+[ ] emails you your playerId and name together
+[ ] You can always create another one
+
+EASY SIGNUP DESIGN
+BUT, honestly, if you have no guys, you should be allowed to re-register the player, no?
+Right..
+So, I delete the player? No, I simply allow you to register a name OVER the player if it has no bots
+And bot cleanup is by player, but it doesn't delete the player, just the bots
+Then it lets you re-register that player anyway
 
 NEXT STEPS
 [x] Make sure you can deploy it

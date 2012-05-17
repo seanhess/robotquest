@@ -72,7 +72,7 @@ main = do
         -- works because it's a secret number, never sent to anyone
         post "/players" $ decodeBody $ \p -> do
             id <- db $ createPlayer p
-            sendAction "" id
+            sendActionFault "" id
 
         get "/players/:name" $ do
             cache minute
