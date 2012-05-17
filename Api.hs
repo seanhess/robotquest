@@ -26,7 +26,7 @@ main :: IO ()
 main = do
 
     -- without this you don't see any log output
-    hSetBuffering stdout NoBuffering
+    hSetBuffering stdout LineBuffering
     putStrLn "Starting BOTLAND"
 
     pipe <- connectMongo
