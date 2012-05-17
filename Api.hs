@@ -22,6 +22,8 @@ import Web.Scotty
 main :: IO ()
 main = do
 
+    putStrLn "Starting BOTLAND"
+
     pipe <- connectMongo
     let db action = liftIO $ access pipe master "botland" action
     let auth = runAuth pipe "botland"
