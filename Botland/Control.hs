@@ -29,8 +29,8 @@ connectMongo = runIOE $ connect (host "127.0.0.1")
 ensureIndexes :: Action IO ()
 ensureIndexes = do
 
-    -- don't need this right now, I don't ever query by location
-    -- ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" True True)
+    -- I query by location when someone spawns
+    ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" False False)
 
     -- for leaderboards
     ensureIndex (Index "bots" ["kills" =: -1] "kills" False False)
