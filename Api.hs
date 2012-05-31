@@ -64,7 +64,7 @@ main = do
         -- returns all the bots, obstacles and whathaveyounots
         -- everything except playerId
         get "/game/objects" $ do
-            cache second
+            {- cache second-}
             res <- db $ objects
             sendAction "" res
 
