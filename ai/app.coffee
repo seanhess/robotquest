@@ -20,6 +20,8 @@ MONSTERS = process.env.MONSTERS || 10
 
 start = (host) ->
 
+  console.log "AI starting MONSTERS=#{MONSTERS} HOST=#{HOST}"
+
   player =
     name: AINAME
     source: REPO
@@ -82,6 +84,12 @@ start = (host) ->
 
 ## HELPERS
 isAi = (bot) -> bot.player == AINAME
+
+wander = ->
+  direction = randomElement directions
+  action = randomElement ["Stop", "Stop", "Move"]
+  # action = randomElement ["Move"]
+  {action, direction}
 
 ## AI!
 
@@ -187,11 +195,6 @@ sorcerer =
 ais = [rat, rat, rat, rat, orc, orc, blarg, blarg, demon, sorcerer]
 #ais = [orc, demon, sorcerer]
 #ais = [sorcerer]
-
-wander = ->
-  direction = randomElement directions
-  action = randomElement ["Stop", "Stop", "Move"]
-  {action, direction}
 
 if module == require.main
   start HOST
