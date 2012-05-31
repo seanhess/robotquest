@@ -26,7 +26,8 @@ $(function() {
 
         var w = gameInfo.width
         var h = gameInfo.height
-        var ms = gameInfo.tick
+        var ms = gameInfo.tickDelay
+        var count = gameInfo.tickCount
 
         // this will make it scroll
         $viewer.css({width: w * PX, height: h * PY})
@@ -35,8 +36,11 @@ $(function() {
         console.log("GAME INFO", w, h, ms)
 
         function poll() {
-            $.get("/game/objects", function(bots) {
-                tick(bots)
+            var start = Date.now()
+            $.get("/game/objects/" + (count), function(game) {
+                count = (game.info.tickCount+1)
+                console.log("TICK COUNT BACK", count)
+                tick(game.objects)
             })
         }
 

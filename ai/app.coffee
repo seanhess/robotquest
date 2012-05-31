@@ -42,10 +42,12 @@ start = (host) ->
       player.id = id
 
       poll = ->
-        api.objects (objects) ->
-          tick objects
+        console.log "TICK COUNT", info.tickCount
+        api.objects (info.tickCount+1), (game) ->
+          info = game.info
+          tick game.objects
 
-      setInterval poll, info.tick
+      setInterval poll, info.tickDelay
 
       ## MONSTER ACTONS
       # api: the api

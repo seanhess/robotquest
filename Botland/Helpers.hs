@@ -116,6 +116,7 @@ fault f = do
         NotFound -> status status400
         InvalidPosition -> status status400
         NotImplemented -> status status501
+        BadRequest m -> status status400
         _ -> status status500
     json f
 

@@ -1,3 +1,12 @@
+NEXT STEPS
+[ ] Docs: tickDelay, currentTick
+
+[ ] why is it slow in production? is it slow locally?
+[ ] daily leaderboards. add player
+[ ] blocks
+[ ] gold
+
+
 CLEANUP
 [x] Fix sorcerers
 [x] /commands

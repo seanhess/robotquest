@@ -16,8 +16,8 @@ robotQuestApi = (host, onError) ->
   gameInfo: (cb) ->
     request.get {url: host + "/game/info", json: true}, respond cb
 
-  objects: (cb) ->
-    request.get {url: host + "/game/objects", json: true}, respond cb
+  objects: (tickCount, cb) ->
+    request.get {url: host + "/game/objects/#{tickCount}", json: true}, respond cb
 
   createPlayer: (player, cb) ->
     request.post {url: host + "/players", json: player}, respond cb

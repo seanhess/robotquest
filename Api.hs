@@ -27,11 +27,14 @@ main = do
 
     -- without this you don't see any log output
     hSetBuffering stdout LineBuffering
-    putStrLn "Starting BOTLAND"
+    putStrLn "Starting RobotQuest"
 
     pipe <- connectMongo
-    let db action = liftIO $ access pipe master "botland" action
-    let auth = runAuth pipe "botland"
+    let db action = liftIO $ access pipe master "robotquest" action
+    let auth = runAuth pipe "robotquest"
+
+    -- setup 
+    db ensureIndexes
 
     -- recurring tasks
     forkIO $ cleanup db
@@ -55,18 +58,30 @@ main = do
             header "Content-Type" "text/html"
             file "public/docs/docs.html"
 
-        get "/version" $ text "Botland 0.3.0"
+        get "/version" $ text "RobotQuest 0.3.0"
 
         get "/game/info" $ do
-            cache minute
-            json gameInfo
+            -- cache minute
+            gameInfo <- db $ getGameInfo
+            sendAction "" gameInfo
 
         -- returns all the bots, obstacles and whathaveyounots
         -- everything except playerId
-        get "/game/objects" $ do
+
+        -- this seems LAME
+        -- maybe I could get varnish to delete the cache-control field
+        -- cache-control expires-at?
+
+        -- well, but I want an update-oriented thing eventually anyway
+
+
+        get "/game/objects/:tickCount" $ do
+            t <- param "tickCount"
+
+            -- DON'T CACHE (without tick count). the browser won't send the request a second later 
             cache second
-            res <- db $ objects
-            sendAction "" res
+            res <- db $ gameAndObjects t
+            sendActionFault "" res
 
         -- really, just gives you a session id, but pretend that it matters :)
         -- works because it's a secret number, never sent to anyone

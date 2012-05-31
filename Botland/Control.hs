@@ -9,7 +9,7 @@ import Control.Monad.IO.Class (liftIO)
 import Control.Monad (forM_)
 
 import Data.Map (assocs)
-import Data.Maybe (isNothing, fromJust, isJust)
+import Data.Maybe (isNothing, fromJust, isJust, fromMaybe)
 import Data.DateTime (DateTime, addSeconds, getCurrentTime)
 
 import Database.MongoDB hiding (Field)
@@ -28,6 +28,8 @@ connectMongo = runIOE $ connect (host "127.0.0.1")
 
 ensureIndexes :: Action IO ()
 ensureIndexes = do
+
+    liftIO $ putStrLn "INDEXES"
 
     -- I query by location when someone spawns
     ensureIndex (Index "bots" ["x" =: 1, "y" =: 1] "xy" False False)
@@ -48,11 +50,24 @@ ensureIndexes = do
     -- for cleanup
     ensureIndex (Index "players" ["heartbeat" =: 1] "player_heartbeat" False False)
 
+    liftIO $ putStrLn "INDEXES 2222"
+
 botOwner :: String -> String -> Action IO Bool
 botOwner pid botId = do
     m <- findOne (select ["_id" =: botId, "playerId" =: pid] "bots") {project = ["_id" =: 1]}
     return $ isJust m
 
+saveGameInfo :: GameInfo -> Action IO ()
+saveGameInfo g = do
+    save "info" (toDoc g)
+    return ()
+
+getGameInfo :: Action IO GameInfo
+getGameInfo = do
+  md <- findOne (select ["_id" =: "info"] "info")
+  case md of
+    Nothing -> return $ GameInfo 0 0 0 0
+    Just d -> return $ fromDoc d
 
 -- DETAILS --------------------------------------------------------
 
@@ -252,7 +267,17 @@ objects = do
     bs <- rest c
     return $ map fromDoc bs
 
+gameAndObjects :: Integer -> Action IO (Either Fault GameObjects)
+gameAndObjects tc = do
+    game <- getGameInfo
 
+    -- make sure the tick matches
+    if ((tickCount game) /= tc) then
+      return $ Left $ BadRequest ("Tick count " ++ (show tc) ++ " does not match server " ++ (show (tickCount game)))
+    else do
+
+    objs <- objects
+    return $ Right $ GameObjects game objs
 
 
 -- HELPERS ----------------------------------------------------------

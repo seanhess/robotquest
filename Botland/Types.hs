@@ -58,8 +58,12 @@ data Point = Point { x :: Int, y :: Int }
 -- gives the field and interval
 data GameInfo = GameInfo { width :: Int
                  , height :: Int
-                 , tick :: Integer
+                 , tickDelay :: Integer
+                 , tickCount :: Integer
                  } deriving (Show, Generic)
+
+-- GameInfo + Objects
+data GameObjects = GameObjects GameInfo [Bot]
 
 -- available actions
 data BotCommand = BotCommand { action :: BotAction, direction :: Direction } deriving (Show, Eq, Typeable, Generic)
@@ -73,6 +77,7 @@ data Fault = Fault String
            | NotAuthorized
            | NotImplemented
            | InvalidPosition
+           | BadRequest String
            deriving (Generic, Show)
 
 -- when I just want to send back an id
@@ -85,9 +90,6 @@ data Ok = Ok deriving (Show)
 
 
 -- JSON SUPPORT --------------------------------------------------------------
-
-instance ToJSON GameInfo
-instance FromJSON GameInfo
 
 instance ToJSON Id where
     toJSON (Id id) = A.String $ T.pack id
@@ -163,6 +165,11 @@ instance FromJSON Player where
 instance ToJSON Player where
     toJSON (Player id name source) = object ["name" .= name, "source" .= source]
 
+instance ToJSON GameObjects where
+  toJSON (GameObjects game bots) = object ["info" .= game, "objects" .= bots]
+
+instance ToJSON GameInfo
+instance FromJSON GameInfo
 
 -- SERVER MESSAGES ----------------------------------------------------------
 
@@ -177,6 +184,7 @@ message NotFound = "Not Found"
 message NotAuthorized = "Not Authorized"
 message NotImplemented = "Not Implemented"
 message InvalidPosition = "Invalid Position"
+message (BadRequest m) = m
 message (Fault m) = m
 
 
@@ -228,6 +236,17 @@ instance ToDoc Player where
     toDoc p = [ "_id" := val (playerId p)
               , "name" := val (playerName p)
               , "source" := val (source p)
+              ]
+
+instance FromDoc GameInfo where
+    fromDoc g = GameInfo (at "width" g) (at "height" g) (at "tickDelay" g) (at "tickCount" g)
+
+instance ToDoc GameInfo where
+    toDoc g = [ "_id" := B.String "info"
+              , "width" := val (width g)
+              , "height" := val (height g)
+              , "tickDelay" := val (tickDelay g)
+              , "tickCount" := val (tickCount g)
               ]
 
 instance Val BotCommand where

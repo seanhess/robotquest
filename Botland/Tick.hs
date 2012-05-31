@@ -26,7 +26,7 @@ import System.CPUTime (getCPUTime)
 type IdMap = Map String Bot
 
 gameInfo :: GameInfo
-gameInfo = GameInfo 25 20 1000
+gameInfo = GameInfo 25 20 1000 0
 
 -- long enough that it doesn't happen by accident
 cleanupDelay :: Integer
@@ -41,7 +41,7 @@ cleanup db = do
 runTick :: GameInfo -> (Action IO () -> IO (Either Failure ())) -> IO ()
 runTick g db = do
 
-    let delayms = tick g
+    let delayms = tickDelay g
 
     startTime <- getCPUTime -- picoseconds
 
@@ -54,11 +54,11 @@ runTick g db = do
         waitµs = (delayms * 1000) - durationµs
 
     -- If you get worried that the game tick is going slow, uncomment this
-    -- liftIO $ putStrLn ("GameTick: " ++ (show durationµs) ++ "µs")
+    liftIO $ putStrLn ("GameTick: " ++ (show (tickCount g)) ++ " dur=" ++ (show durationµs) ++ "µs")
 
     threadDelay $ fromIntegral waitµs
 
-    runTick g db
+    runTick (g {tickCount = (tickCount g) + 1}) db
 
 
 gameTick :: GameInfo -> Action IO ()
@@ -70,6 +70,7 @@ gameTick info = do
     {- liftIO $ print newState-}
     mapM_ updateBot $ toBots newState
     clearCommands
+    saveGameInfo info
 
 processActions :: [Bot] -> GameState ()
 processActions bots = do
