@@ -4,9 +4,13 @@ RobotQUEST AI
 
 # On any error: I want to log the error, then exit and reconnect. (Throw the error)
 
-request = require 'request'
-{clone, map, find, compose, isEqual, bind, extend, filter, intersect, sortBy, last} = require 'underscore'
-{curry} = require 'fjs'
+{map, find, extend, filter, intersect, sortBy, last, id} = require 'underscore'
+
+lib = require './lib'
+{robotQuestApi, adjacent, dir, navigate, random, randomElement, id} = lib
+{UP, DOWN, LEFT, RIGHT, STOP, ATTACK, MOVE} = lib
+{directions, pointKey, distance, isHit, attack, move, stop} = lib
+
 
 HOST = process.env.HOST || "http://localhost:3026"
 AINAME = "AI"
@@ -78,9 +82,6 @@ start = (host) ->
 
 ## HELPERS
 isAi = (bot) -> bot.player == AINAME
-
-random = (n) -> Math.floor(Math.random() * n)
-randomElement = (vs) -> vs[random(vs.length)]
 
 ## AI!
 
@@ -187,103 +188,10 @@ ais = [rat, rat, rat, rat, orc, orc, blarg, blarg, demon, sorcerer]
 #ais = [orc, demon, sorcerer]
 #ais = [sorcerer]
 
-## REUSABLE AI
-
-UP = "Up"
-DOWN = "Down"
-LEFT = "Left"
-RIGHT = "Right"
-
-STOP = "Stop"
-ATTACK = "Attack"
-MOVE = "Move"
-
-directions = [UP, DOWN, LEFT, RIGHT]
-
-# if two objects are adjacent
-# functional programming example! This works against ANY object that has x and y coordinates!
-# I don't have to be over-specific
-adjacent = curry (a, b) ->
-  dirs = directions.map (d) -> dir(b, d)
-  hits = dirs.filter isHit(a)
-  hits.length
-
-# move point in direction
-dir = (point, d) ->
-  switch d
-    when UP then {x: point.x, y: point.y-1}
-    when DOWN then {x: point.x, y: point.y+1}
-    when LEFT then {x: point.x-1, y: point.y}
-    when RIGHT then {x: point.x+1, y: point.y}
-    else point
-
-# gives you a direction from a to b
-# assumes they are adjacent
-navigate = (a, b) ->
-  if a.x is b.x
-    if a.y < b.y then DOWN
-    else UP
-  else
-    if a.x < b.x then RIGHT
-    else LEFT
-
-
-pointKey = (p) -> p.x + "," + p.y
-
-distance = curry (a, b) -> Math.abs(b.x - a.x) + Math.abs(b.y - a.y)
-
-mask = curry (fields, obj) ->
-  masked = {}
-  fields.forEach (f) ->
-    masked[f] = obj[f]
-  return masked
-
-isHit = curry (a, b) -> a.x is b.x and a.y is b.y
-
 wander = ->
   direction = randomElement directions
   action = randomElement ["Stop", "Stop", "Move"]
   {action, direction}
-
-
-attack = (direction) -> {action: ATTACK, direction}
-
-move = (direction) -> {action: MOVE, direction}
-
-stop = (d) -> {action: STOP, direction: UP}
-
-val = curry (key, obj) -> obj[key]
-eq = curry (a, b) -> a == b
-id = (obj) -> obj.id
-
-
-## API
-robotQuestApi = (host, onError) ->
-
-  respond = (cb, checkStatus = true) ->
-    (err, rs, body) ->
-      if err? then return onError err
-      if checkStatus and rs.statusCode != 200
-        return onError new Error body.message
-      cb body
-
-  gameInfo: (cb) ->
-    request.get {url: host + "/game/info", json: true}, respond cb
-
-  objects: (cb) ->
-    request.get {url: host + "/game/objects", json: true}, respond cb
-
-  createPlayer: (player, cb) ->
-    request.post {url: host + "/players", json: player}, respond cb
-
-  createMinion: (player, minion, cb) ->
-    request.post {url: host + "/players/" + player.id + "/minions", json: minion}, respond(cb, false)
-
-  command: (player, minion, command, cb) ->
-    #console.log "COMMAND", minion.id, command
-    request.post {url: host + "/players/" + player.id + "/minions/" + minion.id + "/commands", json: command}, respond cb
-
-
 
 if module == require.main
   start HOST
