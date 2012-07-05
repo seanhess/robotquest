@@ -81,10 +81,33 @@ data Id = Id { id :: String } deriving (Show, Generic)
 -- just means the server was successful
 data Ok = Ok deriving (Show)
 
+-- OBJECTS!
+data Block = Block BlockType Point deriving (Show)
+data BlockType = Wood deriving (Show, Read, Eq, Typeable)
 
+-- I'd REALLY like to use some duck typing when it comes to the game logic!
+-- the map should be based on EVERYTHING
 
+data GameObject = BlockObject Block
+                | BotObject Bot
+                deriving (Show)
 
 -- JSON SUPPORT --------------------------------------------------------------
+
+instance ToJSON GameObject where
+  toJSON (BlockObject block) = toJSON block
+  toJSON (BotObject bot) = toJSON bot
+
+instance ToJSON Block where
+  toJSON (Block t p) = object ["blockType" .= t, "x" .= x p, "y" .= y p]
+
+instance ToJSON BlockType where
+    toJSON = typeToJSON show
+
+instance FromJSON BlockType where
+    parseJSON = typeParseJSON readMay
+
+
 
 instance ToJSON GameInfo
 instance FromJSON GameInfo

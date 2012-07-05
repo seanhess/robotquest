@@ -23,8 +23,6 @@ import Prelude hiding (lookup)
 
 import System.CPUTime (getCPUTime)
 
-type IdMap = Map String Bot
-
 gameInfo :: GameInfo
 gameInfo = GameInfo 25 20 1000
 
@@ -112,19 +110,6 @@ attackAction b p d = do
           update $ victim { botState = Dead }
           update $ b { kills = k }
           
--- converts a command document into a (Bot, BotCommand)
-botById :: IdMap -> String -> Maybe Bot
-botById m id = lookup id m 
-
--- creates a map of bot id to bot, for use in the other functions
-idMap :: [Bot] -> IdMap
-idMap bs = foldr a empty bs
-    where a b m = insert (botId b) b m
-
-{-toField :: [Bot] -> Field-}
-{-toField bs = foldr a empty bs -}
-    {-where a b f = insert (Point (x b) (y b)) b f-}
-
 -- Gives you the point in a given direction
 destination :: Direction -> Point -> Point
 destination d (Point x y) = case d of

@@ -1,3 +1,20 @@
+WAHOO
+might be time to switch to updates?
+run through, change the state AND make an array of updates
+
+add a block
+  -- insert to points
+
+remove a block
+  -- delete from points
+
+afterward
+  -- save points!
+  (but we don't know that one was DELETED). That's a state change we have to make
+
+updates!
+  -- just have a bunch of update types, and you can process them afterwards. you can also push them out if you want
+
 CLEANUP
 [x] Fix sorcerers
 [x] /commands
