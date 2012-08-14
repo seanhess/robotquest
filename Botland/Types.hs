@@ -256,7 +256,7 @@ typeToBSON show = val . show
 
 typeFromBSON :: (String -> Maybe a) -> B.Value -> Maybe a
 typeFromBSON read (B.String bs) = do
-    m <- read $ C.unpack bs
+    m <- read $ T.unpack bs
     return m
 
 
