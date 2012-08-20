@@ -1,11 +1,13 @@
 // example ggg.js. Delete what you don't need
 module.exports = {
 
+  install: "",
+
   // servers to deploy to
   servers: {
     api: {
       hosts: "root@robotquest.tk",
-      start: "cabal-dev/bin/botland",
+      start: "./Api",
       install: ""
     },
     ai: {
