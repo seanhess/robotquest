@@ -1,6 +1,7 @@
-# Tested on Ubuntu Server 11.10 
+## UBUNTU 11
 
 # dependencies
+apt-get update
 apt-get -y install git make wget
 
 # TODO mongodb!
@@ -25,3 +26,19 @@ make install
 
 # install cabal-dev
 cabal install cabal-dev --prefix=/usr
+
+
+
+
+
+
+## UBUNTU 12 (you don't need this on the server, this is just to compile the binary)
+apt-get update
+apt-get -y install git make wget
+apt-get -y install haskell-platform
+
+# nodejs for gogogo
+apt-get install python-software-properties
+add-apt-repository ppa:chris-lea/node.js
+apt-get update
+apt-get install nodejs npm
