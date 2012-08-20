@@ -21,11 +21,9 @@ Executable botland
                     , aeson
                     , mtl 
                     , bytestring 
-                    , MissingH  
                     , wai-middleware-static
                     , wai-middleware-headers
                     , safe                 
-                    , system-uuid         
                     , datetime           
                     , either-unwrap     
                     , transformers, containers, ghc-prim, compact-string-fix, bson, random, http-types, conduit, resourcet

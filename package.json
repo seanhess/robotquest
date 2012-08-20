@@ -8,9 +8,7 @@
     "url": "git://github.com/seanhess/botland.git"
   },
   "scripts": {
-    "install":"bin/install",
-    "test": "node_modules/.bin/mocha test/*.js -R spec -b",
-    "start":"cabal-dev/bin/botland"
+    "test": "node_modules/.bin/mocha test/*.js -R spec -b"
   },
   "engines": {
     "node": "0.6.x"
