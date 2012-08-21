@@ -32,13 +32,20 @@ cabal install cabal-dev --prefix=/usr
 
 
 
-## UBUNTU 12 (you don't need this on the server, this is just to compile the binary)
+
+
+## UBUNTU 12
 apt-get update
 apt-get -y install git make wget
-apt-get -y install haskell-platform
+apt-get -y install haskell-platform # (you don't need this on the server, this is just to compile the binary)
 
 # nodejs for gogogo
-apt-get install python-software-properties
+apt-get -y install python-software-properties
 add-apt-repository ppa:chris-lea/node.js
 apt-get update
-apt-get install nodejs npm
+apt-get -y install nodejs npm
+
+# mongodb
+# locale-gen en_US # wtf?
+apt-get -y install mongodb
+start mongodb
