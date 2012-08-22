@@ -302,51 +302,51 @@ where <code>sheet</code> is the name of one of the following sheets, and <code>x
   <table>
     <div class="spritesheet">
       <h5>classm</h5>
-      <img src="http://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_classm32.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_classm32.gif">
     </div>
     <div class="spritesheet">
       <h5>humans</h5>
-      <img src="/assets/angbandtk/dg_humans32.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_humans32.gif">
     </div>
     <div class="spritesheet">
       <h5>undead</h5>
-      <img src="/assets/angbandtk/dg_undead32.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_undead32.gif">
     </div>
     <div class="spritesheet clear">
       <h5>uniques</h5>
-      <img src="/assets/angbandtk/dg_uniques32.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_uniques32.gif">
     </div>
     <div class="spritesheet">
       <h5>monster5</h5>
-      <img src="/assets/angbandtk/dg_monster532.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster532.gif">
     </div>
     <div class="spritesheet clear">
       <h5>monster1</h5>
-      <img src="/assets/angbandtk/dg_monster132.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster132.gif">
     </div>
     <div class="spritesheet">
       <h5>monster2</h5>
-      <img src="/assets/angbandtk/dg_monster232.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster232.gif">
     </div>
     <div class="spritesheet">
       <h5>monster3</h5>
-      <img src="/assets/angbandtk/dg_monster332.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster332.gif">
     </div>
     <div class="spritesheet clear">
       <h5>monster4</h5>
-      <img src="/assets/angbandtk/dg_monster432.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster432.gif">
     </div>
     <div class="spritesheet">
       <h5>monster6</h5>
-      <img src="/assets/angbandtk/dg_monster632.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster632.gif">
     </div>
     <div class="spritesheet">
       <h5>monster7</h5>
-      <img src="/assets/angbandtk/dg_monster732.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster732.gif">
     </div>
     <div class="spritesheet">
       <h5>people</h5>
-      <img src="/assets/angbandtk/dg_people32.gif">
+      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_people32.gif">
     </div>
   </table>
 
