@@ -14,7 +14,9 @@ All players share a single world
 
 [The Documentation](#documentation) will teach you how to connect to the game and control your minions.
 
-[The Source](http://github.com/seanhess/robotquest) is here on github. Fork it, read it, or yell at me on the [issues page](http://github.com/seanhess/robotquest/issues). The server is written in Haskell, and the AI is written in CoffeeScript
+[The Source](http://github.com/seanhess/robotquest) is here on github
+
+Also see [Status](#status). I don't have plans to continue development. Fork and reuse at will. 
 
 What can I do?
 --------------
@@ -49,11 +51,17 @@ Feature Ideas
 Technical Details
 -----------------
 
-The application was written in Haskell (ghc 7.2+, I think), with the [Scotty Web Framework](http://hackage.haskell.org/package/scotty-0.0.1), [mongodb](http://www.mongodb.org/), some HTML and of course, JSON. 
+The application was written in Haskell (ghc 7.2+), with the [Scotty Web Framework](http://hackage.haskell.org/package/scotty-0.0.1), [mongodb](http://www.mongodb.org/), some HTML and of course, JSON. 
 
 When players issue a command, it saves those on their minion object. A game timer fires once a second, grabbing all the commands and resolving them in haskell before saving out all the changes at once. 
 
 I'll write more detailed articles soon on http://seanhess.github.com. Specifically, I'd like to address the difficulties of developing a web app in haskell.
+
+To run locally
+
+1. install haskell platform 2012
+2. `cabal install cabal-dev`
+3. `cabal-dev install` within the directory
 
 Status
 ------
@@ -71,9 +79,9 @@ Please fork and do whatever you want with it.
 Documentation
 =============
 
-### <a href="#examples">Examples</a>
+<a href="#examples">Examples</a>
 
-### <a href="#types">Types</a>
+<a href="#types">Types</a>
 
 <ul>
   <li><a href="#fault">Fault</a>
@@ -85,7 +93,7 @@ Documentation
   <li><a href="#command">Command</a>
 </ul>
 
-### <a href="#routes">Routes</a>
+<a href="#routes">Routes</a>
 
 <ul>
   <li><a href="#get-gameinfo">GET /game/info</a>
@@ -99,14 +107,14 @@ Documentation
   <li><a href="#delete-playersplayeridminionsminionid">DELETE /players/:playerId/minions/:minionId</a>
 </ul>
 
-### <a href="#sprites">Sprites</a>
+<a href="#sprites">Sprites</a>
 
 Notes
 -----
 
 All routes are relative to the root domain: http://robotquest.tk
 
-    curl -X GET http://robotquest.tk/game/info
+    curl -X GET [http://robotquest.tk/game/info](http://robotquest.tk/game/info)
 
 All types sent and received from the server are in JSON. Don't forget to set "Content-Type: application/json" and Content-Length (good libraries will do this for you)
 
@@ -123,7 +131,7 @@ Here are three complete examples:
 * [Scarab (JS)](https://github.com/Rob-ot/Rob-bot)
 * [Zombies (PHP)](https://github.com/FrizbeeFanatic14/RoroUiraArii)
 
-The following example are in psuedocode
+The following examples are in psuedocode
 
 ### Control a minion
 
