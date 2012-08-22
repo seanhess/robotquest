@@ -131,7 +131,8 @@ Any method can return a <code>Fault</code> instead of its regular response.
     
 Note that this will include quotes when it comes down. This is valid JSON. Just run it through your normal JSON decoder and it will come out a string
 
-<h2 id="GameInfo">GameInfo</h2>
+GameInfo
+--------
 
     {
         width: 25,
@@ -200,7 +201,7 @@ Each route lists the url, the body it expects (if any), and what it returns. All
 
 <h3 id="game_info">GET /game/info</h3>
 Always call this when you start. Respect the tick and size
-<pre><span>returns</span> <a href="#GameInfo">GameInfo</a></pre>
+<pre><span>returns</span> <a href="#gameinfo">GameInfo</a></pre>
 
 <h3 id="game_objects">GET /game/objects</h3>
 <p>Call this every <code>tick</code> to know where things are in the game. If a minion dies, it will come back one last time with <code>state: "Dead"</code>, after which it will stop appearing in this call.</p>
