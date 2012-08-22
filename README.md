@@ -124,7 +124,7 @@ Types
 
 Any method can return a <code>Fault</code> instead of its regular response.
 
-### Ok<
+### Ok
 
     "Ok"
 
