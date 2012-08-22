@@ -46,6 +46,28 @@ Feature Ideas
 * Limit Player Creation - right now it's completely open
 * Limit Spawning - make it a resource of some kind
 
+Technical Details
+-----------------
+
+The application was written in Haskell (ghc 7.2+, I think), with the [Scotty Web Framework](http://hackage.haskell.org/package/scotty-0.0.1), [mongodb](http://www.mongodb.org/), some HTML and of course, JSON. 
+
+When players issue a command, it saves those on their minion object. A game timer fires once a second, grabbing all the commands and resolving them in haskell before saving out all the changes at once. 
+
+I'll write more detailed articles soon on http://seanhess.github.com. Specifically, I'd like to address the difficulties of developing a web app in haskell.
+
+Status
+------
+
+I don't know if I'll continue work on this. See [Feature Ideas](#feature-ideas) for where I was planning on going next. 
+
+The server is not really production ready. Too many bots will make it drag down. It keeps breaking.
+
+Please fork and do whatever you want with it. 
+
+
+
+
+
 Documentation
 =============
 
@@ -82,14 +104,26 @@ Documentation
 Notes
 -----
 
+All routes are relative to the root domain: http://robotquest.tk
+
+    curl -X GET http://robotquest.tk/game/info
+
 All types sent and received from the server are in JSON. Don't forget to set "Content-Type: application/json" and Content-Length (good libraries will do this for you)
 
 This includes the [Id](#id) type, which is just a JSON string. Run everything through your JSON parser and all will be well
 
+Supports CORS: Cross-Origin Resource Sharing. You should be able to hit the API from another domain even from a browser. 
+
 Examples
 --------
 
-These examples are in pseudocode. For a complete example <a href="https://github.com/seanhess/robotquest/blob/master/ai/app.coffee">please take a look at the AI (CoffeeScript)</a>
+Here are three complete examples:
+
+* [AI (CoffeeScript)](https://github.com/seanhess/robotquest/blob/master/ai/app.coffee)
+* [Scarab (JS)](https://github.com/Rob-ot/Rob-bot)
+* [Zombies (PHP)](https://github.com/FrizbeeFanatic14/RoroUiraArii)
+
+The following example are in psuedocode
 
 ### Control a minion
 

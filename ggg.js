@@ -7,7 +7,7 @@ module.exports = {
   servers: {
     api: {
       hosts: "root@robotquest.tk",
-      start: "./Api",
+      start: "bin/Api",
       install: ""
     },
     ai: {
