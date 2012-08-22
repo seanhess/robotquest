@@ -85,9 +85,9 @@ This includes the <a href="#Id">Id</a> type, which is just a JSON string. Run ev
 Examples
 --------
 
-These examples are in pseudocode. For a complete example <a href="https://github.com/seanhess/botland/blob/master/ai/app.coffee">please take a look at the AI (CoffeeScript)</a><
+These examples are in pseudocode. For a complete example <a href="https://github.com/seanhess/botland/blob/master/ai/app.coffee">please take a look at the AI (CoffeeScript)</a>
 
-### Control a minion<
+### Control a minion
 
     # register our player
     player = {name:"example", source: "http://github.com/seanhess/botland"}
@@ -115,93 +115,86 @@ These examples are in pseudocode. For a complete example <a href="https://github
 Types
 -----
 
-  <div class="object">
-    <h3 id="Fault">Fault</h3>
-    <pre>{ message: "Space occupied" }</pre>
-    <p>Any method can return a <code>Fault</code> instead of its regular response.</p>
-  </div>
+### Fault
 
-  <div class="object">
-    <h3 id="Ok">Ok</h3>
-    <pre>"Ok"</pre>
-  </div>
+    { message: "Space occupied" }
 
-  <div class="object">
-    <h3 id="Id">Id</h3>
-    <pre>"6dc21b03a79fa15d"</pre>
-    <p>Note that this will include quotes when it comes down. This is valid JSON. Just run it through your normal JSON decoder and it will come out a string</p> 
-  </div>
+Any method can return a <code>Fault</code> instead of its regular response.
 
-  <div class="object">
-    <h3 id="GameInfo">GameInfo</h3>
-    <pre>{
-  width: 25,
-  height: 20,
-  tick: 1000
-}</pre>
-      <p><code>tick</code> - Game tick in ms. How often you can send commands and poll for information</p>
-      <p><code>width, height</code> - World dimensions in squares</p>
-  </div>
+### Ok
 
-  <div class="object">
-    <h3 id="Player">Player</h3>
-    <pre>{
-  name: "sean",
-  source: "http://github.com/seanhess/botland"
-}</pre>
-      <p><code>name</code> - A unique player name for your program.</p>
-      <p><code>source</code> - Bot homepage. Source code preferred.</p>
-  </div>
+    "Ok"
 
-  <div class="object">
-    <h3 id="Minion">Minion</h3>
-      <pre>// To Server
-{
-  name: "rat",
-  sprite: "monster1-1-4",
-  x: 10,
-  y: 10
-}
-  
-// From Server
-{
-  name: "rat",
-  sprite: "monster1-1-4",
-  x: 10
-  y: 10,
+### Id
 
-  // generated fields
-  state: "Active",
-  kills: 0,
-  created: "2012-05-03T12:06:48.666Z",
-  player: "AI",
-  id: "6dc21b03a79fa15d",
-}
+    "6dc21b03a79fa15d"
+    
+Note that this will include quotes when it comes down. This is valid JSON. Just run it through your normal JSON decoder and it will come out a string
 
-</pre>
-      <p><code>name</code> - The name chosen for the minion by its player.</p>
-      <p><code>sprite</code> - Player-chosen <a href="#sprites">sprite</a></p>
-      <p><code>x, y</code> - Position in squares</p>
-      <p><code>state</code> - Active or Dead. If a minion dies, the server will send down Dead once, then the minion will no longer appear in the result of <a href="#game_objects">/game/objects</a></p>
-      <p><code>player</code> - Name of the controlling <a href="#Player">Player</a></p>
-  </div>
+### GameInfo
 
-  <div class="object">
-    <h3 id="Command">Command</h3>
-    <p>Careful, I'm case sensitive!</p>
-    <pre>{
-  action: "Move",
-  direction: "Left"
-}</pre>
-      <p><code>action</code> - "Move", "Attack"</p>
-      <p><code>direction</code> - "Left", "Right", "Up", or "Down"</p>
-  </div>
+    {
+        width: 25,
+        height: 20,
+        tick: 1000
+    }
+
+`tick` - Game tick in ms. How often you can send commands and poll for information
+
+<code>width, height</code> - World dimensions in squares
+
+### Player
+    {
+        name: "sean",
+        source: "http://github.com/seanhess/botland"
+    }
+
+<code>name</code> - A unique player name for your program.
+<code>source</code> - Bot homepage. Source code preferred.
+
+### Minion
+    // To Server
+    {
+      name: "rat",
+      sprite: "monster1-1-4",
+      x: 10,
+      y: 10
+    }
+      
+    // From Server
+    {
+      name: "rat",
+      sprite: "monster1-1-4",
+      x: 10
+      y: 10,
+
+      // generated fields
+      state: "Active",
+      kills: 0,
+      created: "2012-05-03T12:06:48.666Z",
+      player: "AI",
+      id: "6dc21b03a79fa15d",
+    }
+
+<p><code>name</code> - The name chosen for the minion by its player.</p>
+<p><code>sprite</code> - Player-chosen <a href="#sprites">sprite</a></p>
+<p><code>x, y</code> - Position in squares</p>
+<p><code>state</code> - Active or Dead. If a minion dies, the server will send down Dead once, then the minion will no longer appear in the result of <a href="#game_objects">/game/objects</a></p>
+<p><code>player</code> - Name of the controlling <a href="#Player">Player</a></p>
+
+<h3 id="Command">Command</h3>
+<p>Careful, I'm case sensitive!</p>
+
+    {
+        action: "Move",
+        direction: "Left"
+    }
+<p><code>action</code> - "Move", "Attack"</p>
+<p><code>direction</code> - "Left", "Right", "Up", or "Down"</p>
 
 
-
-
-
-  <h2 id="routes">Routes</h2>
+Routes
+------
 
   <p>Each route lists the url, the body it expects (if any), and what it returns. All types are JSON</p>
 
