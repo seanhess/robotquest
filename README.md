@@ -45,7 +45,7 @@ Feature Ideas
 * Limit Player Creation - right now it's completely open
 * Limit Spawning - make it a resource of some kind
 
-Documentation
+Documentation <a id="api"></a>
 =============
 
 ### <a href="#examples">Examples</a>
