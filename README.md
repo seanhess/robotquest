@@ -1,10 +1,10 @@
 [viewer]: http://robotquest.tk/viewer/ "RobotQuest Viewer"
 [source]: http://github.com/seanhess/robotquest "RobotQuest Source"
 
-![RobotQuest Screenshot](https://raw.github.com/seanhess/robotquest/master/public/screen.png)
+RobotQuest
+==========
 
-What is RobotQuest?
-===================
+<a href="http://robotquest.tk/viewer/"><img src="https://raw.github.com/seanhess/robotquest/master/public/screen.png"></a>
 
 RobotQuest is a MMO, programming game. Instead of playing RobotQuest directly, you write a program that plays it for you. Your program communicates with the [game server API](#api) over HTTP by sending and receiving JSON messages.
 
