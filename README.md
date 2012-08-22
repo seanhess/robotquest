@@ -48,32 +48,35 @@ Feature Ideas
 Documentation
 =============
 
-    <!-- <div class="toc">-->
-    <!--   <a href="#examples">Examples</a>-->
-    <!--   <a href="#types">Types</a>-->
-    <!--   <ul>-->
-    <!--     <li><a href="#Fault">Fault</a>-->
-    <!--     <li><a href="#Id">Id</a>-->
-    <!--     <li><a href="#Ok">Ok</a>-->
-    <!--     <li><a href="#GameInfo">GameInfo</a>-->
-    <!--     <li><a href="#Player">Player</a>-->
-    <!--     <li><a href="#Minion">Minion</a>-->
-    <!--     <li><a href="#Command">Command</a>-->
-    <!--   </ul>-->
-    <!--   <a href="#routes">Routes</a>-->
-    <!--   <ul class="routes">-->
-    <!--     <li><a href="#game_info">GET /game/info</a>-->
-    <!--     <li><a href="#game_objects">GET /game/objects</a>-->
-    <!--     <li><a href="#new_player">POST /players</a>-->
-    <!--     <li><a href="#get_player">GET /players/:name</a>-->
-    <!--     <li><a href="#new_minion">POST /players/:playerId/minions</a>-->
-    <!--     <li><a href="#get_minion">GET /minions/:minionId</a>-->
-    <!--     <li><a href="#command">POST /players/:playerId/minions/:minionId/commands</a>-->
-    <!--     <li><a href="#delete_player">DELETE /players/:playerId</a>-->
-    <!--     <li><a href="#delete_minion">DELETE /players/:playerId/minions/:minionId</a>-->
-    <!--   </ul>-->
-    <!--   <a href="#sprites">Sprites</a>-->
-    <!-- </div>-->
+<a href="#examples">Examples</a>
+
+<a href="#types">Types</a>
+
+<ul>
+  <li><a href="#fault">Fault</a>
+  <li><a href="#id">Id</a>
+  <li><a href="#ok">Ok</a>
+  <li><a href="#gameinfo">GameInfo</a>
+  <li><a href="#player">Player</a>
+  <li><a href="#minion">Minion</a>
+  <li><a href="#command">Command</a>
+</ul>
+
+<a href="#routes">Routes</a>
+
+<ul>
+  <li><a href="#game_info">GET /game/info</a>
+  <li><a href="#game_objects">GET /game/objects</a>
+  <li><a href="#new_player">POST /players</a>
+  <li><a href="#get_player">GET /players/:name</a>
+  <li><a href="#new_minion">POST /players/:playerId/minions</a>
+  <li><a href="#get_minion">GET /minions/:minionId</a>
+  <li><a href="#command">POST /players/:playerId/minions/:minionId/commands</a>
+  <li><a href="#delete_player">DELETE /players/:playerId</a>
+  <li><a href="#delete_minion">DELETE /players/:playerId/minions/:minionId</a>
+</ul>
+
+<a href="#sprites">Sprites</a>
 
 Notes
 -----
@@ -115,24 +118,23 @@ These examples are in pseudocode. For a complete example <a href="https://github
 Types
 -----
 
-<h2 id="Fault">Fault</h2>
+### Fault
 
     { message: "Space occupied" }
 
 Any method can return a <code>Fault</code> instead of its regular response.
 
-<h2 id="Ok">Ok</h2>
+### Ok<
 
     "Ok"
 
-<h2 id="Id">Id</h2>
+### Id
 
     "6dc21b03a79fa15d"
     
 Note that this will include quotes when it comes down. This is valid JSON. Just run it through your normal JSON decoder and it will come out a string
 
-GameInfo
---------
+### GameInfo
 
     {
         width: 25,
@@ -144,7 +146,8 @@ GameInfo
 
 <code>width, height</code> - World dimensions in squares
 
-<h2 id="Player">Player</h2>
+### Player
+
     {
         name: "sean",
         source: "http://github.com/seanhess/botland"
@@ -153,7 +156,8 @@ GameInfo
 <code>name</code> - A unique player name for your program.
 <code>source</code> - Bot homepage. Source code preferred.
 
-<h2 id="Minion">Minion</h2>
+### Minion
+
     // To Server
     {
       name: "rat",
@@ -183,7 +187,7 @@ GameInfo
 <p><code>state</code> - Active or Dead. If a minion dies, the server will send down Dead once, then the minion will no longer appear in the result of <a href="#game_objects">/game/objects</a></p>
 <p><code>player</code> - Name of the controlling <a href="#Player">Player</a></p>
 
-<h3 id="Command">Command</h3>
+### Command
 <p>Careful, I'm case sensitive!</p>
 
     {
@@ -298,7 +302,7 @@ where <code>sheet</code> is the name of one of the following sheets, and <code>x
   <table>
     <div class="spritesheet">
       <h5>classm</h5>
-      <img src="/assets/angbandtk/dg_classm32.gif">
+      <img src="raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_classm32.gif">
     </div>
     <div class="spritesheet">
       <h5>humans</h5>
