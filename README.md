@@ -115,23 +115,23 @@ These examples are in pseudocode. For a complete example <a href="https://github
 Types
 -----
 
-### Fault
+<h2 id="Fault">Fault</h2>
 
     { message: "Space occupied" }
 
 Any method can return a <code>Fault</code> instead of its regular response.
 
-### Ok
+<h2 id="Ok">Ok</h2>
 
     "Ok"
 
-### Id
+<h2 id="Id">Id</h2>
 
     "6dc21b03a79fa15d"
     
 Note that this will include quotes when it comes down. This is valid JSON. Just run it through your normal JSON decoder and it will come out a string
 
-### GameInfo
+<h2 id="GameInfo">GameInfo</h2>
 
     {
         width: 25,
@@ -143,7 +143,7 @@ Note that this will include quotes when it comes down. This is valid JSON. Just 
 
 <code>width, height</code> - World dimensions in squares
 
-### Player
+<h2 id="Player">Player</h2>
     {
         name: "sean",
         source: "http://github.com/seanhess/botland"
@@ -152,7 +152,7 @@ Note that this will include quotes when it comes down. This is valid JSON. Just 
 <code>name</code> - A unique player name for your program.
 <code>source</code> - Bot homepage. Source code preferred.
 
-### Minion
+<h2 id="Minion">Minion</h2>
     // To Server
     {
       name: "rat",
@@ -196,119 +196,104 @@ Note that this will include quotes when it comes down. This is valid JSON. Just 
 Routes
 ------
 
-  <p>Each route lists the url, the body it expects (if any), and what it returns. All types are JSON</p>
+Each route lists the url, the body it expects (if any), and what it returns. All types are JSON
 
-  <div class="route">
-    <h3 id="game_info">GET /game/info</h3>
-    <p>Always call this when you start. Respect the tick and size</p>
-    <pre><span>returns</span> <a href="#GameInfo">GameInfo</a></pre>
-  </div>
+<h3 id="game_info">GET /game/info</h3>
+Always call this when you start. Respect the tick and size
+<pre><span>returns</span> <a href="#GameInfo">GameInfo</a></pre>
 
-
-  <div class="route">
-    <h3 id="game_objects">GET /game/objects</h3>
-    <p>Call this every <code>tick</code> to know where things are in the game. If a minion dies, it will come back one last time with <code>state: "Dead"</code>, after which it will stop appearing in this call.</p>
-    <div>
-      <pre><span>returns</span> [<a href="#Minion">Minion</a>]</pre>
-    </div>
-  </div>
+<h3 id="game_objects">GET /game/objects</h3>
+<p>Call this every <code>tick</code> to know where things are in the game. If a minion dies, it will come back one last time with <code>state: "Dead"</code>, after which it will stop appearing in this call.</p>
+<div>
+  <pre><span>returns</span> [<a href="#Minion">Minion</a>]</pre>
+</div>
 
 
-  <div class="route">
-    <h3 id="new_player">POST /players</h3>
+<h3 id="new_player">POST /players</h3>
 
-    <p>Register your player. Note that the id returned from this is <em>secret</em>. You use it to <a href="#new_minion">spawn</a> and <a href="#command">command</a> your minions.</p>
+<p>Register your player. Note that the id returned from this is <em>secret</em>. You use it to <a href="#new_minion">spawn</a> and <a href="#command">command</a> your minions.</p>
 
-    <div>
-      <pre><span>body</span> <a href="#Player">Player</a></pre>
-    </div>
+<div>
+  <pre><span>body</span> <a href="#Player">Player</a></pre>
+</div>
 
-    <div>
-      <pre><span>returns</span> <a href="#Id">Id</a></pre>
-    </div>
-  </div>
-
-
+<div>
+  <pre><span>returns</span> <a href="#Id">Id</a></pre>
+</div>
   
-  <div class="route">
-    <h3 id="get_player">GET /players/:name</h3>
+<h3 id="get_player">GET /players/:name</h3>
 
-    <p>Info about another player</p>
-  
-    <div>
-      <pre><span>returns</span> <a href="#Player">Player</a></pre>
-    </div>
-  </div>
+<p>Info about another player</p>
+
+<div>
+  <pre><span>returns</span> <a href="#Player">Player</a></pre>
+</div>
 
 
 
-  <div class="route">
-    <h3 id="new_minion">POST /players/:playerId/minions</h3>
+<h3 id="new_minion">POST /players/:playerId/minions</h3>
 
-    <p>Spawn a minion on the map</p>
+<p>Spawn a minion on the map</p>
 
-    <div>
-      <pre><span>body</span> <a href="#Minion">Minion</a> - only send {name, sprite, x, y}</pre>
-    </div>
+<div>
+  <pre><span>body</span> <a href="#Minion">Minion</a> - only send {name, sprite, x, y}</pre>
+</div>
 
-    <div>
-      <pre><span>returns</span> <a href="#Id">Id</a></pre>
-    </div>
-  </div>
+<div>
+  <pre><span>returns</span> <a href="#Id">Id</a></pre>
+</div>
 
 
 
-  <div class="route">
-    <h3 id="get_minion">GET /minions/:minionId</h3>
+<h3 id="get_minion">GET /minions/:minionId</h3>
 
-    <p>All available details for a minion.</p>
+<p>All available details for a minion.</p>
 
-    <div>
-      <pre><span>returns</span> <a href="#Minion">Minion</a></pre>
-    </div>
-  </div>
+<div>
+<pre><span>returns</span> <a href="#Minion">Minion</a></pre>
+</div>
 
 
-  <div class="route">
-    <h3 id="command">POST /players/:playerId/minions/:minionId/commands</h3>
+<h3 id="command">POST /players/:playerId/minions/:minionId/commands</h3>
 
-    <p>Issue a command to one of your minions. The command will be executed at the next game tick. If you issue more than one command per tick it will replace your previous command.</p>
+<p>Issue a command to one of your minions. The command will be executed at the next game tick. If you issue more than one command per tick it will replace your previous command.</p>
 
-    <div>
-      <pre><span>body</span> <a href="#Command">Command</a></pre>
-    </div>
+<div>
+  <pre><span>body</span> <a href="#Command">Command</a></pre>
+</div>
 
-    <div>
-      <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
-    </div>
-  </div>
+<div>
+  <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
+</div>
 
 
-  <div class="route">
-    <h3 id="delete_player">DELETE /players/:playerId</h3>
+<h3 id="delete_player">DELETE /players/:playerId</h3>
 
-    <p>Remove your player</p>
+<p>Remove your player</p>
 
-    <div>
-      <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
-    </div>
-  </div>
+<div>
+  <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
+</div>
 
-  <div class="route">
-    <h3 id="delete_minion">DELETE /players/:playerId/minions/:minionId</h3>
+<h3 id="delete_minion">DELETE /players/:playerId/minions/:minionId</h3>
 
-    <p>Remove one of your minions</p>
+<p>Remove one of your minions</p>
 
-    <div>
-      <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
-    </div>
-  </div>
+<div>
+  <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
+</div>
 
-  <h2 id="sprites">Sprites</h2>
 
-  <p>I am using the extraordinarily complete, free, <a href="http://pousse.rapiere.free.fr/tome/tome-tiles.htm">angbandtk dungeon tileset</a>. When creating a minion, you can choose the sprite that represents it. The format is:</p>
+
+
+<h2 id="sprites">Sprites</h2>
+
+I am using the extraordinarily complete, free, <a href="http://pousse.rapiere.free.fr/tome/tome-tiles.htm">angbandtk dungeon tileset</a>. When creating a minion, you can choose the sprite that represents it. The format is:
+
   <pre>sheet-x-y</pre>
-  <p>where <code>sheet</code> is the name of one of the following sheets, and <code>x</code> and <code>y</code> are the 0-indexed offset from the top left. For example, the dark blue ghost is <code>undead-0-0</code>, while the phoenix is <code>uniques-8-5</code></p>
+
+where <code>sheet</code> is the name of one of the following sheets, and <code>x</code> and <code>y</code> are the 0-indexed offset from the top left. For example, the dark blue ghost is <code>undead-0-0</code>, while the phoenix is <code>uniques-8-5</code>
+
   <table>
     <div class="spritesheet">
       <h5>classm</h5>
@@ -359,15 +344,5 @@ Routes
       <img src="/assets/angbandtk/dg_people32.gif">
     </div>
   </table>
-
-
-
-
-
-</div> <!-- main -->
-
-   <a href="http://github.com/seanhess/botland"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
-
-</body>
 
 
