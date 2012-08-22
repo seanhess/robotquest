@@ -302,7 +302,7 @@ where <code>sheet</code> is the name of one of the following sheets, and <code>x
   <table>
     <div class="spritesheet">
       <h5>classm</h5>
-      <img src="raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_classm32.gif">
+      <img src="http://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_classm32.gif">
     </div>
     <div class="spritesheet">
       <h5>humans</h5>
