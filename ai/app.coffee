@@ -14,7 +14,7 @@ lib = require './lib'
 
 HOST = process.env.HOST || "http://localhost:3026"
 AINAME = "AI"
-REPO = "http://github.com/seanhess/botland"
+REPO = "http://github.com/seanhess/robotquest"
 
 MONSTERS = process.env.MONSTERS || 10
 

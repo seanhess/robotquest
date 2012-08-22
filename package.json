@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/seanhess/botland.git"
+    "url": "git://github.com/seanhess/robotquest.git"
   },
   "scripts": {
     "test": "node_modules/.bin/mocha test/*.js -R spec -b"

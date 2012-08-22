@@ -51,7 +51,7 @@
             var currentAction = randomAction()
 
             function connect() {
-                var player = {name:"chaosbot", source:"http://github.com/seanhess/botland"}
+                var player = {name:"chaosbot", source:"http://github.com/seanhess/robotquest"}
                 request("POST", "/players", player, function(err, mcp) {
                     mcpId = mcp.id
                     log("MCP " + mcpId)

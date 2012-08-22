@@ -14,7 +14,7 @@ function CleanupBot(worldInfo) {
     this.tick = tick
     this.start = start
 
-    var description = {kind: "CleanupBot", name: "CleanupBotN", source: "http://github.com/seanhess/botland", notes:"moves towards inactive units and destroys them", color: color } 
+    var description = {kind: "CleanupBot", name: "CleanupBotN", source: "http://github.com/seanhess/robotquest", notes:"moves towards inactive units and destroys them", color: color } 
 
     function tick(locations, units) {
 

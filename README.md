@@ -1,5 +1,5 @@
 [viewer]: http://robotquest.tk/viewer/ "RobotQuest Viewer"
-[source]: http://github.com/seanhess/botland "RobotQuest Source"
+[source]: http://github.com/seanhess/robotquest "RobotQuest Source"
 
 
 What is RobotQuest?
@@ -13,7 +13,7 @@ All players share a single world
 
 [The Documentation](#documentation) will teach you how to connect to the game and control your minions.
 
-[The Source](http://github.com/seanhess/botland) is here on github. Fork it, read it, or yell at me on the [issues page](http://github.com/seanhess/botland/issues). The server is written in Haskell, and the AI is written in CoffeeScript
+[The Source](http://github.com/seanhess/robotquest) is here on github. Fork it, read it, or yell at me on the [issues page](http://github.com/seanhess/robotquest/issues). The server is written in Haskell, and the AI is written in CoffeeScript
 
 What can I do?
 --------------
@@ -70,7 +70,7 @@ Documentation
   <li><a href="#post-players">POST /players</a>
   <li><a href="#get-playersname">GET /players/:name</a>
   <li><a href="#post-playersplayeridminions">POST /players/:playerId/minions</a>
-  <li><a href="#get-minionsminionId">GET /minions/:minionId</a>
+  <li><a href="#get-minionsminionid">GET /minions/:minionId</a>
   <li><a href="#post-playersplayeridminionsminionidcommands">POST /players/:playerId/minions/:minionId/commands</a>
   <li><a href="#delete-playersplayerid">DELETE /players/:playerId</a>
   <li><a href="#delete-playersplayeridminionsminionid">DELETE /players/:playerId/minions/:minionId</a>
@@ -88,12 +88,12 @@ This includes the [Id](#id) type, which is just a JSON string. Run everything th
 Examples
 --------
 
-These examples are in pseudocode. For a complete example <a href="https://github.com/seanhess/botland/blob/master/ai/app.coffee">please take a look at the AI (CoffeeScript)</a>
+These examples are in pseudocode. For a complete example <a href="https://github.com/seanhess/robotquest/blob/master/ai/app.coffee">please take a look at the AI (CoffeeScript)</a>
 
 ### Control a minion
 
     # register our player
-    player = {name:"example", source: "http://github.com/seanhess/botland"}
+    player = {name:"example", source: "http://github.com/seanhess/robotquest"}
     player.id = POST "/players" player
 
     # spawn a minion
@@ -150,7 +150,7 @@ Note that this will include quotes when it comes down. This is valid JSON. Just 
 
     {
         name: "sean",
-        source: "http://github.com/seanhess/botland"
+        source: "http://github.com/seanhess/robotquest"
     }
 
 <code>name</code> - A unique player name for your program.
@@ -300,39 +300,39 @@ I am using the extraordinarily complete, free, <a href="http://pousse.rapiere.fr
 where <code>sheet</code> is the name of one of the following sheets, and <code>x</code> and <code>y</code> are the 0-indexed offset from the top left. For example, the dark blue ghost is <code>undead-0-0</code>, while the phoenix is <code>uniques-8-5</code>
 
 <h5>classm</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_classm32.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_classm32.gif">
 
 <h5>humans</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_humans32.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_humans32.gif">
 
 <h5>undead</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_undead32.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_undead32.gif">
 
 <h5>uniques</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_uniques32.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_uniques32.gif">
 
 <h5>monster5</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster532.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_monster532.gif">
 
 <h5>monster1</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster132.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_monster132.gif">
 
 <h5>monster2</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster232.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_monster232.gif">
 
 <h5>monster3</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster332.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_monster332.gif">
 
 <h5>monster4</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster432.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_monster432.gif">
 
 <h5>monster6</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster632.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_monster632.gif">
 
 <h5>monster7</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster732.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_monster732.gif">
 
 <h5>people</h5>
-<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_people32.gif">
+<img src="https://raw.github.com/seanhess/robotquest/master/public/assets/angbandtk/dg_people32.gif">
 
 
