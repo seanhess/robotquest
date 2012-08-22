@@ -48,9 +48,9 @@ Feature Ideas
 Documentation
 =============
 
-<a href="#examples">Examples</a>
+### <a href="#examples">Examples</a>
 
-<a href="#types">Types</a>
+### <a href="#types">Types</a>
 
 <ul>
   <li><a href="#fault">Fault</a>
@@ -76,14 +76,14 @@ Documentation
   <li><a href="#delete_minion">DELETE /players/:playerId/minions/:minionId</a>
 </ul>
 
-<a href="#sprites">Sprites</a>
+### <a href="#sprites">Sprites</a>
 
 Notes
 -----
 
 All types sent and received from the server are in JSON. Don't forget to set "Content-Type: application/json" and Content-Length (good libraries will do this for you)
 
-This includes the <a href="#Id">Id</a> type, which is just a JSON string. Run everything through your JSON parser and all will be well
+This includes the [Id](#id) type, which is just a JSON string. Run everything through your JSON parser and all will be well
 
 Examples
 --------
@@ -185,7 +185,7 @@ Note that this will include quotes when it comes down. This is valid JSON. Just 
 <p><code>sprite</code> - Player-chosen <a href="#sprites">sprite</a></p>
 <p><code>x, y</code> - Position in squares</p>
 <p><code>state</code> - Active or Dead. If a minion dies, the server will send down Dead once, then the minion will no longer appear in the result of <a href="#game_objects">/game/objects</a></p>
-<p><code>player</code> - Name of the controlling <a href="#Player">Player</a></p>
+<p><code>player</code> - Name of the controlling <a href="#player">Player</a></p>
 
 ### Command
 <p>Careful, I'm case sensitive!</p>
@@ -210,7 +210,7 @@ Always call this when you start. Respect the tick and size
 <h3 id="game_objects">GET /game/objects</h3>
 <p>Call this every <code>tick</code> to know where things are in the game. If a minion dies, it will come back one last time with <code>state: "Dead"</code>, after which it will stop appearing in this call.</p>
 <div>
-  <pre><span>returns</span> [<a href="#Minion">Minion</a>]</pre>
+  <pre><span>returns</span> [<a href="#minion">Minion</a>]</pre>
 </div>
 
 
@@ -219,11 +219,11 @@ Always call this when you start. Respect the tick and size
 <p>Register your player. Note that the id returned from this is <em>secret</em>. You use it to <a href="#new_minion">spawn</a> and <a href="#command">command</a> your minions.</p>
 
 <div>
-  <pre><span>body</span> <a href="#Player">Player</a></pre>
+  <pre><span>body</span> <a href="#player">Player</a></pre>
 </div>
 
 <div>
-  <pre><span>returns</span> <a href="#Id">Id</a></pre>
+  <pre><span>returns</span> <a href="#id">Id</a></pre>
 </div>
   
 <h3 id="get_player">GET /players/:name</h3>
@@ -231,7 +231,7 @@ Always call this when you start. Respect the tick and size
 <p>Info about another player</p>
 
 <div>
-  <pre><span>returns</span> <a href="#Player">Player</a></pre>
+  <pre><span>returns</span> <a href="#player">Player</a></pre>
 </div>
 
 
@@ -241,11 +241,11 @@ Always call this when you start. Respect the tick and size
 <p>Spawn a minion on the map</p>
 
 <div>
-  <pre><span>body</span> <a href="#Minion">Minion</a> - only send {name, sprite, x, y}</pre>
+  <pre><span>body</span> <a href="#minion">Minion</a> - only send {name, sprite, x, y}</pre>
 </div>
 
 <div>
-  <pre><span>returns</span> <a href="#Id">Id</a></pre>
+  <pre><span>returns</span> <a href="#id">Id</a></pre>
 </div>
 
 
@@ -264,11 +264,11 @@ Always call this when you start. Respect the tick and size
 <p>Issue a command to one of your minions. The command will be executed at the next game tick. If you issue more than one command per tick it will replace your previous command.</p>
 
 <div>
-  <pre><span>body</span> <a href="#Command">Command</a></pre>
+  <pre><span>body</span> <a href="#command">Command</a></pre>
 </div>
 
 <div>
-  <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
+  <pre><span>returns</span> <a href="#ok">Ok</a></pre>
 </div>
 
 
@@ -277,7 +277,7 @@ Always call this when you start. Respect the tick and size
 <p>Remove your player</p>
 
 <div>
-  <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
+  <pre><span>returns</span> <a href="#ok">Ok</a></pre>
 </div>
 
 <h3 id="delete_minion">DELETE /players/:playerId/minions/:minionId</h3>
@@ -285,7 +285,7 @@ Always call this when you start. Respect the tick and size
 <p>Remove one of your minions</p>
 
 <div>
-  <pre><span>returns</span> <a href="#Ok">Ok</a></pre>
+  <pre><span>returns</span> <a href="#ok">Ok</a></pre>
 </div>
 
 
@@ -299,55 +299,40 @@ I am using the extraordinarily complete, free, <a href="http://pousse.rapiere.fr
 
 where <code>sheet</code> is the name of one of the following sheets, and <code>x</code> and <code>y</code> are the 0-indexed offset from the top left. For example, the dark blue ghost is <code>undead-0-0</code>, while the phoenix is <code>uniques-8-5</code>
 
-  <table>
-    <div class="spritesheet">
-      <h5>classm</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_classm32.gif">
-    </div>
-    <div class="spritesheet">
-      <h5>humans</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_humans32.gif">
-    </div>
-    <div class="spritesheet">
-      <h5>undead</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_undead32.gif">
-    </div>
-    <div class="spritesheet clear">
-      <h5>uniques</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_uniques32.gif">
-    </div>
-    <div class="spritesheet">
-      <h5>monster5</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster532.gif">
-    </div>
-    <div class="spritesheet clear">
-      <h5>monster1</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster132.gif">
-    </div>
-    <div class="spritesheet">
-      <h5>monster2</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster232.gif">
-    </div>
-    <div class="spritesheet">
-      <h5>monster3</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster332.gif">
-    </div>
-    <div class="spritesheet clear">
-      <h5>monster4</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster432.gif">
-    </div>
-    <div class="spritesheet">
-      <h5>monster6</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster632.gif">
-    </div>
-    <div class="spritesheet">
-      <h5>monster7</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster732.gif">
-    </div>
-    <div class="spritesheet">
-      <h5>people</h5>
-      <img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_people32.gif">
-    </div>
-  </table>
+<h5>classm</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_classm32.gif">
+
+<h5>humans</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_humans32.gif">
+
+<h5>undead</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_undead32.gif">
+
+<h5>uniques</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_uniques32.gif">
+
+<h5>monster5</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster532.gif">
+
+<h5>monster1</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster132.gif">
+
+<h5>monster2</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster232.gif">
+
+<h5>monster3</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster332.gif">
+
+<h5>monster4</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster432.gif">
+
+<h5>monster6</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster632.gif">
+
+<h5>monster7</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_monster732.gif">
+
+<h5>people</h5>
+<img src="https://raw.github.com/seanhess/botland/master/public/assets/angbandtk/dg_people32.gif">
 
 
