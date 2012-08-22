@@ -11,9 +11,9 @@ All players share a single world
 
 [The Viewer][viewer] lets you watch the game being played live.
 
-[The Documentation](#api) will teach you how to connect to the game and control your minions.
+[The Documentation](#documentation) will teach you how to connect to the game and control your minions.
 
-[The Source](http://github.com/seanhess/botland) is here on github. Fork it, read it, or yell at me on the [issues page](http://github.com/seanhess/botland/issues)">. The server is written in Haskell, and the AI is written in CoffeeScript
+[The Source](http://github.com/seanhess/botland) is here on github. Fork it, read it, or yell at me on the [issues page](http://github.com/seanhess/botland/issues). The server is written in Haskell, and the AI is written in CoffeeScript
 
 What can I do?
 --------------
@@ -45,7 +45,7 @@ Feature Ideas
 * Limit Player Creation - right now it's completely open
 * Limit Spawning - make it a resource of some kind
 
-Documentation <a id="api"></a>
+Documentation
 =============
 
 ### <a href="#examples">Examples</a>
@@ -62,18 +62,18 @@ Documentation <a id="api"></a>
   <li><a href="#command">Command</a>
 </ul>
 
-<a href="#routes">Routes</a>
+### <a href="#routes">Routes</a>
 
 <ul>
-  <li><a href="#game_info">GET /game/info</a>
-  <li><a href="#game_objects">GET /game/objects</a>
-  <li><a href="#new_player">POST /players</a>
-  <li><a href="#get_player">GET /players/:name</a>
-  <li><a href="#new_minion">POST /players/:playerId/minions</a>
-  <li><a href="#get_minion">GET /minions/:minionId</a>
-  <li><a href="#command">POST /players/:playerId/minions/:minionId/commands</a>
-  <li><a href="#delete_player">DELETE /players/:playerId</a>
-  <li><a href="#delete_minion">DELETE /players/:playerId/minions/:minionId</a>
+  <li><a href="#get-gameinfo">GET /game/info</a>
+  <li><a href="#get-gameobjects">GET /game/objects</a>
+  <li><a href="#post-players">POST /players</a>
+  <li><a href="#get-playersname">GET /players/:name</a>
+  <li><a href="#post-playersplayeridminions">POST /players/:playerId/minions</a>
+  <li><a href="#get-minionsminionId">GET /minions/:minionId</a>
+  <li><a href="#post-playersplayeridminionsminionidcommands">POST /players/:playerId/minions/:minionId/commands</a>
+  <li><a href="#delete-playersplayerid">DELETE /players/:playerId</a>
+  <li><a href="#delete-playersplayeridminionsminionid">DELETE /players/:playerId/minions/:minionId</a>
 </ul>
 
 ### <a href="#sprites">Sprites</a>
