@@ -114,7 +114,7 @@ Notes
 
 All routes are relative to the root domain: http://robotquest.tk
 
-    curl -X GET [http://robotquest.tk/game/info](http://robotquest.tk/game/info)
+    curl -X GET http://robotquest.tk/game/info
 
 All types sent and received from the server are in JSON. Don't forget to set "Content-Type: application/json" and Content-Length (good libraries will do this for you)
 
