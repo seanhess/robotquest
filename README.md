@@ -1,6 +1,7 @@
 [viewer]: http://robotquest.tk/viewer/ "RobotQuest Viewer"
 [source]: http://github.com/seanhess/robotquest "RobotQuest Source"
 
+![RobotQuest Screenshot](https://raw.github.com/seanhess/robotquest/master/public/screen.png)
 
 What is RobotQuest?
 ===================

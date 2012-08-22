@@ -6,12 +6,12 @@ module.exports = {
   // servers to deploy to
   servers: {
     api: {
-      hosts: "root@184.106.251.159",
+      hosts: "root@robotquest.tk",
       start: "./Api",
       install: ""
     },
     ai: {
-      hosts: "root@184.106.251.159",
+      hosts: "root@robotquest.tk",
       start: "node_modules/.bin/coffee ai/app.coffee",
       install: "npm install"
     }
