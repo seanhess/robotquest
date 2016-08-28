@@ -1,16 +1,16 @@
-[viewer]: http://robotquest.tk/viewer/ "RobotQuest Viewer"
+[viewer]: http://github.com/seanhess/robotquest "RobotQuest Viewer"
 [source]: http://github.com/seanhess/robotquest "RobotQuest Source"
 
 RobotQuest
 ==========
 
-<a href="http://robotquest.tk/viewer/"><img src="https://raw.github.com/seanhess/robotquest/master/public/screen.png"></a>
+<a href="http://github.com/seanhess/robotquest "><img src="https://raw.github.com/seanhess/robotquest/master/public/screen.png"></a>
 
 RobotQuest is a MMO, programming game. Instead of playing RobotQuest directly, you write a program that plays it for you. Your program communicates with the [game server API](#api) over HTTP by sending and receiving JSON messages.
 
 All players share a single world
 
-[The Viewer][viewer] lets you watch the game being played live.
+~~[The Viewer][viewer] lets you watch the game being played live.~~
 
 [The Documentation](#documentation) will teach you how to connect to the game and control your minions.
 
